@@ -1,0 +1,76 @@
+#!/bin/bash
+if [ -e /tmp/proxy ];then
+    source /tmp/proxy
+fi
+if ! command -v git>/dev/null 2>&1;then
+    echo "git is not installed!">&2
+    exit 1
+fi
+SCRIPTDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPTDIR"
+
+if ! command -v vimdiff >/dev/null 2>&1;then
+    echo "Warning: Need vimdiff"
+fi
+
+gitconfig(){
+    git config --global user.email "$1"
+    git config --global user.name "$2"
+    git config --global http.postBuffer 524288000
+    git config --global push.default simple
+    #save password for several minutes
+    git config --global credential.helper cache
+    if command -v vimdiff >/dev/null 2>&1;then
+        git config --global merge.tool vimdiff
+    else
+        echo "No vimdiff, so merge.tool is empty"
+    fi
+    # git config --global alias.tree "log --oneline --graph --decorate --all"
+    git config --global alias.tree "log --pretty=format:\"%Cgreen%h %Cred%d %Cblue%s %x09%Creset[%cn %cd]\" --graph --date=iso"
+    git config --global alias.list "config --global --list"
+    if command -v nvim >/dev/null 2>&1;then
+        git config --global core.editor nvim
+    elif command -v vim >/dev/null 2>&1;then
+        git config --global core.editor vim
+    elif command -v vi >/dev/null 2>&1;then
+        git config --global core.editor vi
+    fi
+    if command -v vimdiff >/dev/null 2>&1;then
+        git config --global diff.tool vimdiff
+    fi
+
+    # read -p "Set git proxy(http[s].proxy to socks5://localhost:1080) ?[Y/n] " gitp
+    # if [[ "$gitp" != [nN] ]];then
+    #     # git config --global http.proxy "http://127.0.0.1:8118"
+    #     # git config --global https.proxy "http://127.0.0.1:8118"
+    #     echo "set git http.proxy to socks5://localhost:1080"
+    #     echo "set git https.proxy to socks5://localhost:1080"
+    #     git config --global http.proxy "socks5://localhost:1080"
+    #     git config --global https.proxy "socks5://localhost:1080"
+    # fi
+}
+
+read -p "git user.email: (default: sunliang711@163.com)"  email
+read -p "git user.name: (default: sunliang)"  name
+if [[ -z "$email" ]];then
+    email="sunliang711@163.com"
+fi
+if [[ -z "$name" ]];then
+    name="sunliang"
+fi
+
+export -f gitconfig
+#如果不是root权限执行的话,则是普通用户,那么就给执行脚本的用户配置git
+if [[ $EUID != 0 ]];then
+    gitconfig "$email" "$name"
+#如果是root权限,而且是通过sudo命令提升权限的,则执行者的用意肯定是
+#给他的非root账号配置git,因此需要切换到那个非root的账号
+elif [[ -n $SUDO_USER ]];then
+    su $SUDO_USER -c "/bin/bash -c gitconfig $email $name"
+else
+#如果是root权限并且不是通过sudo命令执行的,也就是说是在root账号状态下执行的
+#那么给当前用户(root)配置git
+    gitconfig "$email" "$name"
+fi
+
+# vim: set filetype=sh

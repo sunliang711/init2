@@ -1,0 +1,42 @@
+#!/bin/bash
+if [ -e /tmp/proxy ];then
+    source /tmp/proxy
+fi
+if ! command -v dnf > /dev/null 2>&1;then
+    echo "Error: Not fedora!"
+    exit 1
+fi
+if [[ $EUID != 0 ]];then
+    echo "Error: Need root priviledge!"
+    exit 1
+fi
+
+#change grub timeout to 1 second
+sed -i 's/\(^GRUB_TIMEOUT=\)[0-9]\+/\11/' /etc/default/grub && grub2-mkconfig -o /boot/grub2/grub.cfg
+
+
+#TODO
+#设置fedora国内源
+
+basicApps="vim neovim tree screenfetch pv"
+#install development tools
+devApps="kernel-devel clang python-devel python-pip python3-devel python3-pip cmake golang golang-godoc boost-devel ncurses-devel"
+read -p "Install development apps (ie: clang python golang boost)? [Y/n] "  installDev
+dnf update -y
+for app in ${basicApps};do
+    dnf install $app -y
+done
+
+if [[ "$installDev" != [nN] ]];then
+    dnf groupinstall "development tools" -y
+    for tool in ${devApps};do
+        dnf install $tool -y
+    done
+fi
+
+#parallels desktop
+read -p "Install parallels tools dependency?[y/N] "  pd
+if [[ "$pd" == [yY] ]];then
+    dnf install dkms -y
+    dnf install selinux-policy-devel -y
+fi

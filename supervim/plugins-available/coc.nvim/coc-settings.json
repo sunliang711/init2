@@ -1,0 +1,65 @@
+{
+    //Valid options: ["preview", "echo", "float"]
+    "coc.preferences.hoverTarget":"float",
+
+    // python
+    // install coc-python by :CocInstall coc-python first
+    // [https://www.npmjs.com/package/coc-python]
+    "python.jediEnabled":false,
+
+    "languageserver": {
+        //  coc.nvim supports json comments
+        //  Uncomment below to enable clangd as c/cpp language server
+        //  (use brew to install clangd)
+        "clangd": {
+            "command": "clangd",
+            "filetypes": [
+                "c",
+                "cpp",
+                "objc",
+                "objcpp"
+            ],
+            "rootPatterns": [
+                ".vim/",
+                "compile_flags.txt",
+                "compile_commands.json"
+            ]
+        },
+        "bash": {
+            "args": [
+                "start"
+            ],
+            "command": "bash-language-server",
+            "filetypes": [
+                "sh"
+            ],
+            "ignoredRootPaths": [
+                "~"
+            ]
+        },
+        "cmake": {
+            "command": "cmake-language-server",
+            "filetypes": [
+                "cmake"
+            ],
+            "initializationOptions": {
+                "buildDirectory": "build"
+            },
+            "rootPatterns": [
+                "build/"
+            ]
+        },
+        "golang": {
+            "command": "gopls",
+            "filetypes": [
+                "go"
+            ],
+            "rootPatterns": [
+                "go.mod",
+                ".vim/",
+                ".git/",
+                ".hg/"
+            ]
+        }
+    }
+}

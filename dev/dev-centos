@@ -1,0 +1,30 @@
+#!/bin/bash
+if [ -e /tmp/proxy ];then
+    source /tmp/proxy
+fi
+if ! command -v yum > /dev/null 2>&1;then
+    echo "Error: Not CentOS!"
+    exit 1
+fi
+
+if [[ $EUID != 0 ]];then
+    echo "Error: Need root priviledge!"
+    exit 1
+fi
+
+
+basicApps="net-tools vim tree wget zsh bc pv"
+#install development tools
+devApps="kernel-devel kernel-headers clang python-devel cmake golang boost-devel ncurses-devel"
+read -p "Install development apps (ie: clang python golang boost)? [Y/n] "  installDev
+yum update -y
+for app in ${basicApps};do
+    yum install $app -y
+done
+
+if [[ "$installDev" != [nN] ]];then
+    yum groupinstall "development tools" -y
+    for tool in ${devApps};do
+        yum install $tool -y
+    done
+fi

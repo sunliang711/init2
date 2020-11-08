@@ -1,0 +1,81 @@
+#!/bin/bash
+rpath="$(readlink ${BASH_SOURCE})"
+if [ -z "$rpath" ];then
+    rpath=${BASH_SOURCE}
+fi
+root="$(cd $(dirname $rpath) && pwd)"
+cd "$root"
+
+user="${SUDO_USER:-$(whoami)}"
+home="$(eval echo ~$user)"
+
+red=$(tput setaf 1)
+green=$(tput setaf 2)
+yellow=$(tput setaf 3)
+blue=$(tput setaf 4)
+cyan=$(tput setaf 5)
+reset=$(tput sgr0)
+runAsRoot(){
+    verbose=0
+    while getopts ":v" opt;do
+        case "$opt" in
+            v)
+                verbose=1
+                ;;
+            \?)
+                echo "Unknown option: \"$OPTARG\""
+                exit 1
+                ;;
+        esac
+    done
+    shift $((OPTIND-1))
+    cmd="$@"
+    if [ -z "$cmd" ];then
+        echo "${red}Need cmd${reset}"
+        exit 1
+    fi
+
+    if [ "$verbose" -eq 1 ];then
+        echo "run cmd:\"${red}$cmd${reset}\" as root."
+    fi
+
+    if (($EUID==0));then
+        sh -c "$cmd"
+    else
+        if ! command -v sudo >/dev/null 2>&1;then
+            echo "Need sudo cmd"
+            exit 1
+        fi
+        sudo sh -c "$cmd"
+    fi
+}
+
+if ! grep -q 'Ubuntu' /etc/issue;then
+    echo "Not ubuntu,quit"
+    exit 1
+fi
+version=$(lsb_release  -a 2>/dev/null|grep 'Codename'|awk '{print $2}')
+if [ -z "version" ];then
+    echo "Not Ubuntu ?? Cannot find codename in the output of 'lsb_release -a'"
+    exit 1
+fi
+
+tmpSource=/tmp/ubuntu-source
+ubuntuSource=/etc/apt/sources.list
+
+runAsRoot "mv ${ubuntuSource} ${ubuntuSource}.bak"
+
+cat>${tmpSource}<<EOF
+deb http://mirrors.163.com/ubuntu/ VERSION main restricted universe multiverse
+deb http://mirrors.163.com/ubuntu/ VERSION main restricted universe multiverse
+deb http://mirrors.163.com/ubuntu/ VERSION main restricted universe multiverse
+deb http://mirrors.163.com/ubuntu/ VERSION main restricted universe multiverse
+deb http://mirrors.163.com/ubuntu/ VERSION main restricted universe multiverse
+deb-src http://mirrors.163.com/ubuntu/ VERSION main restricted universe multiverse
+deb-src http://mirrors.163.com/ubuntu/ VERSION main restricted universe multiverse
+deb-src http://mirrors.163.com/ubuntu/ VERSION main restricted universe multiverse
+deb-src http://mirrors.163.com/ubuntu/ VERSION main restricted universe multiverse
+deb-src http://mirrors.163.com/ubuntu/ VERSION main restricted universe multiverse
+EOF
+
+runAsRoot "sed -e 's|VERSION|${version}|g' ${tmpSource} > ${ubuntuSource}"

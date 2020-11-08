@@ -1,0 +1,2 @@
+" BSD ctags not work,use 'brew install ctags on MacOS'
+Plug 'majutsushi/tagbar'

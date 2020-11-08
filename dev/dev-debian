@@ -1,0 +1,64 @@
+#!/bin/bash
+if [ -e /tmp/proxy ];then
+    source /tmp/proxy
+fi
+if ! command -v apt-get >/dev/null 2>&1;then
+    echo "Error: Not Debian!"
+    exit 1
+fi
+if [[ $EUID != 0 ]];then
+    echo "Error:need root priviledge!"
+    exit 1
+fi
+
+installer=apt-get
+
+#apt比apt-get更好用
+if command -v apt > /dev/null 2>&1;then
+    installer=apt
+fi
+
+basicApps="sudo bc vim vim-gtk tree curl screenfetch zsh openssh-server nload nethogs pv"
+devApps="build-essential cmake clang  python-apt python-dev python-pip python3-dev python3-pip libboost-all-dev golang golang-golang-x-tools ncurses-dev"
+
+#delete cdrom source
+cp /etc/apt/sources.list{,.bak}
+sed -ri '/deb cdrom/d' /etc/apt/sources.list
+
+echo "apt update..."
+$installer update -y >/dev/null 2>&1 || { echo "apt update failed!"; exit 1; }
+read -p "Install development tools (ie:clang python boost golang)? [y/N] "  installDev
+read -p "Setup swap? [Y/n]"  setupSwap
+# read -p "Whom to be add to sudo group?" -t 3 sudoer
+
+# #TODO check $sudoer existence. if $sudoer does not exist?
+# if [[ -n "$sudoer" ]];then
+#     adduser $sudoer sudo
+# fi
+
+for app in ${basicApps};do
+    echo "Install $app..."
+    $installer install $app -y >/dev/null 2>&1 || { echo "Install $app failed."; }
+done
+
+if [[ "$installDev" == [yY] ]];then
+    for app in ${devApps};do
+        echo "Install $app..."
+        $installer install $app -y >/dev/null 2>&1 || { echo "Install $app failed."; }
+    done
+fi
+
+
+if [[ "$setupSwap" != [nN] ]];then
+    SWAP=/var/swap.img
+    if [[ ! -e "$SWAP" ]];then
+        dd if=/dev/zero of="$SWAP" bs=1024k count=1000
+        chmod 0600 "$SWAP"
+        mkswap "$SWAP"
+        swapon "$SWAP"
+        echo "$SWAP none swap sw 0 0">>/etc/fstab
+    else
+        echo "Already exist swap file."
+    fi
+fi
+

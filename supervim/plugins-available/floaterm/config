@@ -1,0 +1,18 @@
+if has('nvim')
+    let g:floaterm_position = 'center'
+    let g:floaterm_width = 0.9
+    let g:floaterm_height = 0.8
+    let g:floaterm_wintype = 'floating'
+else
+    let g:floaterm_wintype = 'normal'
+endif
+
+"let g:floaterm_rootmarkers = ['.project', '.git', '.hg', '.svn', '.root', '.gitignore']
+
+inoremap <silent> <F7>  <Esc>:FloatermToggle<CR>
+nnoremap <silent> <F7>  :FloatermToggle<CR>
+tnoremap <silent> <F7>  <C-\><C-n>:FloatermToggle<CR>
+
+"inoremap <silent> <c-l>7  <Esc>:FloatermToggle<CR>
+"nnoremap <silent> <c-l>7  :FloatermToggle<CR>
+"tnoremap <silent> <c-l>7  <C-\><C-n>:FloatermToggle<CR>

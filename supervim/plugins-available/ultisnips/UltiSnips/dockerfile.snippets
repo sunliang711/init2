@@ -1,0 +1,17 @@
+snippet	multi "multi stage build" b
+FROM golang:alpine as builder
+COPY . /tmp/recharge
+ENV GO111MODULE=on
+ENV GOPROXY="https://goproxy.cn"
+RUN cd /tmp/recharge/cmd/recharge &&  go build -o recharge main.go
+
+FROM alpine
+WORKDIR /usr/local/bin
+
+COPY --from=builder /tmp/recharge/cmd/recharge/config-test.toml /usr/local/bin/
+COPY --from=builder /tmp/recharge/cmd/recharge/config-pre.toml /usr/local/bin/
+COPY --from=builder /tmp/recharge/cmd/recharge/config-prd.toml /usr/local/bin/
+COPY --from=builder /tmp/recharge/cmd/recharge/recharge /usr/local/bin/
+
+ENTRYPOINT ["/usr/local/bin/recharge"]
+endsnippet

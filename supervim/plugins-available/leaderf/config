@@ -1,0 +1,41 @@
+let g:Lf_ShowDevIcons = 1
+
+" let g:Lf_WindowPosition = 'popup'
+" use <Ctrl>P to preview
+let g:Lf_PreviewInPopup = 1
+let g:Lf_StlSeparator = { 'left': "\ue0b0", 'right': "\ue0b2", 'font': "DejaVu Sans Mono for Powerline" }
+let g:Lf_PreviewResult = {'Function':0, 'BufTag':0}
+
+" file
+let g:Lf_ShortcutF = "<space>f"
+let g:Lf_ShortcutB = "<space>b"
+nnoremap <space>m :Leaderf mru<CR>
+
+" 使用rg(ripgrep)来搜索(search)
+nnoremap <space>sr :Leaderf rg<CR>
+" 当跳转到一条搜索结果后，继续跳到下一条的结果
+nnoremap <space>sn :Leaderf rg --next<CR>
+" 当跳转到一条搜索结果后，继续跳到上一条的结果
+nnoremap <space>sp :Leaderf rg --previous<CR>
+" cword表示光标处的单词，只有rg命令才有实际意义；file，buffer的话很少需要
+nnoremap <space>sc :Leaderf --cword rg<CR>
+
+nnoremap <space>g :Leaderf gtags<CR>
+
+nnoremap <space>c :Leaderf command<CR>
+nnoremap <space>h :Leaderf cmdHistory<CR>
+nnoremap <space>w :Leaderf window<CR>
+
+
+" 查找项目根目录
+let g:Lf_RootMarkers = ['.project', '.root', '.svn', '.git']
+let g:Lf_WorkingDirectoryMode = 'Ac'
+let g:Lf_WindowHeight = 0.30
+if has('nvim')
+    let g:Lf_CacheDirectory = expand('~/.config/.nvim/cache')
+else
+    let g:Lf_CacheDirectory = expand('~/.vim/cache')
+endif
+let g:Lf_ShowRelativePath = 0
+let g:Lf_HideHelp = 1
+let g:Lf_StlColorscheme = 'powerline'

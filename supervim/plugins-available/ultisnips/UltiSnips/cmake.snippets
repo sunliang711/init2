@@ -1,0 +1,107 @@
+snippet cmake "cmake template" b
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+PROJECT(${1:projectName})
+SET(SRC ${2:main.c})
+
+SET(CMAKE_EXPORT_COMPILE_COMMANDS on)
+
+SET(CMAKE_C_FLAGS "\${CMAKE_C_FLAGS}")
+# OR
+# SET(CMAKE_CXX_FLAGS "\${CMAKE_CXX_FLAGS}")
+
+# SET(INCLUDE_DIRS "/PATH/TO/INCLUDE/DIRS")
+# INCLUDE_DIRECTORIES(\${INCLUDE_DIRS})
+
+FUNCTION(add_executable target_name)
+# call builtin add_executable first
+	_add_executable(\${target_name} \${ARGN})
+# add custom statement
+	EXECUTE_PROCESS(COMMAND ln -sf \${PROJECT_BINARY_DIR}/compile_commands.json \${PROJECT_SOURCE_DIR})
+ENDFUNCTION(add_executable target_name)
+
+ADD_EXECUTABLE(\${PROJECT_NAME} \${SRC})
+
+# SET(LIBS "libname")
+# target_link_libraries(\${PROJECT_NAME} \${LIBS})
+
+endsnippet
+
+snippet cmakellvm "cmake with llvm" b
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+project(${1:projectName})
+
+SET(SRC ${2:main.cpp})
+
+SET(CMAKE_EXPORT_COMPILE_COMMANDS on)
+
+# SET(INCLUDE_DIRS "/PATH/TO/INCLUDE/DIRS")
+# INCLUDE_DIRECTORIES(\${INCLUDE_DIRS})
+
+# SET(LLVM_DIR ~/Workspace/llvm3.5-source/llvm-3.5.0.src/install/share/llvm/cmake)
+# OR
+# SET(CMAKE_PREFIX_PATH ~/Workspace/llvm3.5-source/llvm-3.5.0.src/install)
+# OR
+find_package(LLVM 3.5 REQUIRED
+	PATHS ~/Workspace/llvm3.5-source/llvm-3.5.0.src/install
+)
+
+message(STATUS "Found LLVM \${LLVM_PACKAGE_VERSION}")
+message(STATUS "Using LLVMConfig.cmake in: \${LLVM_DIR}")
+message(STATUS "LLVM_INCLUDE_DIRS: \${LLVM_INCLUDE_DIRS}")
+message(STATUS "LLVM_DEFINITIONS: \${LLVM_DEFINITIONS}")
+
+set(CMAKE_CXX_FLAGS "\${CMAKE_CXX_FLAGS} -fno-rtti")
+
+include_directories(\${LLVM_INCLUDE_DIRS})
+add_definitions(\${LLVM_DEFINITIONS})
+
+FUNCTION(add_executable target_name)
+# call builtin add_executable first
+	_add_executable(\${target_name} \${ARGN})
+# add custom statement
+EXECUTE_PROCESS(COMMAND ln -sf \${PROJECT_BINARY_DIR}/compile_commands.json \${PROJECT_SOURCE_DIR})
+ENDFUNCTION(add_executable target_name)
+
+ADD_EXECUTABLE(\${PROJECT_NAME} \${SRC})
+
+llvm_map_components_to_libnames(llvm_libs bitreader support core)
+
+message(STATUS "llvm_libs: \${llvm_libs}")
+
+target_link_libraries(\${PROJECT_NAME} \${llvm_libs})
+
+endsnippet
+
+snippet cmakeglib "cmake with glib" b
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+project(${1:projectName})
+
+SET(SRC ${2:main.c})
+
+find_package(PkgConfig REQUIRED)
+pkg_search_module(GLIB REQUIRED glib-2.0)
+
+SET(CMAKE_EXPORT_COMPILE_COMMANDS on)
+
+FUNCTION(add_executable target_name)
+# call builtin add_executable firsT
+	_add_executable(\${target_name} \${ARGN})
+# add custom statement
+	EXECUTE_PROCESS(COMMAND ln -sf \${PROJECT_BINARY_DIR}/compile_commands.json \${PROJECT_SOURCE_DIR})
+ENDFUNCTION(add_executable target_name)
+
+# SET(INCLUDE_DIRS "/PATH/TO/INCLUDE/DIRS")
+# INCLUDE_DIRECTORIES(\${INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(\${GLIB_INCLUDE_DIRS})
+
+MESSAGE(STATUS "GLIB_INCLUDE_DIRS: \${GLIB_INCLUDE_DIRS}")
+MESSAGE(STATUS "GLIB_LIBRARY_DIRS: \${GLIB_LIBRARY_DIRS}")
+
+LINK_DIRECTORIES(\${GLIB_LIBRARY_DIRS})
+
+ADD_EXECUTABLE(\${PROJECT_NAME} \${SRC})
+
+ADD_DEFINITIONS(\${GLIB_CFLAGS_OTHER})
+TARGET_LINK_LIBRARIES(\${PROJECT_NAME} \${GLIB_LIBRARIES})
+
+endsnippet

@@ -1,0 +1,17 @@
+let g:go_highlight_functions = 1
+let g:go_highlight_methods = 1
+let g:go_highlight_fields = 1
+let g:go_highlight_types = 1
+let g:go_highlight_operators = 1
+let g:go_highlight_build_constraints = 1
+let g:go_def_mode = 'gopls'
+let g:go_info_mode = 'gopls'
+let g:go_fmt_command = "goimports"
+
+"disable K to show doc, K is used by coc for doc-show
+let g:go_doc_keywordprg_enabled = 0
+"disable gd to map :GoDef, gd is used by coc for go to define
+let g:go_def_mapping_enabled = 0
+
+" disable popup window,use preview window
+let g:go_doc_popup_window = 0

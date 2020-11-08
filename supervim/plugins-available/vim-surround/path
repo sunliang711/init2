@@ -1,0 +1,7 @@
+"快速给词加环绕符号,例如单引号 双引号括号
+"常用命令
+"替换命令: cs<old-char><new-char>  cst<new-char>  t表示html标签(tag)
+"删除命令: ds<deleted-char>
+"添加命令: csw<new-char>    w表示write
+"添加整行: yss<new-char>
+Plug 'tpope/vim-surround'

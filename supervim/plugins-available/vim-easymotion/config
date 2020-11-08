@@ -1,0 +1,2 @@
+" no config
+map <leader>em <Plug>(easymotion-s2)

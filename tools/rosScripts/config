@@ -1,0 +1,31 @@
+
+subnet=10.1.1.0/24
+bridge=br-lan
+wan=pppoe-out1
+dynWanTag=dynWanDNAT
+hairpinTag=HairpinNAT
+
+
+
+# format
+# "protocol|dstPort|toAddresses|toPorts|comment"
+# toPorts可以省略，这时候会取dstPort的值
+# "tcp|26| 10.1.1.22|  22 |mjr ssh"
+
+mappings=(
+"tcp|26|10.1.1.26|22|mjr ssh"
+"tcp|137|10.1.1.137|22|d10-server ssh"
+"tcp|1281-1282|10.1.1.112||lede socks5 http"
+"tcp|2281|10.1.1.110|1281|router110 socks5"
+"tcp|8000-8030|10.1.1.137||tcp socks http ss"
+"udp|8000-8030|10.1.1.137||udp socks http ss"
+"udp|500,4500,1701|10.1.1.137||ikev2 or l2tp vpn"
+"tcp|6001|10.1.1.241|5001|dsm web"
+"tcp|9091|10.1.1.241|9091|dsm transmission"
+"tcp|2000|10.1.1.241|22|dsm ssh"
+"tcp|32400|10.1.1.100|32400|pve plex server"
+"tcp|9006|10.1.1.100|8006|pve web controller"
+"tcp|3389|10.1.1.21||win10 remote desktop"
+"tcp|27017|10.1.1.26||mongo db"
+)
+

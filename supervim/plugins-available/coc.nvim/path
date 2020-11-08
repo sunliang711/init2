@@ -1,0 +1,5 @@
+"Coc Conquer of Completion
+" need install yarn on your OS
+" Plug 'neoclide/coc.nvim', {'do': 'yarn install --frozen-lockfile'}
+" Plug 'neoclide/coc.nvim', {'do': { -> coc#util#install() }}
+Plug 'neoclide/coc.nvim', {'branch':'release'}

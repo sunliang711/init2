@@ -1,0 +1,2 @@
+"给其他插件比如ctrlp nerdtree startify增加图标
+Plug 'ryanoasis/vim-devicons'

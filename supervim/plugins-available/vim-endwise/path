@@ -1,0 +1,2 @@
+"自动添加结尾 比如有些语言输入if，会自动添加endif
+Plug 'tpope/vim-endwise'

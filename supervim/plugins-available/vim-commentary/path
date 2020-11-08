@@ -1,0 +1,3 @@
+"注释插件
+"快捷键gc（visual模式下）gcc(Normal 模式下)
+Plug 'tpope/vim-commentary'

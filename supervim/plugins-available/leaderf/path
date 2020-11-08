@@ -1,0 +1,2 @@
+Plug 'Yggdroot/LeaderF' , { 'do': './install.sh' }
+Plug 'Yggdroot/LeaderF-marks'

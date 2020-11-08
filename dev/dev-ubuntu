@@ -1,0 +1,60 @@
+#!/bin/bash
+if [ -e /tmp/proxy ];then
+    source /tmp/proxy
+fi
+if ! command -v apt-get >/dev/null 2>&1;then
+    echo "Error: Not ubuntu!"
+    exit 1
+fi
+rpath="$(readlink ${BASH_SOURCE})"
+if [ -z "$rpath" ];then
+    rpath=${BASH_SOURCE}
+fi
+root="$(cd $(dirname $rpath) && pwd)"
+cd "$root"
+
+if [[ $EUID != 0 ]];then
+    echo "Error:need root priviledge!"
+    exit 1
+fi
+
+#设置ubuntu国内源
+if grep -i 'ubuntu' /etc/issue >/dev/null 2>&1;then
+    read -p "Use Chinese software source ? [y/N] "  soft
+    if [[ "$soft" == [yY] ]];then
+        bash ./ubuntu-china-source
+    fi
+fi
+
+installer=apt-get
+
+#apt比apt-get更好用
+if command -v apt > /dev/null 2>&1;then
+    installer=apt
+fi
+
+basicApps="vim vim-gtk neovim tree curl screenfetch zsh nload nethogs pv"
+devApps="linux-headers-generic build-essential cmake clang  python-apt python-dev python-pip python3-dev python3-pip libboost-all-dev golang golang-golang-x-tools ncurses-dev"
+inputApps="fcitx fcitx-sunpinyin fcitx-table-wubi"
+
+echo "apt update..."
+$installer update -y >/dev/null 2>&1 || { echo "apt update failed."; exit 1; }
+read -p "Install development tools (ie:clang python golang)? [Y/n] "  installDev
+read -p "Install fcitx input method? [y/N] "  installFcitx
+for app in ${basicApps};do
+    echo "Install $app..."
+    $installer install $app -y >/dev/null 2>&1 || { echo "Install $app failed."; }
+done
+
+if [[ "$installDev" != [nN] ]];then
+    for app in ${devApps};do
+        echo "Install $app..."
+        $installer install $app -y >/dev/null 2>&1 || { echo "Install $app failed."; }
+    done
+fi
+
+if [[ "$installFcitx" == [yY] ]];then
+    for tool in ${inputApps};do
+        $installer install $tool -y
+    done
+fi

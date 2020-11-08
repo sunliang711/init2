@@ -1,0 +1,23 @@
+[Unit]
+Description=docker daemon
+#After=network.target
+
+[Service]
+#Type=forking
+#PIDFile=
+#ExecStart=
+#ExecStop=
+
+#Type=oneshot
+#RemainAfterExit=yes
+#ExecStart=
+#ExecStop=
+
+Type=simple
+ExecStart=/usr/local/bin/dockerd
+ExecStop=
+
+#Restart=on-failure
+#Environment=
+[Install]
+WantedBy=multi-user.target

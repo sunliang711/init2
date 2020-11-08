@@ -1,0 +1,2 @@
+nnoremap <silent> <F9> :PreviousColorScheme<CR>
+nnoremap <silent> <F10> :NextColorScheme<CR>

@@ -1,0 +1,1630 @@
+function Source(){
+    file="${1}"
+    [ -e "$file" ] && source "$file"
+}
+
+function functions(){
+    functionFile=$SHELLRC_ROOT/shellrc.d/function
+    if [ ! -f $functionFile ];then
+        echo "No file $functionFile"
+        return 1
+    fi
+    echo "Custom functions:"
+    output=$(perl -ne 'print "$2\n" if/^\s*(function)\s*(\w+)\s*\(\s*\)/' $functionFile)
+    echo ${green}$output${reset}
+}
+
+function sm(){
+    if echo "${SHELL}" | grep -q zsh;then
+        echo "source ${HOME}/.zshrc"
+        source "${HOME}"/.zshrc
+    elif echo "${SHELL}" | grep -q bash;then
+        echo "source ${HOME}/.bashrc"
+        source "$HOME/.bashrc"
+    else
+        echo "Unknow shell type"
+    fi
+}
+
+function append_path(){
+    save=0
+    while getopts ":hs" opt;do
+        case $opt in
+            h)
+                echo "Usage: $0 [-h|-s] <path>  -s means to save"
+                return 1
+                ;;
+            s)
+                save=1
+                ;;
+            :)
+                echo "missing arg for option: \"$OPTARG\""
+                return 1
+                ;;
+            \?)
+                echo "Valid option \"$OPTARG\""
+                return 1
+                ;;
+
+        esac
+    done
+    shift $(($OPTIND-1))
+    if [ -z "$1" ];then
+        echo "Missing path to add."
+        return 1
+    fi
+    if ! echo -e ${PATH//:/"\n"} | grep -c "^$1$" >/dev/null 2>&1;then
+        export PATH=$PATH:$1
+        if (($save==1));then
+            (sed -n -e '1,/#END custom PATH/{
+            /#END custom PATH/!p
+        }' $SHELLRC_ROOT/shellrc.d/env;echo "append_path $1";sed -n -e '/#END custom PATH/,$p' $SHELLRC_ROOT/shellrc.d/env) >/tmp/tmpenv
+            mv /tmp/tmpenv $SHELLRC_ROOT/shellrc.d/env
+        fi
+    fi
+}
+
+function insert_path(){
+    if [ -z "$1" ];then
+        return
+    fi
+    echo -e ${PATH//:/"\n"} | grep -c "^$1$" >/dev/null 2>&1 || export PATH=$1:$PATH
+}
+#BEGIN function
+if command -v git >/dev/null 2>&1;then
+    function ghclone(){
+        p=${1:?"Usage: ghclone githubAccount/xx.git [newDir]"}
+        if (($#>1));then
+            newname=${2}
+            git clone "https://github.com/$p" "$newname"
+        else
+            git clone "https://github.com/$p"
+        fi
+    }
+    function gcclone(){
+        p=${1:?"Usage: gcclone coding.netAccount/xx.git [newDir]"}
+        if (($#>1));then
+            newname=${2}
+            git clone "https://git.coding.net/$p" "$newname"
+        else
+            git clone "https://git.coding.net/$p"
+        fi
+    }
+    function geclone(){
+        p=${1:?"Usage: geclone giteeAccount/xx.git [newDir]"}
+        if (($#>1));then
+            newname=${2}
+            git clone "https://gitee.com/$p" "$newname"
+        else
+            git clone "https://gitee.com/$p"
+        fi
+    }
+    #gpon(){
+    #    #add default parameter
+    #    local proxy=${1:-http://localhost:6119}
+    #    # local proxy=${1:-socks5://localhost:1080}
+
+    #    git config --global http.proxy $proxy
+    #    git config --global https.proxy $proxy
+
+    #    proxyon
+    #    gpstatus
+    #}
+    #gpoff(){
+    #    #git proxy off function
+    #    git config --global --unset-all http.proxy
+    #    git config --global --unset-all https.proxy
+    #}
+    #gpstatus(){
+    #    out=$(git config --global -l | grep 'https\?\.proxy')
+    #    if [[ -n "$out" ]];then
+    #        echo "$out"
+    #    else
+    #        echo "[git] proxy is off."
+    #    fi
+    #    # if git config --global -l | grep http.proxy >/dev/null 2>&1;then
+    #    #     echo "git proxy is on"
+    #    #     git config --global -l | \grep proxy
+    #    # else
+    #    #     echo "git proxy is off"
+    #    # fi
+    #}
+fi
+
+function echoExec(){
+    cmd=${1:?"missing cmd"}
+    echo "$cmd ..."
+    eval "$cmd"
+}
+
+function slientExe(){
+    eval "$@" >/dev/null 2>&1
+}
+
+
+# function proxyon(){
+#     proxyon_
+#     destFile="$HOME/.shellrc.d/local"
+#     if ! grep -q 'proxyon_\|proxyoff_' $destFile;then
+#         echo 'proxyoff_' >> $destFile
+#     fi
+#     sed -i.bak -e 's|proxyoff_|proxyon_|' "$destFile"
+#     rm "${destFile}.bak"
+# }
+
+function currentNetworkService(){
+    if [ "$(uname)" != "Darwin" ];then
+        echo "Only support MacOS"
+        return 1
+    fi
+    while read -r line; do
+        sname=$(echo "$line" | awk -F  "(, )|(: )|[)]" '{print $2}')
+        sdev=$(echo "$line" | awk -F  "(, )|(: )|[)]" '{print $4}')
+        #echo "Current service: $sname, $sdev, $currentservice"
+        if [ -n "$sdev" ]; then
+            ifout="$(ifconfig "$sdev" 2>/dev/null)"
+            echo "$ifout" | grep 'status: active' > /dev/null 2>&1
+            rc="$?"
+            if [ "$rc" -eq 0 ]; then
+                currentservice="$sname"
+                currentdevice="$sdev"
+                currentmac=$(echo "$ifout" | awk '/ether/{print $2}')
+
+                # may have multiple active devices, so echo it here
+                echo "$currentservice, $currentdevice, $currentmac"
+            fi
+        fi
+    done <<< "$(networksetup -listnetworkserviceorder | grep 'Hardware Port')"
+
+    if [ -z "$currentservice" ]; then
+        # >&2 echo "Could not find current service"
+        return 1
+    fi
+}
+
+macproxy(){
+    echo "TODO"
+}
+
+npmproxyon(){
+    npm config set registry http://registry.npm.taobao.org
+}
+
+npmproxyoff(){
+    npm config delete registry
+}
+
+aptproxyon(){
+    if ! command -v apt >/dev/null 2>&1;then
+        echo "No apt command found"
+        return 1
+    fi
+
+    local host=localhost
+
+    while getopts ":h:" opt;do
+        case $opt in
+            h)
+                host=$OPTARG
+                ;;
+            :)
+                echo "Option '$OPTARG' missing arg"
+                return 1
+                ;;
+            \?)
+                echo "Unkown option '$OPTARG'"
+                return 2
+                ;;
+        esac
+    done
+    shift $(($OPTIND-1))
+    local port=${1:-8000}
+
+    local proxy="http://$host:$port"
+
+    local proxyFile=/etc/apt/apt.conf.d/httpProxy
+    echo "use proxy: $proxy"
+    cat>/tmp/httpProxy<<EOF
+Acquire::http::proxy "$proxy";
+Acquire::https::proxy "$proxy";
+EOF
+    sudo mv /tmp/httpProxy $proxyFile
+}
+
+aptproxyoff(){
+    if ! command -v apt >/dev/null 2>&1;then
+        echo "No apt command found"
+        return 1
+    fi
+    local proxyFile=/etc/apt/apt.conf.d/httpProxy
+    sudo /bin/rm -rf ${proxyFile}
+
+}
+
+proxyon2(){
+    local defaultProxy="http://localhost:6119"
+    local proxy=${1}
+    if [ -z "${proxy}" ];then
+        case $(uname) in
+            Darwin)
+                local networkService=`currentNetworkService`
+                if [ -n "$networkService" ];then
+                    local ns=$(echo $networkService | awk -F, '{print $1}')
+                    if [ -n "$ns" ];then
+                        local webproxy=$(networksetup -getwebproxy $ns)
+                        if echo $webproxy | grep ^Enabled | grep -q 'Yes';then
+                            host=`echo $webproxy | grep ^Server | perl -ne 'print $1 if /Server:\s*(.+)/'`
+                            port=`echo $webproxy | grep ^Port | perl -ne 'print $1 if /Port:\s*(.+)/'`
+                            proxy="http://$host:$port"
+                            # echo "proxy: $proxy"
+                        fi
+                    fi
+                fi
+                ;;
+            Linux)
+                ;;
+        esac
+    fi
+
+    if [ -z "${proxy}" ];then
+        proxy=${defaultProxy}
+    fi
+
+    echoExec "export http_proxy=$proxy"
+    echoExec "export https_proxy=$proxy"
+    echoExec "export ftp_proxy=$proxy"
+    echoExec "export all_proxy=$proxy"
+    echoExec "export HTTP_PROXY=$proxy"
+    echoExec "export HTTPS_PROXY=$proxy"
+    echoExec "export FTP_PROXY=$proxy"
+    echoExec "export ALL_PROXY=$proxy"
+
+    #set git proxy
+    if command -v git >/dev/null 2>&1;then
+        echoExec "git config --global http.proxy $proxy"
+        echoExec "git config --global https.proxy $proxy"
+    fi
+
+    if command -v npm >/dev/null 2>&1;then
+        echo "npm config set registry http://registry.npm.taobao.org"
+        npm config set registry http://registry.npm.taobao.org
+    fi
+}
+
+function proxyon_(){
+    # 在mac下，如果不指定参数，并且有设置mac系统代理的脚本存在
+    # 则查看当前mac系统的代理，用它作为参数来设置其他的代理
+    if [ $# -eq 0 ] && [ "$(uname)" = "Darwin" ];then
+        if command -v setMacProxy >/dev/null 2>&1;then
+            systemProxy="$(setMacProxy list  | grep -i 'Http[[:space:]]*proxy' | awk '{print $5}' | perl -lne 'print $1 if /(\w+:\d+)/')"
+            if [ -n "$systemProxy" ];then
+                if echo "$systemProxy" | grep -q '^http://';then
+                    systemProxy=${systemProxy:7}
+                    echo "Found system proxy: ${systemProxy}"
+                fi
+            fi
+        fi
+    fi
+    local host=localhost
+
+    while getopts ":h:" opt;do
+        case $opt in
+            h)
+                host=$OPTARG
+                ;;
+            :)
+                echo "Option '$OPTARG' missing arg"
+                return 1
+                ;;
+            \?)
+                echo "Unkown option '$OPTARG'"
+                return 2
+                ;;
+        esac
+    done
+    shift $(($OPTIND-1))
+    local port=${1:-6119}
+
+    # local proxy=http://$host:$port
+    if [ -n "${systemProxy}" ];then
+        echo "use system proxy: ${systemProxy}"
+        local proxy=${systemProxy}
+    else
+        echo "use host:$host (-h to specify) port: $port (first parameter) as proxy"
+        local proxy="http://${host}:${port}"
+    fi
+
+    echo "set http_proxy https_proxy ftp_proxy all_proxy to $proxy"
+    export http_proxy=$proxy
+    export https_proxy=$proxy
+    export ftp_proxy=$proxy
+    export all_proxy=$proxy
+    export HTTP_PROXY=$proxy
+    export HTTPS_PROXY=$proxy
+    export FTP_PROXY=$proxy
+    export ALL_PROXY=$proxy
+
+    echo "set git proxy to $proxy"
+    # set git proxy
+    if command -v git >/dev/null 2>&1;then
+        git config --global http.proxy $proxy
+        git config --global https.proxy $proxy
+    fi
+
+    if command -v pip >/dev/null 2>&1;then
+        echo "alias pip=\"pip --proxy $proxy\""
+        alias pip="pip --proxy $proxy"
+    fi
+    if command -v pip3 >/dev/null 2>&1;then
+        echo "alias pip3=\"pip3 --proxy $proxy\""
+        alias pip3="pip3 --proxy $proxy"
+    fi
+    if command -v npm >/dev/null 2>&1;then
+        echo "set npm registry to http://registry.npm.taobao.org"
+        npm config set registry http://registry.npm.taobao.org
+    fi
+
+}
+
+# function proxyoff(){
+#     proxyoff_
+#     destFile="$HOME/.shellrc.d/local"
+#     if ! grep -q 'proxyon_\|proxyoff_' $destFile;then
+#         echo 'proxyoff_' >> $destFile
+#     fi
+#     sed -i.bak -e 's|proxyon_|proxyoff_|' "$destFile"
+#     rm "${destFile}.bak"
+# }
+
+function proxyoff_(){
+    echoExec "unset http_proxy"
+    echoExec "unset https_proxy"
+    echoExec "unset ftp_proxy"
+    echoExec "unset HTTP_PROXY"
+    echoExec "unset HTTPS_PROXY"
+    echoExec "unset FTP_PROXY"
+    echoExec "unset all_proxy"
+    echoExec "unset ALL_PROXY"
+
+    if command -v git >/dev/null 2>&1;then
+        echoExec "git config --global --unset-all http.proxy"
+        echoExec "git config --global --unset-all https.proxy"
+    fi
+    echoExec "unalias brew" 2>/dev/null
+    echoExec "unalias curl" 2>/dev/null
+    echoExec "unalias pip" 2>/dev/null
+    echoExec "unalias pip3" 2>/dev/null
+    # local configFile="/tmp/curlrc"
+    # rm -rf "$configFile" 2>/dev/null
+    if command -v npm >/dev/null 2>&1;then
+        npm config delete registry
+    fi
+}
+
+proxystatus(){
+    # if declare -x | grep 'http_proxy="\{,1\}127.0.0.1:6119' >/dev/null 2>&1;then
+    if declare -x | grep '_proxy=' >/dev/null 2>&1;then
+        echo "http proxy is set:"
+        #declare -x |grep 6119
+        declare -x |grep -i '_proxy'
+    else
+        echo "[http] proxy is off"
+    fi
+    out=$(git config --global -l | grep 'https\?\.proxy')
+    if [[ -n "$out" ]];then
+        echo
+        echo "git proxy setting:"
+        git config --global -l | grep 'https\?\.proxy'
+        # echo "$out"
+    else
+        echo "[git] proxy is off."
+    fi
+    alias | grep curl
+    alias | grep brew
+}
+
+#创建目录并进入该目录
+function mkcddir(){
+    if (($#!=1));then
+        echo "Usage: mkcddir new_dir_name_here"
+        return 1
+    fi
+    if [ -e "$1" ];then
+        echo "$1 already exists"
+        return 1
+    fi
+    mkdir -p "$1" && cd $_
+}
+
+rm(){
+    local pre=/tmp/recycle
+    if [ ! -d "${pre}" ];then
+        mkdir -p "${pre}"
+    fi
+    local timestamp="$(date +%Y-%m-%d_%H-%M-%S)"
+    for f in "$@";do
+        # local fullpath="$(realpath -s $f)"
+        local fullpath="$(echo $(cd $(dirname $f); pwd)/$(basename $f))"
+        local newpath="${pre}/${fullpath//\//#}-${timestamp}"
+        echo "mv ${f} to ${newpath}"
+        mv "${f}" "${newpath}"
+    done
+
+}
+
+#TODO
+restore(){
+    echo "TODO: revert rm()"
+}
+
+codePath="/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code"
+if [ -e "$codePath" ];then
+    function code(){
+        "$codePath" "$@"
+    }
+fi
+
+function extract ()
+{
+    name=$1;
+    if [ -z "$name"  ]; then
+        return 1;
+    fi;
+    if file "$name" | grep -qE '(compressed data|tar archive)'; then
+        tar xvf "$name";
+    elif file "$name" | grep -qE '(Zip archive data)';then
+        unzip "$name"
+    fi
+}
+
+function myip_(){
+    #-h: host(include scheme:http socks5...) 
+    #-p port
+    #-t timeout
+    host=socks5://localhost
+    port=1080
+    timeout=3
+    while getopts ":h:p:t:" opt;do
+        case $opt in
+            h)
+                host=$OPTARG
+                ;;
+            p)
+                port=$OPTARG
+                ;;
+            t)
+                timeout=$OPTARG
+                ;;
+            :)
+                echo "missing arg for option: \"$OPTARG\""
+                return 1
+                ;;
+            \?)
+                echo "Valid option -h <host> -p <port> -t <timeout>"
+                return 1
+                ;;
+
+        esac
+    done
+    sources=(ipinfo.io cip.cc myip.ipip.net ifconfig.me)
+    for i in "${sources[@]}";do
+        curl -x "$host:$port" --max-time $timeout "$i"
+    done
+}
+
+# 检测出当前系统的版本，形如ubuntu-16.10,archlinux,fedora-23,centos-6.8,debian-8,macos
+function currentOS(){
+    local currentos=
+    case "$(uname)" in
+        "Linux")
+            #pacman -> archlinux
+            if command -v pacman >/dev/null 2>&1;then
+                currentos="archlinux-$(uname -r)"
+
+            #apt-get -> debian or ubuntu
+            elif command -v apt-get >/dev/null 2>&1;then
+                #get version info from lsb_release -a
+                #lsb_release -a命令会有个错误输出No LSB modules are available.把这个丢弃使用 2>/dev/null
+                lsb=$(lsb_release -a 2>/dev/null)
+                distributor=$(echo "$lsb" | grep 'Distributor ID' | grep -oP ':.*' | grep -oP '\w+')
+                if [[ "$distributor" == "Ubuntu" ]];then
+                    currentos=$(echo "$lsb" | grep "Description" | awk -F: '{print $2}' | awk '{print $1"-"$2}')
+                elif [[ "$distributor" == "Debian" ]];then
+                    release=$(echo "$lsb" | grep 'Release' | grep -oP ':.*' | grep -oP '\d.+')
+                    currentos="$distributor-$release"
+                else
+                    currentos="error(not ubuntu or debian)"
+                fi
+            #yum -> centos or fedora
+            elif command -v yum >/dev/null 2>&1;then
+                info=$(cat /etc/redhat-release)
+                os=$(echo $info | awk '{print $1}')
+                release=$(echo $info | grep -oP '(?<=release )\d[^ \t]+')
+                currentos="$os-$release"
+            else
+                currentos="unknown"
+            fi
+            ;;
+        "Darwin")
+            release=$(sw_vers -productVersion)
+            currentos="macos-$release"
+            ;;
+        *)
+            currentos="unknown"
+            ;;
+    esac
+    echo "$currentos" | tr A-Z a-z
+}
+
+function www(){
+    if [ "$1" = "-h" ];then
+        echo "usage: $0 [port,default 8000]"
+        return
+    fi
+    if [ -z "$1" ];then
+        echo "Not specify port,use default: 8000"
+        python -m SimpleHTTPServer
+    else
+        echo "Use sepcify port: $1"
+        python -m SimpleHTTPServer "$1"
+    fi
+}
+
+function speed(){
+    if [ "$1" = "-h" ];then
+        echo "usage: $0 [-s,for silent]"
+        return
+    fi
+    #speedtest-cli 可以用brew install speedtest-cli安装(MAC OS下，linux还没测试)
+    #3633表示上海电信服务器，可以通过speedtest-cli --list获取
+    #speedtest-cli --list | grep -i shanghai
+    if [ "$1" = "-s" ];then
+        speedtest-cli --server 3633 --simple
+    else
+        speedtest-cli --server 3633
+    fi
+}
+# bk(){
+#     if (($# !=1));then
+#         echo "Usage: bk The_exist_file_or_directory" 1>&2
+#         return 1
+#     fi
+#     if [ ! -e "$f" ];then
+#         echo "$f does not exist!"
+#         return 2
+#     fi
+#     cp -n "$1" "$1.bak"
+# }
+
+#rotate backup
+function bk(){
+    if (($# < 1));then
+        echo "Usage: bk the_existing_file_or_directory [optional_max_number]"
+        return 1
+    fi
+    local file="$1"
+    local maxNo="${2:-7}"
+    if [ ! -e "$file" ];then
+        echo "$file" does not exist!
+        return 2
+    fi
+    if ! echo "$maxNo" | grep '^[0-9]\+$' >/dev/null 2>&1;then
+        echo "optional_max_number must be number!"
+        return 3
+    fi
+    if (($maxNo<1));then
+        echo "optional_max_number must >= 1"
+        return 4
+    fi
+
+    rm -vf "${file}.${maxNo}" 2>/dev/null
+    ((maxNo--))
+    for i in $(seq "$maxNo" -1 1);do
+        ((j=i+1))
+        mv -v "${file}.${i}" "${file}.${j}" 2>/dev/null
+    done
+    mv -v "${file}" "${file}.1"
+}
+
+function godoc(){
+    if command -v godoc >/dev/null 2>&1;then
+        if ! ps aux|grep 'godoc -http=:12306'|grep -v grep;then
+            #因为godoc做本地文档服务器的时候，会把GOPATH中的本地代码也显示出来
+            #如果本地代码很多的时候，这样回显得很乱
+            #把GOPATH设置到一个假的GOPATH地方
+            sh -c "GOPATH=~; nohup godoc -http=:12306 -play -index&"
+        fi
+    fi
+}
+
+function pgrep(){
+    if (($# != 1));then
+        echo "Usage: pgrep some_program_name"
+        return 1
+    fi
+    local name
+    name=${1}
+    ps aux | grep "${name}" | grep -v grep
+}
+
+#流量统计输出
+function traffic(){
+	if ! command -v iptables >/dev/null 2>&1;then
+		echo "need iptables command"
+		return 1
+	fi
+    # whichPort=$1
+    # if [ -z "$whichPort" ];then
+    #     msg=$(iptables -nvL OUTPUT)
+    # else
+    #     msg=$(iptables -nvL OUTPUT | grep ":$whichPort")
+    # fi
+    # if [ -z "$msg" ];then
+    #     echo "Can't find port $whichPort traffic"
+    # else
+    #     echo "$msg"|grep -v Chain|grep -v pkts|awk '{print $3 " " $10 "  " $2}'|sed 's/spt/port/'
+    # fi
+    echo "OUTPUT"
+    iptables -nvLOUTPUT | grep 'pt:' |  awk '{printf "%-5s %-10s %-10s\n",$9,$10,$2}'
+    echo
+    echo "INPUT"
+    iptables -nvLINPUT | grep 'pt:' | awk '{printf "%-5s %-10s %-10s\n",$10,$11,$2}'
+    echo
+}
+function sshCopy(){
+    if (($#<1));then
+        echo "Usage: $(basename $0) [-p port-value] remoteUser@remoteHost"
+        return 1
+    fi
+
+    while getopts "p:" arg
+    do
+        case $arg in
+            p)
+                remotePort=$OPTARG
+                ;;
+        esac
+    done
+    shift $(($OPTIND-1))
+    if [ -n "$remotePort" ];then
+        echo "remotePort:$remotePort"
+    fi
+    userAtHost=$1
+
+    comment="$(whoami)@$(hostname)  Generated on $(date +%FT%H:%M:%S)"
+    if [ ! -e ~/.ssh/id_rsa ];then
+        ssh-keygen -t rsa -b 4096 -C "$comment" -N "" -f ~/.ssh/id_rsa
+    fi
+
+    if [ -n "$remotePort" ];then
+        ssh-copy-id -p $remotePort "$userAtHost"
+    else
+        ssh-copy-id "$userAtHost"
+    fi
+}
+function whouseport(){
+    if (($#<2));then
+        echo "Usage: whouseport protocol port"
+        return 1
+    fi
+    protocol=$1
+    port=$2
+    case $(uname) in
+        Linux)
+            if [[ $EUID -ne 0 ]];then
+                issudoer=0
+                sudo true && issudoer=1
+                if [[ $issudoer -eq 1 ]];then
+                    listener=$(sudo netstat -tulpn | grep ":$port" | grep "\<$protocol\>" | awk '{print $7}')
+                else
+                    echo "Need root privilege!!"
+                    return 1
+                fi
+            else
+                listener=$(netstat -tulpn | grep ":$port" | grep "\<$protocol\>" | awk '{print $7}')
+            fi
+
+            if [ -z "$listener" ];then
+                echo "The port $protocol:$port is not in use."
+            else
+                process=$(echo $listener | awk -F'/' '{print $2}')
+                pid=$(echo $listener | awk -F'/' '{print $1}')
+                echo "The port $protocol:$port is used by $process with pid: $pid."
+            fi
+            ;;
+        Darwin)
+            listener=$(lsof -i $protocol:$port | grep 'LISTEN')
+            if [[ -n "$listener" ]];then
+                process=$(echo "$listener" | awk '{print $1}')
+                pid=$(echo "$listener" | awk '{print $2}')
+                echo "The port $protocol:$port is used by $process with pid: $pid."
+            else
+                echo "The port $protocol:$port is not in use."
+            fi
+            ;;
+        *)
+        ;;
+    esac
+}
+function mailto(){
+    #homebrew中有gnu版本的常用工具，比如grep sed
+    #默认安装的时候为了和mac自带的区分，他们的名字前面加个字母g
+    #如何安装这些gnu工具参考dev-mac文件
+    GREP=grep
+    if [ "$(uname)" = "Darwin" ];then
+        if ! command -v ggrep >/dev/null 2>&1;then
+            echo "ggrep not installed."
+            exit 1
+        fi
+        #前提是先安装gnu grep
+        GREP=ggrep
+    fi
+    if ! command -v ssmtp >/dev/null 2>&1;then
+        echo "Please install ssmtp and configure it firstly!"
+        return 1
+    fi
+    if (($#<3));then
+        echo "Usage: mailto receiver subject content"
+        return 1
+    fi
+    cfg=/etc/ssmtp/ssmtp.conf
+    receiver=$1
+    subject=$2
+    content=$3
+    #过滤注释，因为里面可能有老的配置
+    From=$(sed -rn '/^[^#]/p' $cfg | $GREP -oP '(?<=root=).+')
+    mailfile=/tmp/ssmtp-tmpfile
+    echo "From : $From"
+    echo "mail file : $mailfile"
+    cat >$mailfile<<EOF
+To: $receiver
+From: $From
+Subject: $subject
+
+$content
+EOF
+    ssmtp $receiver < $mailfile && echo "Your email has sent successfully!"
+}
+
+# brew(){
+#     echo "This is a brew wrap function that can use proxy."
+#     echo "For example: brew [-p proxyString] cmd..."
+#     echo
+#     proxy=
+#     while getopts "p:h" opt;do
+#         case "$opt" in
+#             p)
+#                 proxy=$OPTARG
+#                 ;;
+#             h)
+#                 echo "Usage: -p proxyString cmd..."
+#                 ;;
+#         esac
+#     done
+#     shift $(($OPTIND-1))
+#     if [ -n "$proxy" ];then
+#         echo "Using proxy: $proxy"
+#         echo
+#         ALL_PROXY="$proxy"
+#     fi
+#     if (($#<1));then
+#         echo "Need cmd (for example: install ,list ,info)"
+#     else
+#         # /usr/local/bin/brew "$@"
+#         command brew "$@"
+#     fi
+# }
+#launchd plist file
+function plistFile(){
+if [ $# -eq 0 ];then
+    echo "Usage: $(basename $0) plist_filename"
+    return 1
+fi
+cat>/tmp/$1.plist<<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string></string>
+    <key>WorkingDirectory</key>
+    <string>TODO</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>PROGRAM_PUT_HERE</string>
+        <string>PARAMETER</string>
+    </array>
+    <!--
+    <key>StandardOutPath</key>
+    <string>STD_OUT_FILE_PUT_HERE</string>
+    -->
+    <!--
+    <key>StandardErrorPath</key>
+    <string>STD_ERR_FILE_PUT_HERE</string>
+    -->
+    <key>RunAtLoad</key>
+    <true/>
+    <!--
+        start job every 60 seconds
+    -->
+    <!--
+    <key>StartInterval</key>
+    <integer>60</integer>
+    -->
+
+    <!--
+        crontab like job schedular
+    -->
+    <!--
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Minute</key>
+        <integer>0</integer>
+        <key>Hour</key>
+        <integer>0</integer>
+        <key>Day</key>
+        <integer>0</integer>
+        <key>Weekday</key>
+        <integer>0</integer>
+        <key>Month</key>
+        <integer>0</integer>
+    </dict>
+
+    -->
+</dict>
+</plist>
+EOF
+vim /tmp/$1.plist
+if command -v launchctl >/dev/null 2>&1;then
+    echo -n "Copy /tmp/$1.plist to $home/Library/LaunchAgents ? [y/n] "
+    read cpPlist
+    if [[ "$cpPlist" == "y" ]];then
+        cp "/tmp/$1.plist" $home/Library/LaunchAgents && chmod 644 $home/Library/LaunchAgents/$1.plist
+    fi
+fi
+rm /tmp/$1.plist
+}
+#systemd service file
+function serviceFile(){
+    if (($#<1));then
+        echo "Usage: $(basename $0) serviceName"
+        return 1
+    fi
+cat>/tmp/$1.service<<EOF
+[Unit]
+Description=
+#After=network.target
+
+[Service]
+#Type=forking
+#PIDFile=
+#ExecStart=
+#ExecStop=
+
+#Type=oneshot
+#RemainAfterExit=yes
+#ExecStart=
+#ExecStop=
+
+#Type=simple
+#ExecStart=
+#ExecStop=
+
+#User=USER
+#WorkingDirectory=/path/to/wd
+#Restart=always
+#Environment=
+[Install]
+WantedBy=multi-user.target
+EOF
+editor=vi
+if command -v vim >/dev/null 2>&1;then
+    editor=vim
+fi
+$editor /tmp/$1.service
+if command -v systemctl >/dev/null 2>&1;then
+    echo -n "Copy /tmp/$1.service to /etc/systemd/system ? [y/n] "
+    read cpService
+    if [[ "$cpService" == "y" ]];then
+        if (($EUID==0));then
+            cp "/tmp/$1.service" /etc/systemd/system && chmod 664 /etc/systemd/system/$1.service && systemctl daemon-reload
+        else
+            sudo cp "/tmp/$1.service" /etc/systemd/system && sudo chmod 664 /etc/systemd/system/$1.service && sudo systemctl daemon-reload
+        fi
+    fi
+fi
+rm /tmp/$1.service
+}
+
+function serviceEdit(){
+    local name=$1
+    if [ -z "$name" ];then
+        echo "Need serviceName"
+        return 1
+    fi
+
+    local filePath="$(systemctl status $name | perl -ne 'print if /Loaded/' | awk -F'(' '{print $2}' | awk -F';' '{print $1}')"
+    if [ -z "$filePath" ];then
+        echo "Cannot find service file of '$name'!"
+        return 1
+    fi
+    editor=vi
+    if command -v vim >/dev/null 2>&1;then
+        editor=vim
+    fi
+    $editor $filePath
+}
+
+function enc(){
+    /usr/bin/openssl aes-128-cbc -salt -in $1 -out $1.aes && rm -rf $1
+}
+function dec(){
+    /usr/bin/openssl aes-128-cbc -d -in $1.aes -out $1 && rm -rf $1.aes
+}
+#Usage:
+#cecho @red@red text
+#cecho @b@@red@red text with bold
+#cecho @u@@red@red text with underline
+#cecho @b@@u@@red@red text with underline and bold
+function cecho() {
+    echo "$@" | sed \
+        -e "s/\(\(@\(red\|green\|yellow\|blue\|magenta\|cyan\|white\|reset\|b\|u\)@\)\+\)\(.*\)/\1\4@reset@/g" \
+        -e "s/@red@/$(tput setaf 1)/g" \
+        -e "s/@green@/$(tput setaf 2)/g" \
+        -e "s/@yellow@/$(tput setaf 3)/g" \
+        -e "s/@blue@/$(tput setaf 4)/g" \
+        -e "s/@magenta@/$(tput setaf 5)/g" \
+        -e "s/@cyan@/$(tput setaf 6)/g" \
+        -e "s/@white@/$(tput setaf 7)/g" \
+        -e "s/@reset@/$(tput sgr0)/g" \
+        -e "s/@b@/$(tput bold)/g" \
+        -e "s/@u@/$(tput sgr 0 1)/g"
+}
+# case $(uname) in
+#     Linux)
+#         alias listen='netstat -tan | grep LISTEN'
+#         alias ulisten='netstat -uln'
+#         ;;
+#     Darwin)
+#         alias listen='lsof -iTCP -sTCP:LISTEN -P'
+#         alias ulisten='lsof -iUDP -P -n'
+#         ;;
+# esac
+
+function listen(){
+    case $(uname) in
+        Linux)
+            # if (($EUID!=0));then
+            #     netstat -tan | grep LISTEN
+            #     netstat -uln
+            #     echo "run as root privilege,to get more info."
+            # else
+            #     lsof -iTCP -sTCP:LISTEN -P
+            #     lsof -iUDP -P -n
+            # fi
+            if command -v lsof >/dev/null 2>&1;then
+                [ $EUID -eq 0 ] && (lsof -iTCP -sTCP:LISTEN -P; echo "-----------------------";lsof -iUDP -P -n | grep -v '\*:\*$') | less || (sudo lsof -iTCP -sTCP:LISTEN -P; echo "-----------------------";sudo lsof -iUDP -P -n | grep -v '\*:\*$') | less
+
+            else
+                netstat -tan | grep LISTEN
+                echo "-----------------------"
+                netstat -uln
+            fi
+            ;;
+        Darwin)
+            (lsof -iTCP -sTCP:LISTEN -P;echo "-----------------------";
+ lsof -iUDP -P -n | grep -v '\*:\*$') | less
+            ;;
+    esac
+
+}
+
+function em(){
+    editor=vi
+    if command -v vim >/dev/null 2>&1;then
+        editor=vim
+    fi
+    if command -v nvim >/dev/null 2>&1;then
+        editor=nvim
+    fi
+    destfile="$SHELLRC_ROOT/shellrc"
+    while getopts ":hfaeobl" opt;do
+        case $opt in
+            h)
+                echo "Usage: $0 [-h|-b|-f|-a|-e|-o|-l] basic,function,alias,env,other,local"
+                return 1
+                ;;
+            f)
+                destfile="$SHELLRC_ROOT/shellrc.d/function"
+                ;;
+            a)
+                destfile="$SHELLRC_ROOT/shellrc.d/alias"
+                ;;
+            e)
+                destfile="$SHELLRC_ROOT/shellrc.d/env"
+                ;;
+            o)
+                destfile="$SHELLRC_ROOT/shellrc.d/other"
+                ;;
+            b)
+                destfile="$SHELLRC_ROOT/shellrc.d/basic"
+                ;;
+            l)
+                destfile="$SHELLRC_ROOT/shellrc.d/local"
+                ;;
+            \?)
+                echo "Unkown option: \"$OPTARG\""
+                return 1
+                ;;
+
+        esac
+    done
+    $editor "$destfile"
+}
+
+function path(){
+    echo -e ${PATH//:/'\n'}
+}
+
+function gfmt(){
+    find . -name "*.go" -print0 | xargs -0 -I R go fmt R
+}
+
+#folder disk usage
+function siz(){
+    if [ $1 = "-h" ];then
+        echo "Usage: $(basename $0) <path> [unit(mb,kb)]"
+        return 1
+    fi
+    dest="${1:-$(pwd)}"
+    unit=${2:-MB}
+    unit="$(echo $unit | tr 'a-z' 'A-Z')"
+    case "$unit" in
+        MB)
+            (echo "folder[:$dest] usage:(unit $unit)";
+            find "$dest" -maxdepth 1 -print0 | xargs -0 -IR du -sm R 2>/dev/null | sort -nr) | less
+            ;;
+        KB)
+            (echo "folder[:$dest] usage:(unit $unit)";
+            find "$dest" -maxdepth 1 -print0 | xargs -0 -IR du -sk R 2>/dev/null | sort -nr) | less
+            ;;
+        *)
+            echo "Usage: $(basename $0) <path> [unit(mb,kb)]"
+            return 1
+            ;;
+    esac
+}
+
+#soft link(support relative path)
+function softlink(){
+    src="${1}"
+    if [ -z "$src" ];then
+        echo "Usage: $(basename $0) src dest"
+        return 1
+    fi
+    if [ ! -e "$src" ];then
+        echo "$src not exist."
+        return 1
+    fi
+    dest="${2}"
+    if [ -z "$dest" ];then
+        echo "Usage: $(basename $0) src dest"
+        return 1
+    fi
+    src="$(realpath $src)"
+    if [ -z "$src" ];then
+        return 1
+    fi
+    ln -sf "$src" "$dest"
+}
+
+function lines(){
+    usage="Usage: $(basename $0) [-e|-h] folderName"
+    ext=
+    while getopts ":he:" opt;do
+        case $opt in
+            e)
+                ext=$OPTARG
+                ;;
+            h)
+                echo $usage
+                return 1
+                ;;
+            :)
+                echo "Option: \"$OPTARG\" need argument"
+                echo $usage
+                return 1
+                ;;
+            \?)
+                echo "Unkown option: \"$OPTARg\""
+                echo $usage
+                return 1
+                ;;
+        esac
+    done
+    shift $((OPTIND-1))
+    folder=$1
+    if [ -z "$folder" ];then
+        folder="$(pwd)"
+    fi
+    if [ ! -d "$folder" ];then
+        echo "$folder not exist"
+        return 1
+    fi
+    if [ -h "$folder" ];then
+        echo "$folder is soft link"
+        folder=$(realpath $folder)
+        echo "Dest folder is $folder"
+    fi
+    if [ -z "$ext" ];then
+        echo "Total lines in $folder: "
+        find "$folder" -print0| xargs -0 -IR wc -l R | awk 'BEGIN{sum=0}{sum+=$1}END{print sum}'
+    else
+        echo "Total lines with ext($ext) in $folder: "
+        find "$folder" -iname "*.$ext" -print0| xargs -0 -IR wc -l R | awk 'BEGIN{sum=0}{sum+=$1}END{print sum}'
+    fi
+}
+
+case $(uname) in
+    Linux)
+        function cronadd(){
+            item=${1:?"cron add: missing item"}
+            # TODO validate $item format
+            (crontab -l 2 >/dev/null ;echo $item) | crontab -
+        }
+
+        function crondel(){
+            item=${1:?"cron del: missing item"}
+            # TODO validate $item format
+            crontab -l 2>/dev/null | grep -v $item | crontab -
+
+            # last day of the month
+            # 0 23 28-31 * * [ $(date -d +1day +\%d) -eq 1 ] && put_cmd_here
+        }
+        ;;
+esac
+
+function pushall(){
+    branch=$1
+    if [ -z "$branch" ];then
+        echo "Not specify branch,use \"master\""
+        branch=master
+    fi
+    git remote | xargs -IR git push --tags R $branch
+}
+
+function fetchall(){
+    branch=$1
+    if [ -z "$branch" ];then
+        echo "Not specify branch,use \"master\""
+        branch=master
+    fi
+    git remote | xargs -IR git fetch R $branch
+}
+
+function brewlp(){
+    port=${1:-'1080'}
+    export ALL_PROXY="socks5://localhost:$port"
+    echo "export $(tput setaf 1)ALL_PROXY=\"socks5://localhost:$port\"$(tput sgr0)"
+    brew "$@"
+    echo "$(tput setaf 1)unset ALL_PROXY$(tput sgr0)"
+    unset ALL_PROXY
+}
+
+function newsh(){
+    filename=${1}
+    if [ -z "$filename" ];then
+        echo "Usage: ${green}$(basename $0)${reset} <new-shell-script-file-name>"
+        return 1
+    fi
+    editor=vi
+    if command -v vim >/dev/null 2>&1;then
+        editor=vim
+    fi
+    if command -v nvim >/dev/null 2>&1;then
+        editor=nvim
+    fi
+    cat>"$filename" <<-'EOF'
+		#!/bin/bash
+		rpath="$(readlink ${BASH_SOURCE})"
+		if [ -z "$rpath" ];then
+		    rpath=${BASH_SOURCE}
+		fi
+		this="$(cd $(dirname $rpath) && pwd)"
+		cd "$this"
+		export PATH=$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+		
+		user="${SUDO_USER:-$(whoami)}"
+		home="$(eval echo ~$user)"
+		
+		# export TERM=xterm-256color
+
+		# Use colors, but only if connected to a terminal, and that terminal
+		# supports them.
+		if which tput >/dev/null 2>&1; then
+		  ncolors=$(tput colors 2>/dev/null)
+		fi
+		if [ -t 1 ] && [ -n "$ncolors" ] && [ "$ncolors" -ge 8 ]; then
+		    RED="$(tput setaf 1)"
+		    GREEN="$(tput setaf 2)"
+		    YELLOW="$(tput setaf 3)"
+		    BLUE="$(tput setaf 4)"
+            CYAN="$(tput setaf 5)"
+		    BOLD="$(tput bold)"
+		    NORMAL="$(tput sgr0)"
+		else
+		    RED=""
+		    GREEN=""
+		    YELLOW=""
+            CYAN=""
+		    BLUE=""
+		    BOLD=""
+		    NORMAL=""
+		fi
+
+		function _runAsRoot(){
+		    verbose=0
+		    while getopts ":v" opt;do
+		        case "$opt" in
+		            v)
+		                verbose=1
+		                ;;
+		            \?)
+		                echo "Unknown option: \"$OPTARG\""
+		                exit 1
+		                ;;
+		        esac
+		    done
+		    shift $((OPTIND-1))
+		    cmd="$@"
+		    if [ -z "$cmd" ];then
+		        echo "${red}Need cmd${reset}"
+		        exit 1
+		    fi
+		
+		    if [ "$verbose" -eq 1 ];then
+		        echo "run cmd:\"${red}$cmd${reset}\" as root."
+		    fi
+		
+		    if (($EUID==0));then
+		        sh -c "$cmd"
+		    else
+		        if ! command -v sudo >/dev/null 2>&1;then
+		            echo "Need sudo cmd"
+		            exit 1
+		        fi
+		        sudo sh -c "$cmd"
+		    fi
+		}
+		editor=vi
+		if command -v vim >/dev/null 2>&1;then
+		    editor=vim
+		fi
+		if command -v nvim >/dev/null 2>&1;then
+		    editor=nvim
+		fi
+		###############################################################################
+		# write your code below (just define function[s])
+		# function is hidden when begin with '_'
+		###############################################################################
+		# TODO
+		
+		em(){
+		    $editor $0
+		}
+		
+		###############################################################################
+		# write your code above
+		###############################################################################
+		function _help(){
+		    cat<<EOF2
+		Usage: $(basename $0) ${bold}CMD${reset}
+		
+		${bold}CMD${reset}:
+		EOF2
+		    # perl -lne 'print "\t$1" if /^\s*(\w+)\(\)\{$/' $(basename ${BASH_SOURCE})
+		    # perl -lne 'print "\t$2" if /^\s*(function)?\s*(\w+)\(\)\{$/' $(basename ${BASH_SOURCE}) | grep -v '^\t_'
+		    perl -lne 'print "\t$2" if /^\s*(function)?\s*(\w+)\(\)\{$/' $(basename ${BASH_SOURCE}) | perl -lne "print if /^\t[^_]/"
+		}
+		
+		function _loadENV(){
+		    if [ -z "$INIT_HTTP_PROXY" ];then
+		        echo "INIT_HTTP_PROXY is empty"
+		        echo -n "Enter http proxy: (if you need) "
+		        read INIT_HTTP_PROXY
+		    fi
+		    if [ -n "$INIT_HTTP_PROXY" ];then
+		        echo "set http proxy to $INIT_HTTP_PROXY"
+		        export http_proxy=$INIT_HTTP_PROXY
+		        export https_proxy=$INIT_HTTP_PROXY
+		        export HTTP_PROXY=$INIT_HTTP_PROXY
+		        export HTTPS_PROXY=$INIT_HTTP_PROXY
+		        git config --global http.proxy $INIT_HTTP_PROXY
+		        git config --global https.proxy $INIT_HTTP_PROXY
+		    else
+		        echo "No use http proxy"
+		    fi
+		}
+		
+		function _unloadENV(){
+		    if [ -n "$https_proxy" ];then
+		        unset http_proxy
+		        unset https_proxy
+		        unset HTTP_PROXY
+		        unset HTTPS_PROXY
+		        git config --global --unset-all http.proxy
+		        git config --global --unset-all https.proxy
+		    fi
+		}
+		
+		
+		case "$1" in
+		     ""|-h|--help|help)
+		        _help
+		        ;;
+		    *)
+		        "$@"
+		esac
+		EOF
+    "$editor" "$filename"
+    chmod +x "$filename"
+}
+
+function newlogrotate(){
+    filename=${1}
+    if [ -z "$filename" ];then
+        echo "Usage: ${green}$(basename $0)${reset} <new logrotate config file>"
+        return 1
+    fi
+    local editor=vi
+    if command -v vim >/dev/null 2>&1;then
+        editor=vim
+    fi
+    if command -v nvim >/dev/null 2>&1;then
+        editor=nvim
+    fi
+    cat>$filename<<EOF
+<PUT_YOUR_FILE_HERE> {
+    #weekly | monthly | yearly
+    # Note: size will override weekly | monthly | yearly
+    #size 100k # | size 200M | size 1G
+
+    #rotate 3
+    #compress
+
+    # Note: copytruncate conflics with create
+    # and copytruncate works well with tail -f,create not works well with tail -f
+    #create 0640 user group
+    #copytruncate
+
+    #su root root
+}
+EOF
+    $editor $filename
+
+}
+
+function newpy(){
+    filename=${1}
+    if [ -z "$filename" ];then
+        echo "Usage: ${green}$(basename $0)${reset} <new-python-file-name>"
+        return 1
+    fi
+    editor=vi
+    if command -v vim >/dev/null 2>&1;then
+        editor=vim
+    fi
+    cat> "$filename" <<-EOF
+		#!/usr/bin/env python3
+		# -*- coding: utf-8 -*-
+
+		# import logging
+
+		# LOG_FORMAT = "%(asctime)s - %(levelname)s - %(message)s"
+		# DATE_FORMAT = "%Y/%m/%d %H:%M:%S %p"
+		# logging.basicConfig(level=logging.DEBUG, format=LOG_FORMAT, datefmt=DATE_FORMAT)
+		# logging.basicConfig(filename='my.log', level=logging.DEBUG, format=LOG_FORMAT, datefmt=DATE_FORMAT)
+
+		def main():
+		    pass
+
+		if __name__ == '__main__':
+		    main()
+	EOF
+    "$editor" "$filename"
+}
+
+function newgitignore(){
+    dest=${1:-"${PWD}"}
+    ignorefile="${dest}/.gitignore"
+    cat<<EOF>>"$ignorefile"
+.DS_Store
+*.swp
+.idea/
+EOF
+}
+
+function gofmtdir(){
+    if [ "$1" = "-h" ] || [ "$1" = "--help" ];then
+        echo "Usage: $0 <dir>"
+        return 1
+    fi
+    dir=${1:-$PWD}
+    echo "Format directory: $dir"
+    find "$dir" -iname "*.go" -print0 | xargs -0 -n 1 -t go fmt
+}
+
+function grepDir(){
+    ext=${1}
+    word=${2}
+    find . -iname "*.$ext" -print0 | xargs -0 grep "$word" 2>/dev/null
+}
+
+function postjson(){
+    param=""
+    while getopts ':hd:' opt;do
+        case $opt in
+            h)
+                echo "Usage: $0 -d {\"key\":\"value\"} URL "
+                return 0
+                ;;
+            d)
+                param="$OPTARG"
+                ;;
+            :)
+                echo "Missing argument for option: \"$OPTARG\""
+                return 1
+                ;;
+            \?)
+                echo "Unkown option: \"$OPTARG\""
+                return 1
+                ;;
+        esac
+    done
+    shift $((OPTIND-1))
+    if [ $# -eq 0 ];then
+        echo "Missing URL."
+        echo "Usage: $0 -d {\"key\":\"value\"} URL "
+        return 1
+    fi
+    curl -X POST -H 'Content-Type:application/json' -d "$OPTARG" $1
+}
+
+function clang++11(){
+    clang++ -std=c++11 "$@"
+}
+
+function clang++14(){
+    clang++ -std=c++14 "$@"
+}
+
+function clang++17(){
+    clang++ -std=c++17 "$@"
+}
+
+function comma(){
+    digit=${1:?'missing digit'}
+    echo "$digit" | perl -pe 's|(?<=\d)(?=(\d{3})+\D)|,|g'
+}
+
+defaultpath(){
+    export PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin
+}
+
+function bak(){
+    if [ "$1" = "-h" ];then
+        cat<<-EOF
+		Usage: bak files|dirs
+		EOF
+        return 1
+    fi
+
+    for i in "$@";do
+        if [ -e "${i}" ];then
+            echo "back ${i} -> ${i}.bak"
+            mv "${i}" "${i}.bak"
+        fi
+    done
+}
+
+cdinit(){
+    cd ${SHELLRC_ROOT}/..
+}
+
+sshconfig(){
+    editor=vi
+    if command -v vim >/dev/null 2>&1;then
+        editor=vim
+    fi
+    if command -v vim >/dev/null 2>&1;then
+        editor=nvim
+    fi
+
+    user="${SUDO_USER:-$(whoami)}"
+    home="$(eval echo ~$user)"
+
+    local sshDir=${home}/.ssh
+
+    if [ ! -d ${sshDir} ];then
+        mkdir -p ${sshDir}
+    fi
+    $editor ${sshDir}/config
+}
+
+function sendmail(){
+    local url=https://aliyun.eagle711.win:9000/send
+    receiver="sunliang711@163.com"
+    subject=
+    body=
+    auth_key=
+    while getopts ":s:b:k:r:" opt;do
+        case "${opt}" in
+            s)
+                subject="$OPTARG"
+                ;;
+            b)
+                body="$OPTARG"
+                ;;
+            k)
+                auth_key="$OPTARG"
+                ;;
+            r)
+                receiver="$OPTARG"
+                ;;
+            :)
+                echo "missing arg for option: \"$OPTARG\""
+                return 1
+                ;;
+            \?)
+                echo "Valid option -s <subject> -b <body> -k <auth_key> [-r <receiver>]"
+                return 1
+                ;;
+        esac
+    done
+
+    if [ -z "$receiver" ] || [ -z "$subject" ] || [ -z "$auth_key" ];then
+        echo "Valid option -s <subject> -b <body> -k <auth_key> [-r <receiver>]"
+        return 1
+    fi
+
+    if [ -z "$body" ];then
+        body="$subject"
+    fi
+
+    data=$(cat<<EOF
+    {"to":"$receiver", "subject":"$subject", "body":"$body", "auth_key":"$auth_key"}
+EOF
+)
+    # echo "data: ${data}"
+    curl -X POST -d  "${data}" "$url"
+
+}
+
+function cmakeclean(){
+    #if PWD is 'build'
+    if [ "$(basename $(pwd))" = "build" ];then
+        echo "${green}In build directory${reset}"
+        echo "${cyan}create cleaning build directory${reset}"
+        cd .. && /bin/rm -rf build && mkdir build && cd build
+    elif [ -f CMakeLists.txt ] && [ -d build ];then
+        echo "${green}build directory is in PWD${reset}"
+        echo "${cyan}create cleaning build directory${reset}"
+        /bin/rm -rf build && mkdir build
+    else
+        echo "Not in cmake project directory"
+    fi
+}
+
+function editService(){
+    local serviceName=$1
+    if [ -z "$serviceName" ];then
+        echo "Usage: $(basename $0) <systemd service name>"
+        return 1
+    fi
+    sudo -E systemctl edit --full $serviceName
+}
+
+source ${SHELLRC_ROOT}/shellrc.d/function-snippets
+#END function
+
+# vim: set ft=sh:

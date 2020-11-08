@@ -1,0 +1,39 @@
+"preview the hunk: <Leader>hp;
+
+"jump to next hunk (change): ]c
+"jump to previous hunk (change): [c
+
+"You can stage or undo an individual hunk when your cursor is in it:
+" stage the hunk with <Leader>hs or
+" undo it with <Leader>hu.
+
+"you can turn line highlighting on and off (defaults to off):
+" turn on with :GitGutterLineHighlightsEnable
+" turn off with :GitGutterLineHighlightsDisable
+" toggle with :GitGutterLineHighlightsToggle
+
+" 跳转到下一个修改点: ]c
+" 跳转到上一个修改点: [c
+" nmap ]c <Plug>(GitGutterNextHunk)
+" nmap [c <Plug>(GitGutterPrevHunk)
+
+" stage the hunk with <Leader>hs
+" undo it with <Leader>hu
+" preview the hunk, e.g. <Leader>hp;
+
+"With Neovim 0.3.2 or higher, you can turn line number highlighting on and off (defaults to off):
+" turn on with :GitGutterLineNrHighlightsEnable
+" turn off with :GitGutterLineNrHighlightsDisable
+" toggle with :GitGutterLineNrHighlightsToggle.
+
+"NOTE .vimrc is executed before plugins are loaded.
+let g:gitgutter_highlight_linenrs = 1
+" Or
+" autocmd VimEnter * GitGutterLineNrHighlightsEnable
+
+" 高亮所有修改的行，如果太多行，视觉效果不太好
+" let g:gitgutter_highlight_lines = 1
+" Or
+" autocmd VimEnter * GitGutterLineHighlightsEnable
+"禁用所有默认快捷键
+"let g:gitgutter_map_keys = 0
