@@ -74,6 +74,7 @@ _root(){
 begin="#BEGIN smb"
 end="#END smb"
 
+dest=/etc/network/if-up.d
 install(){
     local usage="usage: install <smb_ip> <smb_name> <mount_dir> <smb_user> <smb_password>"
     if ! _root;then
@@ -106,6 +107,11 @@ install(){
 	//${smbip}/${smbname} ${mountdir} cifs credentials=$home/.smbcredentials 0 0
 	${end}
 	EOF
+
+    cat>${dest}/fstab<<-EOF
+	#!/bin/sh
+	mount -a
+	EOF
 }
 
 _backup(){
@@ -126,6 +132,7 @@ uninstall(){
     _backup
 
     sed -i "/${begin}/,/${end}/d" /etc/fstab
+    rm ${dest}/fstab
 }
 
 em(){
