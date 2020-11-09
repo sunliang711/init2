@@ -75,7 +75,12 @@ begin="#BEGIN smb"
 end="#END smb"
 
 install(){
+    local usage="usage: install <smb_ip> <smb_name> <mount_dir> <smb_user> <smb_password>"
     if ! _root;then
+        exit 1
+    fi
+    if [ $# -lt 5 ];then
+        echo "${usage}"
         exit 1
     fi
     if ! dpkg -L cifs-utils >/dev/null 2>&1;then

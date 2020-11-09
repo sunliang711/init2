@@ -1296,6 +1296,15 @@ function newsh(){
 		        sudo sh -c "$cmd"
 		    fi
 		}
+
+		rootID=0
+		function _root(){
+		    if [ ${EUID} -ne ${rootID} ];then
+		        echo "Need run as root!"
+		        exit 1
+		    fi
+		}
+
 		editor=vi
 		if command -v vim >/dev/null 2>&1;then
 		    editor=vim

@@ -56,7 +56,9 @@ function runAsRoot(){
 ###############################################################################
 # TODO
 install(){
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+    local url="https://sh.rustup.rs"
+    echo "install rust from ${url}..."
+    curl --proto '=https' --tlsv1.2 -sSf ${url} | sh
 }
 
 

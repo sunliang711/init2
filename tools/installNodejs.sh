@@ -98,15 +98,20 @@ install(){
     cmd="tar -C $dest -xvf $name.tar.xz"
     echo "$cmd ..."
     bash -c "$cmd >/dev/null" || { echo "extract $name.tar.xz failed"; exit 1; }
-    local localFile="${SHELLRC_ROOT}/shellrc.d/local"
-    local binPath="${dest}/$name/bin"
-    if [ -e "${localFile}" ];then
-        if ! grep -q "${binPath}" "${localFile}";then
-            echo "append_path ${binPath}" >> "${localFile}"
-        fi
-    else
-        echo "nodejs $version has been installed to $dest, add ${binPath} to PATH manually"
-    fi
+
+    echo "nodejs $version has been installed to $dest"
+
+    # DELETE later
+    # local localFile="${SHELLRC_ROOT}/shellrc.d/local"
+    # local binPath="${dest}/$name/bin"
+    # if [ -e "${localFile}" ];then
+    #     if ! grep -q "${binPath}" "${localFile}";then
+    #         echo "append_path ${binPath}" >> "${localFile}"
+    #     fi
+    # else
+    #     echo "nodejs $version has been installed to $dest, add ${binPath} to PATH manually"
+    # fi
+
     cd - >/dev/null
 }
 

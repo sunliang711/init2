@@ -87,15 +87,19 @@ install(){
     cmd="tar -C $dest -xvf ${name}.tar.gz"
     echo "$cmd ..."
     bash -c "$cmd >/dev/null"  || { echo "extract $name.tar.gz failed."; exit 1; }
-    local localFile="${SHELLRC_ROOT}/shellrc.d/local"
-    local binPath="${dest}/$name/bin"
-    if [ -e "${localFile}" ];then
-        if ! grep -q "${binPath}" "${localFile}";then
-            echo "append_path ${binPath}" >> "${localFile}"
-        fi
-    else
-        echo "nvim $version has been installed to $dest, add ${binPath} to PATH manually"
-    fi
+
+    echo "nvim $version has been installed to $dest"
+
+    # DELETE later
+    # local localFile="${SHELLRC_ROOT}/shellrc.d/local"
+    # local binPath="${dest}/$name/bin"
+    # if [ -e "${localFile}" ];then
+    #     if ! grep -q "${binPath}" "${localFile}";then
+    #         echo "append_path ${binPath}" >> "${localFile}"
+    #     fi
+    # else
+    #     echo "nvim $version has been installed to $dest, add ${binPath} to PATH manually"
+    # fi
 }
 
 uninstall(){
