@@ -66,6 +66,8 @@ append_path /usr/bin
 
 append_path /sbin
 append_path /bin
+
+detectBin $HOME/.app
 #BEGIN custom PATH
 
 #END custom PATH

@@ -1624,6 +1624,20 @@ function editService(){
     sudo -E systemctl edit --full $serviceName
 }
 
+function detectBin(){
+    local root=${1:?'missing detect root'}
+    if [ ! -d ${root} ];then
+        echo "${root} not exist"
+        return 1
+    fi
+
+    while read p;do
+        # debug
+        # echo "append_path ${p}"
+        append_path "${p}"
+    done<<<"$(find $(cd ${root} && pwd ) -type d -a -name bin)"
+}
+
 source ${SHELLRC_ROOT}/shellrc.d/function-snippets
 #END function
 
