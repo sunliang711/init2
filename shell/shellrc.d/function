@@ -1644,7 +1644,7 @@ function detectBin(){
         # debug
         # echo "append_path ${p}"
         append_path "${p}"
-    done<<<"$(find $(cd ${root} && pwd ) -type d -a -name bin)"
+    done<<<"$(find $(cd ${root} && pwd ) -type d -a -name bin | grep -v node_modules)"
 }
 
 source ${SHELLRC_ROOT}/shellrc.d/function-snippets
