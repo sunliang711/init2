@@ -182,63 +182,89 @@ function currentNetworkService(){
     fi
 }
 
-macproxy(){
-    echo "TODO"
+macproxyon(){
+    local proxy="$(parseProxy ${1})"
+    if [ -z "${proxy}" ];then
+        echo "Cannot get proxy value,exit."
+        return 1
+    fi
+
+    # proxy format: http://[user:pass]@host:port
+    # parse user pass host port
+    local user="$(echo ${proxy} | perl -lne 'print $3 if /^(http:\/\/)?(([^:]+):)?(([^@]+)@)?([^:]+):(\d+)$/')"
+    local pass="$(echo ${proxy} | perl -lne 'print $5 if /^(http:\/\/)?(([^:]+):)?(([^@]+)@)?([^:]+):(\d+)$/')"
+    local host="$(echo ${proxy} | perl -lne 'print $6 if /^(http:\/\/)?(([^:]+):)?(([^@]+)@)?([^:]+):(\d+)$/')"
+    local port="$(echo ${proxy} | perl -lne 'print $7 if /^(http:\/\/)?(([^:]+):)?(([^@]+)@)?([^:]+):(\d+)$/')"
+
+    if [ -z "${host}" ];then
+        echo "hostname is empty,exit."
+        return 1
+    fi
+
+    if [ -z "${port}" ];then
+        echo "proxy port is empty,exit."
+        return 1
+    fi
+
+    local option="-h ${host}"
+
+    if [ -n "${user}" ];then
+        option="${option} -u ${user}"
+    fi
+
+    if [ -n "${pass}" ];then
+        option="${option} -p ${pass}"
+    fi
+
+    option="${option} ${port}"
+
+
+    eval "setMacProxy http ${option}"
+    eval "setMacProxy https ${option}"
+}
+
+macproxyoff(){
+    setMacProxy unset
 }
 
 npmproxyon(){
-    npm config set registry http://registry.npm.taobao.org
+    local defaultRegistry="http://registry.npm.taobao.org"
+    local registry="${1}"
+    if [ -z "${registry}" ];then
+        echo "Not pass registry, use defaultRegistry: ${defaultRegistry}"
+        registry="${defaultRegistry}"
+    fi
+    echo "Set npm registry to ${registry}"
+    npm config set registry "${registry}"
 }
 
 npmproxyoff(){
-    npm config delete registry
+    echo -n "Delete npm registry .. "
+    npm config delete registry && echo "Done." || echo "Failed."
 }
 
-aptproxyon(){
-    if ! command -v apt >/dev/null 2>&1;then
-        echo "No apt command found"
-        return 1
-    fi
+parseProxy(){
+    # use first parameter: $1
+    local proxy="${1}"
 
-    local host=localhost
-
-    while getopts ":h:" opt;do
-        case $opt in
-            h)
-                host=$OPTARG
-                ;;
-            :)
-                echo "Option '$OPTARG' missing arg"
+    if [ -z "${proxy}" ];then
+        # use ${PROXY_FILE}
+        if [ -n "${PROXY_FILE}" ];then
+            if [ -e "${PROXY_FILE}" ];then
+                #pass http proxy
+                proxy="$(perl -lne 'print $1 if /^http_proxy=(.+)$/' ${PROXY_FILE})"
+            else
+                echo "The file specified by \${PROXY_FILE}: ${PROXY_FILE} not exist,exit." >&2
                 return 1
-                ;;
-            \?)
-                echo "Unkown option '$OPTARG'"
-                return 2
-                ;;
-        esac
-    done
-    shift $(($OPTIND-1))
-    local port=${1:-8000}
-
-    local proxy="http://$host:$port"
-
-    local proxyFile=/etc/apt/apt.conf.d/httpProxy
-    echo "use proxy: $proxy"
-    cat>/tmp/httpProxy<<EOF
-Acquire::http::proxy "$proxy";
-Acquire::https::proxy "$proxy";
-EOF
-    sudo mv /tmp/httpProxy $proxyFile
-}
-
-aptproxyoff(){
-    if ! command -v apt >/dev/null 2>&1;then
-        echo "No apt command found"
-        return 1
+            fi
+        else
+            echo "\${PROXY_FILE} is empty,exit." >&2
+            return 1
+        fi
     fi
-    local proxyFile=/etc/apt/apt.conf.d/httpProxy
-    sudo /bin/rm -rf ${proxyFile}
 
+    # return parsed proxy
+    echo "${proxy}"
 }
 
 proxyon2(){
@@ -1632,6 +1658,79 @@ function editService(){
     fi
     sudo -E systemctl edit --full $serviceName
 }
+
+proxyon3(){
+    local proxyFile=/etc/proxy
+    http_proxy="$(perl -lne 'print $1 if /^http_proxy=(.+)$/' ${proxyFile})"
+    https_proxy="$(perl -lne 'print $1 if /^https_proxy=(.+)$/' ${proxyFile})"
+    echo "http_proxy: ${http_proxy}"
+    echo "https_proxy: ${https_proxy}"
+    export http_proxy=${http_proxy}
+    export https_proxy=${https_proxy}
+
+    #git
+    #system proxy on Mac
+}
+
+aptproxyon(){
+    if ! command -v apt >/dev/null 2>&1;then
+        echo "No apt command found"
+        return 1
+    fi
+
+    local proxy="$(parseProxy ${1})"
+    if [ -z "${proxy}" ];then
+        echo "Cannot get proxy value,exit."
+        return 1
+    fi
+
+    local proxyFile=/etc/apt/apt.conf.d/httpProxy
+    echo "use proxy: $proxy"
+    cat>/tmp/httpProxy<<EOF
+Acquire::http::proxy "$proxy";
+Acquire::https::proxy "$proxy";
+EOF
+    sudo mv /tmp/httpProxy $proxyFile
+}
+
+aptproxyoff(){
+    if ! command -v apt >/dev/null 2>&1;then
+        echo "No apt command found"
+        return 1
+    fi
+    local proxyFile=/etc/apt/apt.conf.d/httpProxy
+    sudo /bin/rm -rf ${proxyFile}
+
+}
+
+gitproxyon(){
+    if ! command -v git >/dev/null 2>&1;then
+        echo "No git command."
+        return 1
+    fi
+    local proxy="$(parseProxy ${1})"
+    if [ -z "${proxy}" ];then
+        echo "Cannot get proxy value,exit."
+        return 1
+    fi
+    echo -n "set git http proxy to ${proxy} .. "
+    git config --global http.proxy $proxy && echo "OK" || echo "Failed"
+    echo -n "set git https proxy to ${proxy} .. "
+    git config --global https.proxy $proxy && echo "OK" || echo "Failed"
+}
+
+gitProxyoff(){
+    if ! command -v git >/dev/null 2>&1;then
+        echo "No git command."
+        return 1
+    fi
+    echo -n "clear git http proxy .. "
+    git config --global --unset-all http.proxy && echo "OK" || echo "Failed"
+    echo -n "clear git https proxy .. "
+    git config --global --unset-all https.proxy && echo "OK" || echo "Failed"
+}
+
+
 
 function detectBin(){
     local root=${1:?'missing detect root'}
