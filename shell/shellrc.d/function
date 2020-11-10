@@ -270,6 +270,7 @@ parseProxy(){
 proxyEnvOn(){
     local proxy="${1}"
     if [ -n "${proxy}" ];then
+        echo "Set http_proxy https_proxy all_proxy to ${proxy}"
         export http_proxy="${proxy}"
         export https_proxy="${proxy}"
         export all_proxy="${proxy}"
@@ -374,10 +375,12 @@ pipproxyoff(){
 }
 
 proxyon(){
-    local proxy="${1}"
+    local proxy="$(parseProxy ${1})"
 
     gitproxyon "${proxy}"
     proxyEnvOn "${proxy}"
+
+    echo
 
     npmproxyon
     pipproxyon
