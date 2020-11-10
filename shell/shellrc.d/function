@@ -1543,7 +1543,16 @@ sshconfig(){
     if [ ! -d ${sshDir} ];then
         mkdir -p ${sshDir}
     fi
-    $editor ${sshDir}/config
+    local cfgFile=${sshDir}/config
+    if [ ! -e ${cfgFile} ];then
+        cat<<-EOF>${cfgFile}
+		# Host <custom>
+		    # HostName <hostname>
+		    # Port    <port>
+		    # User    <user>
+		EOF
+    fi
+    $editor ${cfgFile}
 }
 
 function sendmail(){
