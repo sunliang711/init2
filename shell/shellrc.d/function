@@ -229,7 +229,7 @@ npmproxyon(){
     local defaultRegistry="http://registry.npm.taobao.org"
     local registry="${1}"
     if [ -z "${registry}" ];then
-        echo "Not pass registry, use defaultRegistry: ${defaultRegistry}"
+        echo "No registry parameter passed, use defaultRegistry: ${defaultRegistry}"
         registry="${defaultRegistry}"
     fi
     echo "Set npm registry to ${registry}"
@@ -242,15 +242,16 @@ npmproxyoff(){
 }
 
 parseProxy(){
-    # use first parameter: $1
+    # Note: echo msg to stderr!! echo "msg" >&2
     local proxy="${1}"
 
     if [ -z "${proxy}" ];then
-        echo "Not pass proxy parameter" >&2
+        echo "No proxy parameter passed" >&2
         # use ${PROXY_FILE}
         if [ -n "${PROXY_FILE}" ];then
             if [ -e "${PROXY_FILE}" ];then
                 #pass http proxy
+                echo "Use PROXY_FILE env." >&2
                 proxy="$(perl -lne 'print $1 if /^http_proxy=(.+)$/' ${PROXY_FILE})"
             else
                 echo "The file specified by \${PROXY_FILE}: ${PROXY_FILE} not exist,exit." >&2
@@ -314,7 +315,7 @@ gitproxyon(){
         echo "Cannot get proxy value,exit."
         return 1
     fi
-    echo -n "Set git http proxy to ${proxy} .. "
+    echo -n "Set git http  proxy to ${proxy} .. "
     git config --global http.proxy $proxy && echo "OK" || echo "Failed"
     echo -n "Set git https proxy to ${proxy} .. "
     git config --global https.proxy $proxy && echo "OK" || echo "Failed"
