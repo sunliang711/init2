@@ -141,43 +141,45 @@ function slientExe(){
     eval "$@" >/dev/null 2>&1
 }
 
-dockerproxyon(){
-    echo "TODO"
-}
 
-dockerproxyoff(){
-    echo "TODO"
-}
+# function proxyon(){
+#     proxyon_
+#     destFile="$HOME/.shellrc.d/local"
+#     if ! grep -q 'proxyon_\|proxyoff_' $destFile;then
+#         echo 'proxyoff_' >> $destFile
+#     fi
+#     sed -i.bak -e 's|proxyoff_|proxyon_|' "$destFile"
+#     rm "${destFile}.bak"
+# }
 
-aptproxyon(){
-    if ! command -v apt >/dev/null 2>&1;then
-        echo "No apt command found,skip."
+function currentNetworkService(){
+    if [ "$(uname)" != "Darwin" ];then
+        echo "Only support MacOS"
         return 1
     fi
+    while read -r line; do
+        sname=$(echo "$line" | awk -F  "(, )|(: )|[)]" '{print $2}')
+        sdev=$(echo "$line" | awk -F  "(, )|(: )|[)]" '{print $4}')
+        #echo "Current service: $sname, $sdev, $currentservice"
+        if [ -n "$sdev" ]; then
+            ifout="$(ifconfig "$sdev" 2>/dev/null)"
+            echo "$ifout" | grep 'status: active' > /dev/null 2>&1
+            rc="$?"
+            if [ "$rc" -eq 0 ]; then
+                currentservice="$sname"
+                currentdevice="$sdev"
+                currentmac=$(echo "$ifout" | awk '/ether/{print $2}')
 
-    local proxy="$(parseProxy ${1})"
-    if [ -z "${proxy}" ];then
-        echo "Cannot get proxy value,exit."
+                # may have multiple active devices, so echo it here
+                echo "$currentservice, $currentdevice, $currentmac"
+            fi
+        fi
+    done <<< "$(networksetup -listnetworkserviceorder | grep 'Hardware Port')"
+
+    if [ -z "$currentservice" ]; then
+        # >&2 echo "Could not find current service"
         return 1
     fi
-
-    local proxyFile=/etc/apt/apt.conf.d/httpProxy
-    echo "use proxy: $proxy"
-    cat>/tmp/httpProxy<<EOF
-Acquire::http::proxy "$proxy";
-Acquire::https::proxy "$proxy";
-EOF
-    sudo mv /tmp/httpProxy $proxyFile
-}
-
-aptproxyoff(){
-    if ! command -v apt >/dev/null 2>&1;then
-        echo "No apt command found,skip"
-        return 1
-    fi
-    local proxyFile=/etc/apt/apt.conf.d/httpProxy
-    sudo /bin/rm -rf ${proxyFile}
-
 }
 
 macproxyon(){
@@ -216,9 +218,9 @@ macproxyon(){
 
     option="${option} ${port}"
 
-    echo "Set mac system proxy to ${proxy}"
-    eval "setMacProxy http ${option} >/dev/null"
-    eval "setMacProxy https ${option} >/dev/null"
+
+    eval "setMacProxy http ${option}"
+    eval "setMacProxy https ${option}"
 }
 
 macproxyoff(){
@@ -266,6 +268,18 @@ parseProxy(){
     echo "${proxy}"
 }
 
+# detect git proxy as http_proxy https_proxy env
+detectProxyEnv(){
+    if ! command -v git >/dev/null 2>&1;then
+        echo "No git command,exit."
+        return 1
+    fi
+    local gitHTTPProxy="$(git config --global http.proxy)"
+    if [ -n "${gitHTTPProxy}" ];then
+        proxyEnvOn "${gitHTTPProxy}"
+    fi
+}
+
 proxyEnvOn(){
     local proxy="${1}"
     if [ -n "${proxy}" ];then
@@ -282,124 +296,186 @@ proxyEnvOn(){
     fi
 }
 
-proxyEnvOff(){
-    unset http_proxy
-    unset https_proxy
-    unset all_proxy
-
-    unset HTTP_PROXY
-    unset HTTPS_PROXY
-    unset ALL_PROXY
-}
-
-# detect git proxy as http_proxy https_proxy env
-detectProxyEnv(){
-    if ! command -v git >/dev/null 2>&1;then
-        echo "No git command,exit."
-        return 1
-    fi
-    local gitHTTPProxy="$(git config --global http.proxy)"
-    if [ -n "${gitHTTPProxy}" ];then
-        proxyEnvOn "${gitHTTPProxy}"
-    fi
-}
-
-gitproxyon(){
-    if ! command -v git >/dev/null 2>&1;then
-        echo "No git command."
-        return 1
-    fi
-    local proxy="$(parseProxy ${1})"
+proxyon2(){
+    local defaultProxy="http://localhost:6119"
+    local proxy=${1}
     if [ -z "${proxy}" ];then
-        echo "Cannot get proxy value,exit."
-        return 1
+        case $(uname) in
+            Darwin)
+                local networkService=`currentNetworkService`
+                if [ -n "$networkService" ];then
+                    local ns=$(echo $networkService | awk -F, '{print $1}')
+                    if [ -n "$ns" ];then
+                        local webproxy=$(networksetup -getwebproxy $ns)
+                        if echo $webproxy | grep ^Enabled | grep -q 'Yes';then
+                            host=`echo $webproxy | grep ^Server | perl -ne 'print $1 if /Server:\s*(.+)/'`
+                            port=`echo $webproxy | grep ^Port | perl -ne 'print $1 if /Port:\s*(.+)/'`
+                            proxy="http://$host:$port"
+                            # echo "proxy: $proxy"
+                        fi
+                    fi
+                fi
+                ;;
+            Linux)
+                ;;
+        esac
     fi
-    echo -n "Set git http proxy to ${proxy} .. "
-    git config --global http.proxy $proxy && echo "OK" || echo "Failed"
-    echo -n "Set git https proxy to ${proxy} .. "
-    git config --global https.proxy $proxy && echo "OK" || echo "Failed"
+
+    if [ -z "${proxy}" ];then
+        proxy=${defaultProxy}
+    fi
+
+    echoExec "export http_proxy=$proxy"
+    echoExec "export https_proxy=$proxy"
+    echoExec "export ftp_proxy=$proxy"
+    echoExec "export all_proxy=$proxy"
+    echoExec "export HTTP_PROXY=$proxy"
+    echoExec "export HTTPS_PROXY=$proxy"
+    echoExec "export FTP_PROXY=$proxy"
+    echoExec "export ALL_PROXY=$proxy"
+
+    #set git proxy
+    if command -v git >/dev/null 2>&1;then
+        echoExec "git config --global http.proxy $proxy"
+        echoExec "git config --global https.proxy $proxy"
+    fi
+
+    if command -v npm >/dev/null 2>&1;then
+        echo "npm config set registry http://registry.npm.taobao.org"
+        npm config set registry http://registry.npm.taobao.org
+    fi
 }
 
-gitproxyoff(){
-    if ! command -v git >/dev/null 2>&1;then
-        echo "No git command."
-        return 1
+function proxyon_(){
+    # 在mac下，如果不指定参数，并且有设置mac系统代理的脚本存在
+    # 则查看当前mac系统的代理，用它作为参数来设置其他的代理
+    if [ $# -eq 0 ] && [ "$(uname)" = "Darwin" ];then
+        if command -v setMacProxy >/dev/null 2>&1;then
+            systemProxy="$(setMacProxy list  | grep -i 'Http[[:space:]]*proxy' | awk '{print $5}' | perl -lne 'print $1 if /(\w+:\d+)/')"
+            if [ -n "$systemProxy" ];then
+                if echo "$systemProxy" | grep -q '^http://';then
+                    systemProxy=${systemProxy:7}
+                    echo "Found system proxy: ${systemProxy}"
+                fi
+            fi
+        fi
+    fi
+    local host=localhost
+
+    while getopts ":h:" opt;do
+        case $opt in
+            h)
+                host=$OPTARG
+                ;;
+            :)
+                echo "Option '$OPTARG' missing arg"
+                return 1
+                ;;
+            \?)
+                echo "Unkown option '$OPTARG'"
+                return 2
+                ;;
+        esac
+    done
+    shift $(($OPTIND-1))
+    local port=${1:-6119}
+
+    # local proxy=http://$host:$port
+    if [ -n "${systemProxy}" ];then
+        echo "use system proxy: ${systemProxy}"
+        local proxy=${systemProxy}
+    else
+        echo "use host:$host (-h to specify) port: $port (first parameter) as proxy"
+        local proxy="http://${host}:${port}"
     fi
 
-    echo -n "Clear git http proxy .. "
-    git config --global --unset-all http.proxy && echo "OK" || echo "No git http proxy set,skip."
-    echo -n "Clear git https proxy .. "
-    git config --global --unset-all https.proxy && echo "OK" || echo "No git https proxy set,skip."
-}
+    echo "set http_proxy https_proxy ftp_proxy all_proxy to $proxy"
+    export http_proxy=$proxy
+    export https_proxy=$proxy
+    export ftp_proxy=$proxy
+    export all_proxy=$proxy
+    export HTTP_PROXY=$proxy
+    export HTTPS_PROXY=$proxy
+    export FTP_PROXY=$proxy
+    export ALL_PROXY=$proxy
 
-pipproxyon(){
-    local exist=0
+    echo "set git proxy to $proxy"
+    # set git proxy
+    if command -v git >/dev/null 2>&1;then
+        git config --global http.proxy $proxy
+        git config --global https.proxy $proxy
+    fi
+
     if command -v pip >/dev/null 2>&1;then
-        exist=1
+        echo "alias pip=\"pip --proxy $proxy\""
+        alias pip="pip --proxy $proxy"
     fi
-    if command -v pip3 > /dev/null 2>&1;then
-        exist=1
+    if command -v pip3 >/dev/null 2>&1;then
+        echo "alias pip3=\"pip3 --proxy $proxy\""
+        alias pip3="pip3 --proxy $proxy"
+    fi
+    if command -v npm >/dev/null 2>&1;then
+        echo "set npm registry to http://registry.npm.taobao.org"
+        npm config set registry http://registry.npm.taobao.org
     fi
 
-    if [ "${exist}" -eq 0 ];then
-        echo "Warning: no pip or pip3 command found."
-    fi
+}
 
-    if [ ! -d ${home}/.pip ];then
-          mkdir ${home}/.pip
+# function proxyoff(){
+#     proxyoff_
+#     destFile="$HOME/.shellrc.d/local"
+#     if ! grep -q 'proxyon_\|proxyoff_' $destFile;then
+#         echo 'proxyoff_' >> $destFile
+#     fi
+#     sed -i.bak -e 's|proxyon_|proxyoff_|' "$destFile"
+#     rm "${destFile}.bak"
+# }
+
+function proxyoff_(){
+    echoExec "unset http_proxy"
+    echoExec "unset https_proxy"
+    echoExec "unset ftp_proxy"
+    echoExec "unset HTTP_PROXY"
+    echoExec "unset HTTPS_PROXY"
+    echoExec "unset FTP_PROXY"
+    echoExec "unset all_proxy"
+    echoExec "unset ALL_PROXY"
+
+    if command -v git >/dev/null 2>&1;then
+        echoExec "git config --global --unset-all http.proxy"
+        echoExec "git config --global --unset-all https.proxy"
     fi
-    local source="https://pypi.tuna.tsinghua.edu.cn"
-    echo -n "Set pip source to ${source} .. "
-    cat>${home}/.pip/pip.conf<<-EOF
-		[global]
-		trusted-host = pypi.tuna.tsinghua.edu.cn
-		index-url = https://pypi.tuna.tsinghua.edu.cn/simple
-	EOF
-    if [ $? -eq 0 ];then
-        echo "Done"
+    echoExec "unalias brew" 2>/dev/null
+    echoExec "unalias curl" 2>/dev/null
+    echoExec "unalias pip" 2>/dev/null
+    echoExec "unalias pip3" 2>/dev/null
+    # local configFile="/tmp/curlrc"
+    # rm -rf "$configFile" 2>/dev/null
+    if command -v npm >/dev/null 2>&1;then
+        npm config delete registry
+    fi
+}
+
+proxystatus(){
+    # if declare -x | grep 'http_proxy="\{,1\}127.0.0.1:6119' >/dev/null 2>&1;then
+    if declare -x | grep '_proxy=' >/dev/null 2>&1;then
+        echo "http proxy is set:"
+        #declare -x |grep 6119
+        declare -x |grep -i '_proxy'
     else
-        echo "Error"
+        echo "[http] proxy is off"
     fi
-}
-
-pipproxyoff(){
-    local configFile="${home}/.pip/pip.conf"
-    if [ -e ${configFile} ];then
-        echo -n "Remove pip proxy.."
-        /bin/rm -rf ${configFile} && echo "Done." || echo "Failed."
+    out=$(git config --global -l | grep 'https\?\.proxy')
+    if [[ -n "$out" ]];then
+        echo
+        echo "git proxy setting:"
+        git config --global -l | grep 'https\?\.proxy'
+        # echo "$out"
     else
-        echo "No pip set,skip."
+        echo "[git] proxy is off."
     fi
-}
-
-proxyon(){
-    local proxy="${1}"
-
-    gitproxyon "${proxy}"
-    proxyEnvOn "${proxy}"
-
-    npmproxyon
-    pipproxyon
-
-    case $(uname) in
-        Darwin)
-            macproxyon "${proxy}"
-            ;;
-    esac
-}
-
-proxyoff(){
-    gitproxyoff
-    proxyEnvOff
-
-    npmproxyoff
-    pipproxyoff
-
-    case $(uname) in
-        Darwin)
-            macproxyoff
-            ;;
-    esac
+    alias | grep curl
+    alias | grep brew
 }
 
 #创建目录并进入该目录
@@ -1240,9 +1316,6 @@ function newsh(){
 		    BOLD=""
 		    NORMAL=""
 		fi
-		_err(){
-		    echo "$*" >&2
-		}
 
 		function _runAsRoot(){
 		    verbose=0
@@ -1614,6 +1687,78 @@ function editService(){
     fi
     sudo -E systemctl edit --full $serviceName
 }
+
+proxyon3(){
+    local proxyFile=/etc/proxy
+    http_proxy="$(perl -lne 'print $1 if /^http_proxy=(.+)$/' ${proxyFile})"
+    https_proxy="$(perl -lne 'print $1 if /^https_proxy=(.+)$/' ${proxyFile})"
+    echo "http_proxy: ${http_proxy}"
+    echo "https_proxy: ${https_proxy}"
+    export http_proxy=${http_proxy}
+    export https_proxy=${https_proxy}
+
+    #git
+    #system proxy on Mac
+}
+
+aptproxyon(){
+    if ! command -v apt >/dev/null 2>&1;then
+        echo "No apt command found"
+        return 1
+    fi
+
+    local proxy="$(parseProxy ${1})"
+    if [ -z "${proxy}" ];then
+        echo "Cannot get proxy value,exit."
+        return 1
+    fi
+
+    local proxyFile=/etc/apt/apt.conf.d/httpProxy
+    echo "use proxy: $proxy"
+    cat>/tmp/httpProxy<<EOF
+Acquire::http::proxy "$proxy";
+Acquire::https::proxy "$proxy";
+EOF
+    sudo mv /tmp/httpProxy $proxyFile
+}
+
+aptproxyoff(){
+    if ! command -v apt >/dev/null 2>&1;then
+        echo "No apt command found"
+        return 1
+    fi
+    local proxyFile=/etc/apt/apt.conf.d/httpProxy
+    sudo /bin/rm -rf ${proxyFile}
+
+}
+
+gitproxyon(){
+    if ! command -v git >/dev/null 2>&1;then
+        echo "No git command."
+        return 1
+    fi
+    local proxy="$(parseProxy ${1})"
+    if [ -z "${proxy}" ];then
+        echo "Cannot get proxy value,exit."
+        return 1
+    fi
+    echo -n "set git http proxy to ${proxy} .. "
+    git config --global http.proxy $proxy && echo "OK" || echo "Failed"
+    echo -n "set git https proxy to ${proxy} .. "
+    git config --global https.proxy $proxy && echo "OK" || echo "Failed"
+}
+
+gitProxyoff(){
+    if ! command -v git >/dev/null 2>&1;then
+        echo "No git command."
+        return 1
+    fi
+    echo -n "clear git http proxy .. "
+    git config --global --unset-all http.proxy && echo "OK" || echo "Failed"
+    echo -n "clear git https proxy .. "
+    git config --global --unset-all https.proxy && echo "OK" || echo "Failed"
+}
+
 
 
 function detectBin(){
