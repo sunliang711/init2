@@ -141,12 +141,76 @@ function slientExe(){
     eval "$@" >/dev/null 2>&1
 }
 
+rootID=0
+_root(){
+    if [ $EUID -ne ${rootID} ];then
+        echo "Need run as root"
+        return 1
+    fi
+}
+
+_linux(){
+    if [ $(uname) != "Linux" ];then
+        echo "Need run on Linux"
+        return 1
+    fi
+}
+
+_restartDocker(){
+    if ! _root;then
+        return 1
+    fi
+    if ! _linux;then
+        return 1
+    fi
+    echo "systemctl daemon-reload..."
+    systemctl daemon-reload
+    echo "restart docker..."
+    systemctl restart docker
+}
+
 dockerproxyon(){
-    echo "TODO"
+    local dest=/etc/systemd/system/docker.service.d
+    local cfg=${dest}/proxy.conf
+    if ! _linux;then
+        return 1
+    fi
+    if ! _root;then
+        return 1
+    fi
+    local proxy="$(parseProxy ${1})"
+    if [ -z "${proxy}" ];then
+        echo "Cannot get proxy value,exit."
+        return 1
+    fi
+
+    if [ ! -d ${dest} ];then
+        echo "mkdir ${dest}..."
+        mkdir ${dest}
+    fi
+
+    if [ -e ${cfg} ];then
+        echo "${cfg} already exists,exit."
+        return
+    fi
+
+    echo "Write proxy info to file: ${cfg}"
+    cat<<-EOF>${cfg}
+	[Service]
+	Environment="HTTP_PROXY=${proxy}"
+	Environment="HTTPS_PROXY=${proxy}"
+	EOF
+
+    _restartDocker
+
 }
 
 dockerproxyoff(){
-    echo "TODO"
+    _root
+    local dest=/etc/systemd/system/docker.service.d
+    local cfg=${dest}/proxy.conf
+    rm ${cfg}
+    _restartDocker
 }
 
 aptproxyon(){
