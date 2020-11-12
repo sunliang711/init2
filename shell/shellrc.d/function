@@ -141,14 +141,6 @@ function slientExe(){
     eval "$@" >/dev/null 2>&1
 }
 
-rootID=0
-_root(){
-    if [ $EUID -ne ${rootID} ];then
-        echo "Need run as root"
-        return 1
-    fi
-}
-
 _linux(){
     if [ $(uname) != "Linux" ];then
         echo "Need run on Linux"
@@ -157,25 +149,37 @@ _linux(){
 }
 
 _restartDocker(){
-    if ! _root;then
-        return 1
-    fi
     if ! _linux;then
         return 1
     fi
     echo "systemctl daemon-reload..."
-    systemctl daemon-reload
+    runAsRoot "systemctl daemon-reload"
     echo "restart docker..."
-    systemctl restart docker
+    runAsRoot "systemctl restart docker"
+}
+
+runAsRoot(){
+    cmd="${*}"
+    local rootID=0
+    if [ "${EUID}" -ne "${rootID}" ];then
+        echo -n "Not root, try to run as root.."
+        if eval "sudo ${cmd}";then
+            echo "ok"
+            return 0
+        else
+            echo "failed"
+            return 1
+        fi
+    else
+        eval "${cmd}"
+    fi
 }
 
 dockerproxyon(){
     local dest=/etc/systemd/system/docker.service.d
     local cfg=${dest}/proxy.conf
+
     if ! _linux;then
-        return 1
-    fi
-    if ! _root;then
         return 1
     fi
     local proxy="$(parseProxy ${1})"
@@ -186,7 +190,7 @@ dockerproxyon(){
 
     if [ ! -d ${dest} ];then
         echo "mkdir ${dest}..."
-        mkdir ${dest}
+        runAsRoot "mkdir ${dest}"
     fi
 
     if [ -e ${cfg} ];then
@@ -194,22 +198,23 @@ dockerproxyon(){
         return
     fi
 
-    echo "Write proxy info to file: ${cfg}"
-    cat<<-EOF>${cfg}
+    local tmpFile=/tmp/tmpdockerconf
+    cat<<-EOF>${tmpFile}
 	[Service]
 	Environment="HTTP_PROXY=${proxy}"
 	Environment="HTTPS_PROXY=${proxy}"
 	EOF
 
-    _restartDocker
+    echo "Write proxy info to file: ${cfg}"
+    runAsRoot "mv ${tmpFile} ${cfg}"
 
+    _restartDocker
 }
 
 dockerproxyoff(){
-    _root
     local dest=/etc/systemd/system/docker.service.d
     local cfg=${dest}/proxy.conf
-    rm ${cfg}
+    runAsRoot "rm ${cfg}"
     _restartDocker
 }
 
@@ -1312,38 +1317,22 @@ function newsh(){
 		    echo "$*" >&2
 		}
 
-		function _runAsRoot(){
-		    verbose=0
-		    while getopts ":v" opt;do
-		        case "$opt" in
-		            v)
-		                verbose=1
-		                ;;
-		            \?)
-		                echo "Unknown option: \"$OPTARG\""
-		                exit 1
-		                ;;
-		        esac
-		    done
-		    shift $((OPTIND-1))
-		    cmd="$@"
-		    if [ -z "$cmd" ];then
-		        echo "${red}Need cmd${reset}"
-		        exit 1
-		    fi
-		
-		    if [ "$verbose" -eq 1 ];then
-		        echo "run cmd:\"${red}$cmd${reset}\" as root."
-		    fi
-		
-		    if (($EUID==0));then
-		        sh -c "$cmd"
-		    else
-		        if ! command -v sudo >/dev/null 2>&1;then
-		            echo "Need sudo cmd"
-		            exit 1
+		_runAsRoot(){
+		    cmd="${*}"
+		    local rootID=0
+		    if [ "${EUID}" -ne "${rootID}" ];then
+		        echo -n "Not root, try to run as root.."
+		        # or sudo sh -c ${cmd} ?
+		        if eval "sudo ${cmd}";then
+		            echo "ok"
+		            return 0
+		        else
+		            echo "failed"
+		            return 1
 		        fi
-		        sudo sh -c "$cmd"
+		    else
+		        # or sh -c ${cmd} ?
+		        eval "${cmd}"
 		    fi
 		}
 
