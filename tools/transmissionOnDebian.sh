@@ -107,6 +107,9 @@ _fullpath(){
     cd "${path}" && pwd
 }
 
+UID=0
+GID=0
+
 install(){
     local usage="install <username> <password> <install destination>"
     local username=${1}
@@ -151,8 +154,8 @@ services:
     image: ghcr.io/linuxserver/transmission
     container_name: transmission
     environment:
-      - PUID=1000
-      - PGID=1000
+      - PUID=${UID}
+      - PGID=${GID}
       - TZ=Asia/Shanghai
       - TRANSMISSION_WEB_HOME=/combustion-release/ #optional
       - USER=${username} #optional
@@ -169,6 +172,7 @@ services:
 EOF
     if [ $? -eq 0 ];then
         echo "ok"
+        echo "transmission uid: ${UID} gid: ${GID}"
         echo "run 'docker-compose up -d' in ${dest} to start transmission."
     else
         echo "failed"
