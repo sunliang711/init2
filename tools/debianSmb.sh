@@ -4,7 +4,7 @@ if [ -z "$rpath" ];then
     rpath=${BASH_SOURCE}
 fi
 this="$(cd $(dirname $rpath) && pwd)"
-cd "$this"
+# cd "$this"
 export PATH=$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 user="${SUDO_USER:-$(whoami)}"
@@ -99,15 +99,15 @@ install(){
     smbuser=${4:?'missing smb user'}
     smbpassword=${5:?'missing smb password'}
 
-    cat<<-EOF>>$home/.smbcredentials
+    local credentialFile="${home}/.${smbip}-${smbname}-credential"
+    cat<<-EOF>${credentialFile}
 	username=${smbuser}
 	password=${smbpassword}
 	EOF
 
     _backup
 
-    local credentialFile="${home}/.${smbip}-${smbname}-credential"
-    cat<<-EOF>${credentialFile}
+    cat<<-EOF>>/etc/fstab
 	${begin}
 	#//${smbip}/${smbname} ${mountdir} cifs credentials=${credentialFile},users,rw,iocharset=utf8,sec=ntlm 0 0
 	//${smbip}/${smbname} ${mountdir} cifs credentials=${credentialFile} 0 0

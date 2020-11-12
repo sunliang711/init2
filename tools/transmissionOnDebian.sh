@@ -4,7 +4,7 @@ if [ -z "$rpath" ];then
     rpath=${BASH_SOURCE}
 fi
 this="$(cd $(dirname $rpath) && pwd)"
-cd "$this"
+# cd "$this"
 export PATH=$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 user="${SUDO_USER:-$(whoami)}"
@@ -107,8 +107,8 @@ _fullpath(){
     cd "${path}" && pwd
 }
 
-UID=0
-GID=0
+PUID=0
+PGID=0
 
 install(){
     local usage="install <username> <password> <install destination>"
@@ -134,12 +134,9 @@ install(){
         exit 1
     fi
 
-    local configName=./config
-    local downloadName=./download
-    local watchName=./watch
-    local configDir="${dest}/${configName}"
-    local downloadDir="${dest}/${downloadName}"
-    local watchDir="${dest}/${watchName}"
+    local configDir="${dest}/config"
+    local downloadDir="${dest}/download"
+    local watchDir="${dest}/download/watch"
 
     _createDirWhenNeed ${configDir}
     _createDirWhenNeed ${downloadDir}
@@ -154,16 +151,16 @@ services:
     image: ghcr.io/linuxserver/transmission
     container_name: transmission
     environment:
-      - PUID=${UID}
-      - PGID=${GID}
+      - PUID=${PUID}
+      - PGID=${PGID}
       - TZ=Asia/Shanghai
       - TRANSMISSION_WEB_HOME=/combustion-release/ #optional
       - USER=${username} #optional
       - PASS=${password} #optional
     volumes:
-      - ${configName}:/config
-      - ${downloadName}:/downloads
-      - ${watchName}:/watch
+      - ${configDir}:/config
+      - ${downloadDir}:/downloads
+      - ${watchDir}:/watch
     ports:
       - 9091:9091
       - 51413:51413
@@ -172,7 +169,7 @@ services:
 EOF
     if [ $? -eq 0 ];then
         echo "ok"
-        echo "transmission uid: ${UID} gid: ${GID}"
+        echo "transmission uid: ${PUID} gid: ${PGID}"
         echo "run 'docker-compose up -d' in ${dest} to start transmission."
     else
         echo "failed"
