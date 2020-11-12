@@ -91,6 +91,11 @@ install(){
     smbip=${1:?'missing smb ip'}
     smbname=${2:?'missing smb name'}
     mountdir=${3:?'missing mount dir'}
+    if [ ! -d ${mountdir} ];then
+        echo "Not find mount dir: ${mountdir}"
+        exit 1
+    fi
+    mountdir="$(cd ${mountdir} && pwd)"
     smbuser=${4:?'missing smb user'}
     smbpassword=${5:?'missing smb password'}
 
@@ -101,10 +106,11 @@ install(){
 
     _backup
 
-    cat<<-EOF>>/etc/fstab
+    local credentialFile="${home}/.${smbip}-${smbname}-credential"
+    cat<<-EOF>${credentialFile}
 	${begin}
-	#//${smbip}/${smbname} ${mountdir} cifs credentials=$home/.smbcredentials,users,rw,iocharset=utf8,sec=ntlm 0 0
-	//${smbip}/${smbname} ${mountdir} cifs credentials=$home/.smbcredentials 0 0
+	#//${smbip}/${smbname} ${mountdir} cifs credentials=${credentialFile},users,rw,iocharset=utf8,sec=ntlm 0 0
+	//${smbip}/${smbname} ${mountdir} cifs credentials=${credentialFile} 0 0
 	${end}
 	EOF
 
