@@ -74,29 +74,31 @@ function insert_path(){
 if command -v git >/dev/null 2>&1;then
     function ghclone(){
         p=${1:?"Usage: ghclone githubAccount/xx.git [newDir]"}
+        local user_proj="$(echo $p | perl -lne 'print $2 if /^\s*(https:\/\/github.com\/)?([^\/]+\/[^\/]+)/')"
+        if [ -z "${user_proj}" ];then
+            echo "Usage: ghclone [https://github.com/]USER/PROJ [newDIR]" >&2
+            return 1
+        fi
         if (($#>1));then
             newname=${2}
-            git clone "https://github.com/$p" "$newname"
+            git clone "https://github.com/$user_proj" "$newname"
         else
-            git clone "https://github.com/$p"
+            git clone "https://github.com/$user_proj"
         fi
     }
-    function gcclone(){
-        p=${1:?"Usage: gcclone coding.netAccount/xx.git [newDir]"}
-        if (($#>1));then
-            newname=${2}
-            git clone "https://git.coding.net/$p" "$newname"
-        else
-            git clone "https://git.coding.net/$p"
-        fi
-    }
+
     function geclone(){
         p=${1:?"Usage: geclone giteeAccount/xx.git [newDir]"}
+        local user_proj="$(echo $p | perl -lne 'print $2 if /^\s*(https:\/\/gitee.com\/)?([^\/]+\/[^\/]+)/')"
+        if [ -z "${user_proj}" ];then
+            echo "Usage: geclone [https://gitee.com/]USER/PROJ [newDIR]" >&2
+            return 1
+        fi
         if (($#>1));then
             newname=${2}
-            git clone "https://gitee.com/$p" "$newname"
+            git clone "https://gitee.com/$user_proj" "$newname"
         else
-            git clone "https://gitee.com/$p"
+            git clone "https://gitee.com/$user_proj"
         fi
     }
     #gpon(){
