@@ -1282,8 +1282,9 @@ function newsh(){
 		if [ -z "$rpath" ];then
 		    rpath=${BASH_SOURCE}
 		fi
+		pwd=${PWD}
 		this="$(cd $(dirname $rpath) && pwd)"
-		cd "$this"
+		# cd "$this"
 		export PATH=$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 		
 		user="${SUDO_USER:-$(whoami)}"
