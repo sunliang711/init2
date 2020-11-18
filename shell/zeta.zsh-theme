@@ -130,7 +130,9 @@ function proxy_status(){
     else
         echo -n "%{$grey%} [git]=>off %{$reset_color%}"
     fi
+}
 
+function registry_status(){
     # npm registry
     local defaultRegistry="registry.npmjs.org"
     local np=$(npm config get registry 2>/dev/null)
@@ -157,6 +159,9 @@ function print_prompt_head {
 %{$green_bold%}# proxy:%{$reset_color%}$(proxy_status)\
 "
     print -rP "$proxy_prompt"
+
+    registry_prompt="|-%{$green_bold%}# registry:%{$reset_color%}$(registry_status)"
+    print -rP "$registry_prompt"
 
     local left_prompt="╰─\
 %{$blue%}# \
