@@ -33,7 +33,7 @@ runAsRoot(){
 }
 
 if [ "$(uname)" != "Darwin" ];then
-    echo "Only on MacOS"
+    echo "Only on MacOS" >&2
     exit 1
 fi
 enX="$(route -n get 8.8.8.8 | perl -ne 'print $2 if /(interface:\s*)(\w+)/')"

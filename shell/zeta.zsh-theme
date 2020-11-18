@@ -116,16 +116,36 @@ function get_space {
 }
 
 function proxy_status(){
-    gp=$(git config --global http.proxy)
+    # http proxy
+    if [ -n "$http_proxy" ];then
+        echo -n "%{$green%}[http]=>$http_proxy %{$reset_color%}"
+    else
+        echo -n "%{$grey%}[http]=>off %{$reset_color%}"
+    fi
+
+    # git proxy
+    local gp=$(git config --global http.proxy 2>/dev/null)
     if [ -n "$gp" ];then
         echo -n "%{$green%} [git]=>$gp %{$reset_color%}"
     else
         echo -n "%{$grey%} [git]=>off %{$reset_color%}"
     fi
-    if [ -n "$http_proxy" ];then
-        echo -n "%{$green%}[http]=>$http_proxy %{$reset_color%}"
+
+    # npm registry
+    local defaultRegistry="registry.npmjs.org"
+    local np=$(npm config get registry 2>/dev/null)
+    if echo ${np} | grep -q "${defaultRegistry}";then
+        echo -n "%{$grey%}[npm]=>off %{$reset_color%}"
     else
-        echo -n "%{$grey%}[http]=>off %{$reset_color%}"
+        echo -n "%{$green%}[npm]=>$np %{$reset_color%}"
+    fi
+
+    # pip registry
+    local pipProxy="$(perl -lne 'print $1 if /^trusted-host\s*=\s*(.+)$/' ~/.pip/pip.conf 2>/dev/null)"
+    if [ -n "${pipProxy}" ];then
+        echo -n "%{$green%}[pip]=>${pipProxy} %{$reset_color%}"
+    else
+        echo -n "%{$grey%}[pip]=>off %{$reset_color%}"
     fi
 }
 
