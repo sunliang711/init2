@@ -969,11 +969,17 @@ Description=
 [Install]
 WantedBy=multi-user.target
 EOF
-editor=vi
+local ed=vi
 if command -v vim >/dev/null 2>&1;then
-    editor=vim
+    ed=vim
 fi
-$editor /tmp/$1.service
+if command -v nvim >/dev/null 2>&1;then
+    ed=nvim
+fi
+if [ -n "${editor}" ];then
+    ed=${editor}
+fi
+$ed /tmp/$1.service
 if command -v systemctl >/dev/null 2>&1;then
     echo -n "Copy /tmp/$1.service to /etc/systemd/system ? [y/n] "
     read cpService
@@ -1000,11 +1006,17 @@ function serviceEdit(){
         echo "Cannot find service file of '$name'!"
         return 1
     fi
-    editor=vi
+    local ed=vi
     if command -v vim >/dev/null 2>&1;then
-        editor=vim
+        ed=vim
     fi
-    $editor $filePath
+    if command -v nvim >/dev/null 2>&1;then
+        ed=nvim
+    fi
+    if [ -n "$editor" ];then
+        ed=${editor}
+    fi
+    $ed $filePath
 }
 
 function enc(){
@@ -1072,12 +1084,15 @@ function listen(){
 }
 
 function em(){
-    editor=vi
+    local ed=vi
     if command -v vim >/dev/null 2>&1;then
-        editor=vim
+        ed=vim
     fi
     if command -v nvim >/dev/null 2>&1;then
-        editor=nvim
+        ed=nvim
+    fi
+    if [ -n "${editor}" ];then
+        ed=${editor}
     fi
     destfile="$SHELLRC_ROOT/shellrc"
     while getopts ":hfaeobl" opt;do
@@ -1111,7 +1126,7 @@ function em(){
 
         esac
     done
-    $editor "$destfile"
+    $ed "$destfile"
 }
 
 function path(){
@@ -1269,12 +1284,15 @@ function newsh(){
         echo "Usage: ${green}$(basename $0)${reset} <new-shell-script-file-name>"
         return 1
     fi
-    editor=vi
+    local ed=vi
     if command -v vim >/dev/null 2>&1;then
-        editor=vim
+        ed=vim
     fi
     if command -v nvim >/dev/null 2>&1;then
-        editor=nvim
+        ed=nvim
+    fi
+    if [ -n "${editor}" ];then
+        ed=${editor}
     fi
     cat>"$filename" <<-'EOF'
 		#!/bin/bash
@@ -1345,12 +1363,15 @@ function newsh(){
 		    fi
 		}
 
-		editor=vi
+		local ed=vi
 		if command -v vim >/dev/null 2>&1;then
-		    editor=vim
+		    ed=vim
 		fi
 		if command -v nvim >/dev/null 2>&1;then
-		    editor=nvim
+		    ed=nvim
+		fi
+		if [ -n "${editor}" ];then
+		    ed=${editor}
 		fi
 		###############################################################################
 		# write your code below (just define function[s])
@@ -1359,7 +1380,7 @@ function newsh(){
 		# TODO
 		
 		em(){
-		    $editor $0
+		    $ed $0
 		}
 		
 		###############################################################################
@@ -1415,7 +1436,7 @@ function newsh(){
 		        "$@"
 		esac
 		EOF
-    "$editor" "$filename"
+    "$ed" "$filename"
     chmod +x "$filename"
 }
 
@@ -1425,12 +1446,15 @@ function newlogrotate(){
         echo "Usage: ${green}$(basename $0)${reset} <new logrotate config file>"
         return 1
     fi
-    local editor=vi
+    local ed=vi
     if command -v vim >/dev/null 2>&1;then
-        editor=vim
+        ed=vim
     fi
     if command -v nvim >/dev/null 2>&1;then
-        editor=nvim
+        ed=nvim
+    fi
+    if [ -n "${editor}" ];then
+        ed="${editor}"
     fi
     cat>$filename<<EOF
 <PUT_YOUR_FILE_HERE> {
@@ -1449,7 +1473,7 @@ function newlogrotate(){
     #su root root
 }
 EOF
-    $editor $filename
+    $ed $filename
 
 }
 
@@ -1459,9 +1483,15 @@ function newpy(){
         echo "Usage: ${green}$(basename $0)${reset} <new-python-file-name>"
         return 1
     fi
-    editor=vi
+    local ed=vi
     if command -v vim >/dev/null 2>&1;then
-        editor=vim
+        ed=vim
+    fi
+    if command -v nvim >/dev/null 2>&1;then
+        ed=nvim
+    fi
+    if [ -n "${editor}" ];then
+        ed=${editor}
     fi
     cat> "$filename" <<-EOF
 		#!/usr/bin/env python3
@@ -1480,7 +1510,7 @@ function newpy(){
 		if __name__ == '__main__':
 		    main()
 	EOF
-    "$editor" "$filename"
+    "$ed" "$filename"
 }
 
 function newgitignore(){
@@ -1581,12 +1611,15 @@ cdinit(){
 }
 
 sshconfig(){
-    editor=vi
+    local ed=vi
     if command -v vim >/dev/null 2>&1;then
-        editor=vim
+        ed=vim
     fi
     if command -v vim >/dev/null 2>&1;then
-        editor=nvim
+        ed=nvim
+    fi
+    if [ -n "${editor}" ];then
+        ed=${editor}
     fi
 
     user="${SUDO_USER:-$(whoami)}"
@@ -1606,7 +1639,7 @@ sshconfig(){
 		    # User    <user>
 		EOF
     fi
-    $editor ${cfgFile}
+    $ed ${cfgFile}
 }
 
 function sendmail(){
