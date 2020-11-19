@@ -27,17 +27,18 @@ typ=
 list(){
     case $typ in
         e)
-            ls "$dest/sites-enabled"
+            ls "$dest/sites-enabled" 2>/dev/null
             ;;
         a)
-            ls "$dest/sites-available"
+            ls "$dest/sites-available" 2>/dev/null
             ;;
         *)
             echo "${green}available sites:${reset}"
-            ls "$dest/sites-available"
+            ls "$dest/sites-available" 2>/dev/null
             echo
             echo "${green}enabled sites:${reset}"
-            ls "$dest/sites-enabled"
+            ls "$dest/sites-enabled" 2>/dev/null
+	    echo
             ;;
     esac
 }
