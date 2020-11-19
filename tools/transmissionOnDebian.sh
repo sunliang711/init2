@@ -171,6 +171,7 @@ EOF
         echo "ok"
         echo "transmission uid: ${PUID} gid: ${PGID}"
         echo "run 'docker-compose up -d' in ${dest} to start transmission."
+        echo "You can mount smb on ${downloadDir} to let it be download destination"
     else
         echo "failed"
     fi
