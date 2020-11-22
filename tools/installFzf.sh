@@ -56,11 +56,11 @@ runAsRoot(){
 # TODO
 install(){
     #install binary
-    if [ ! -e $GOPATH/bin/fzf ];then
-        cmd="go get -u github.com/junegunn/fzf"
-        echo "$cmd ..."
-        bash -c "$cmd > /dev/null" && { echo "Done"; } || { echo "Install fzf error!"; exit 1; }
-    fi
+    # if [ ! -e $GOPATH/bin/fzf ];then
+    #     cmd="go get -u github.com/junegunn/fzf"
+    #     echo "$cmd ..."
+    #     bash -c "$cmd > /dev/null" && { echo "Done"; } || { echo "Install fzf error!"; exit 1; }
+    # fi
 
     # git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
     git clone --depth 1 https://gitee.com/quick-source/fzf.git ~/.fzf
