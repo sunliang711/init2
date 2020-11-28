@@ -221,7 +221,7 @@ dockerproxyoff(){
 }
 
 aptproxyon(){
-    if [ $(uname)!="Linux" ];then
+    if [ $(uname) != "Linux" ];then
         echo "Only on Linux"
 	return 1
     fi
