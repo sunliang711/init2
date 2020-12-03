@@ -242,7 +242,7 @@ aptproxyon(){
 Acquire::http::proxy "$proxy";
 Acquire::https::proxy "$proxy";
 EOF
-    sudo mv /tmp/httpProxy $proxyFile
+    sudo mv /tmp/httpProxy $proxyFile || { echo "mv /tmp/httpProxy $proxyFile failed, please issue it mannually!"; }
 }
 
 aptproxyoff(){
@@ -255,7 +255,7 @@ aptproxyoff(){
         return 1
     fi
     local proxyFile=/etc/apt/apt.conf.d/httpProxy
-    sudo /bin/rm -rf ${proxyFile}
+    sudo /bin/rm -rf ${proxyFile} || { echo "remove ${proxyFile} failed, please remove it mannually!"; }
 
 }
 
@@ -1290,6 +1290,56 @@ function brewlp(){
     brew "$@"
     echo "$(tput setaf 1)unset ALL_PROXY$(tput sgr0)"
     unset ALL_PROXY
+}
+
+function _need(){
+    local cmd=${1}
+    if [ -z ${cmd} ];then
+        return
+    fi
+    if ! command -v ${cmd} >/dev/null 2>&1;then
+        echo "Need $cmd"
+        return 1
+    fi
+}
+
+function newrust(){
+    if ! _need cargo;then
+        return 1
+    fi
+    if ! _need tmux;then
+        return 1
+    fi
+    local ed=vi
+    if command -v vim >/dev/null 2>&1;then
+        ed=vim
+    fi
+    if command -v nvim >/dev/null 2>&1;then
+        ed=nvim
+    fi
+    if [ -n "${editor}" ];then
+        ed="${editor}"
+    fi
+    local proj=${1}
+    if [ -z ${proj} ];then
+        echo -n "Missing project name,please enter: "
+        read proj
+        if [ -z "${proj}" ];then
+            echo "No project name provided"
+            return 1
+        fi
+    fi
+
+    cargo new ${proj} || { echo "New project ${proj} failed"; return 1; }
+    cd ${proj}
+
+    local cmd1="${ed}"
+    local cmd2="$2"
+    local cmd3="$3"
+    local cmd4="$4"
+    tmuxCmd="tmux new-session -s ${proj} ${cmd1} \; split-window -v ${cmd2} \; split-window -h ${cmd3}\;  new-window ${cmd4}\; select-window -t 0 \; select-pane -t 0 \;"
+    eval "${tmuxCmd}"
+
 }
 
 function newsh(){
