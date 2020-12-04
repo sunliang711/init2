@@ -1333,7 +1333,12 @@ function newrust(){
     cargo new ${proj} || { echo "New project ${proj} failed"; return 1; }
     cd ${proj}
 
-    local cmd1="${ed}"
+    local cmd1=
+    if [ -f src/main.rs ];then
+        cmd1="${ed} src/main.rs"
+    elif [ -f src/lib.rs ];then
+        cmd1="${ed} src/lib.rs"
+    fi
     local cmd2="$2"
     local cmd3="$3"
     local cmd4="$4"
