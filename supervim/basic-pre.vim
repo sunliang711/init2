@@ -228,7 +228,7 @@ nnoremap <F4> :execute "noautocmd vimgrep /" . expand("<cword>") . "/gj **" <Bar
 "
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " tnoremap <Esc> <C-\><C-n>
-tnoremap <leader>c <C-\><C-n>
+"tnoremap <leader>c <C-\><C-n>
 
 set splitbelow
 set splitright

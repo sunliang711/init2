@@ -184,7 +184,7 @@ EOF
         printf "%-25s = %s\n" ${pluginName} ${pluginDefault} >> ${userChoiceFile}
 
         cd ..
-    done <<< $(find . -maxdepth 1 ! -path . -type d)
+    done <<< "$(find . -maxdepth 1 ! -path . -type d)"
     #TODO when failed,check bash version must 4+
 
     $VIM ${userChoiceFile}
@@ -201,7 +201,7 @@ EOF
         if [ -n "$enable" ];then
             toBeInstalledPlugins+=("$enable")
         fi
-    done < ${userChoiceFile}
+    done < "${userChoiceFile}"
     rm ${userChoiceFile}
 
     echo "--------------------After user choice---------------------------"
@@ -227,7 +227,7 @@ EOF
             echo "$pluginPath" | perl -pe "s|(Plug ')[^/]+(/.+)|\1https://gitee.com/quick-source\2|" >> "$cfg"
         fi
         cd ..
-    done <<< $(find . -maxdepth 1 ! -path . -type d)
+    done <<< "$(find . -maxdepth 1 ! -path . -type d)"
 
     echo "call plug#end()" >> "$cfg"
     echo  >> "$cfg"
@@ -268,7 +268,7 @@ cfgEOF
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 cfgEOFx
         cd ..
-    done <<< $(find . -maxdepth 1 ! -path . -type d)
+    done <<< "$(find . -maxdepth 1 ! -path . -type d)"
 
 
     echo "${bold}${cyan}Done.${reset}"
@@ -296,7 +296,7 @@ cfgEOFx
         [ -e postScript.sh ] && bash postScript.sh
 
         cd ..
-    done <<< $(find . -maxdepth 1 ! -path . -type d)
+    done <<< "$(find . -maxdepth 1 ! -path . -type d)"
 
 
     ## restore PWD
