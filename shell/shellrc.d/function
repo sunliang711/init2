@@ -1341,8 +1341,9 @@ function newrust(){
     fi
     local cmd2="$2"
     local cmd3="$3"
-    local cmd4="$4"
-    tmuxCmd="tmux new-session -s ${proj} ${cmd1} \; split-window -v ${cmd2} \; split-window -h ${cmd3}\;  new-window ${cmd4}\; select-window -t 0 \; select-pane -t 0 \;"
+    # local cmd4="$4"
+    # tmuxCmd="tmux new-session -s ${proj} ${cmd1} \; split-window -v ${cmd2} \; split-window -h ${cmd3}\;  new-window ${cmd4}\; select-window -t 0 \; select-pane -t 0 \;"
+    tmuxCmd="tmux new-session -s ${proj} ${cmd1} \; split-window -h ${cmd2} \;  new-window ${cmd3}\; select-window -t 0 \; select-pane -t 0 \;"
     eval "${tmuxCmd}"
 
 }
