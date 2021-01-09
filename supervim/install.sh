@@ -184,7 +184,7 @@ EOF
         printf "%-25s = %s\n" ${pluginName} ${pluginDefault} >> ${userChoiceFile}
 
         cd ..
-    done <<< "$(find . -maxdepth 1 ! -path . -type d)"
+    done <<< "$(find . -maxdepth 1 ! -path . -type d | sort -n)"
     #TODO when failed,check bash version must 4+
 
     $VIM ${userChoiceFile}
@@ -227,7 +227,7 @@ EOF
             echo "$pluginPath" | perl -pe "s|(Plug ')[^/]+(/.+)|\1https://gitee.com/quick-source\2|" >> "$cfg"
         fi
         cd ..
-    done <<< "$(find . -maxdepth 1 ! -path . -type d)"
+    done <<< "$(find . -maxdepth 1 ! -path . -type d | sort -n)"
 
     echo "call plug#end()" >> "$cfg"
     echo  >> "$cfg"
@@ -268,7 +268,7 @@ cfgEOF
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 cfgEOFx
         cd ..
-    done <<< "$(find . -maxdepth 1 ! -path . -type d)"
+    done <<< "$(find . -maxdepth 1 ! -path . -type d | sort -n)"
 
 
     echo "${bold}${cyan}Done.${reset}"
@@ -296,7 +296,7 @@ cfgEOFx
         [ -e postScript.sh ] && bash postScript.sh
 
         cd ..
-    done <<< "$(find . -maxdepth 1 ! -path . -type d)"
+    done <<< "$(find . -maxdepth 1 ! -path . -type d | sort -n)"
 
 
     ## restore PWD
@@ -305,8 +305,6 @@ cfgEOFx
 
     echo "copy file content: init-tailer.vim -> $cfg"
     cat init-tailer.vim >> "$cfg"
-
-    echo "${bold}${cyan}Done.${reset}"
 
 }
 

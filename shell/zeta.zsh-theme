@@ -160,8 +160,9 @@ function print_prompt_head {
 "
     print -rP "$proxy_prompt"
 
-    registry_prompt="|-%{$green_bold%}# registry:%{$reset_color%}$(registry_status)"
-    print -rP "$registry_prompt"
+    # registry status too slow, disable it
+    # registry_prompt="|-%{$green_bold%}# registry:%{$reset_color%}$(registry_status)"
+    # print -rP "$registry_prompt"
 
     local left_prompt="╰─\
 %{$blue%}# \
