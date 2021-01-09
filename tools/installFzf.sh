@@ -55,6 +55,8 @@ runAsRoot(){
 ###############################################################################
 # TODO
 install(){
+    cd "${thisDir}"
+    echo "Install fzf ..."
     #install binary
     # if [ ! -e $GOPATH/bin/fzf ];then
     #     cmd="go get -u github.com/junegunn/fzf"
@@ -63,8 +65,13 @@ install(){
     # fi
 
     # git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+    if [ -d ~/.fzf ];then
+        echo "~/.fzf exists,exit ..."
+        exit
+    fi
+
     git clone --depth 1 https://gitee.com/quick-source/fzf.git ~/.fzf
-    ~/.fzf/install
+    ~/.fzf/install --all
 
     if ! grep -q '#BEGIN FZF function' ~/.zshrc;then
         echo "add source $(pwd)/fzffunction.sh in .zshrc"

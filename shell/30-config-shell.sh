@@ -111,6 +111,8 @@ install(){
 	EOF
     fi
 
+    ../tools/installFzf.sh install
+
     # if ! grep -q "$root/tools" $root/shellrc.d/local ;then
     #     echo "append_path $root/tools" >> $root/shellrc.d/local
     # fi
