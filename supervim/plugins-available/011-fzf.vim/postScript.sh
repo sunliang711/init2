@@ -14,7 +14,9 @@ if [ -z "$rpath" ];then
 fi
 thisScriptDir="$(cd $(dirname $rpath) && pwd)"
 
-go get -u github.com/junegunn/fzf || { echo "install fzf failed"; }
+
+git clone --depth 1 https://gitee.com/quick-source/fzf.git ~/.fzf
+~/.fzf/install --all
 
 # available ENV variables:
     # VIM               which vim? [vim/nvim]
