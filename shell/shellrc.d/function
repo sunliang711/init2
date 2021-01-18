@@ -1429,6 +1429,7 @@ function newsh(){
 		function _root(){
 		    if [ ${EUID} -ne ${rootID} ];then
 		        echo "Need run as root!"
+		        echo "Requires root privileges."
 		        exit 1
 		    fi
 		}
