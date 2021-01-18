@@ -25,6 +25,8 @@ else
     (cd shell && bash 10-zsh-installer.sh && bash 20-set-zsh-theme.sh && bash 30-config-shell.sh all)
 fi
 
+(./tools/installFzf.sh install)
+
 ##vim
 #if [ "$option" == "-o" ];then
 #    (cd supervim && bash install.sh -o vim)

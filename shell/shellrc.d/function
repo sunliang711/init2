@@ -1458,6 +1458,7 @@ function newsh(){
 		# write your code above
 		###############################################################################
 		function _help(){
+		    cd "${this}"
 		    cat<<EOF2
 		Usage: $(basename $0) ${bold}CMD${reset}
 		
