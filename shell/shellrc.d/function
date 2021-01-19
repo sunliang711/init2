@@ -1005,7 +1005,7 @@ if command -v systemctl >/dev/null 2>&1;then
         fi
     fi
 fi
-rm /tmp/$1.service
+#rm /tmp/$1.service
 }
 
 function serviceEdit(){
