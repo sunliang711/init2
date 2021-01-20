@@ -5,7 +5,24 @@ if [ -z "$rpath" ];then
 fi
 root="$(cd $(dirname $rpath) && pwd)"
 cd "$root"
-[ -e /etc/shell-header.sh ] && source /etc/shell-header.sh
+_runAsRoot(){
+    cmd="${*}"
+    local rootID=0
+    if [ "${EUID}" -ne "${rootID}" ];then
+        echo -n "Not root, try to run as root.."
+        # or sudo sh -c ${cmd} ?
+        if eval "sudo ${cmd}";then
+            echo "ok"
+            return 0
+        else
+            echo "failed"
+            return 1
+        fi
+    else
+        # or sh -c ${cmd} ?
+        eval "${cmd}"
+    fi
+}
 # write your code below
 usage(){
     cat<<-EOF
@@ -45,13 +62,13 @@ list(){
 
 enable(){
     siteName=${1:?"missing siteName"}
-    runAsRoot "ln -sf $dest/sites-available/$siteName $dest/sites-enabled"
+    _runAsRoot "ln -sf $dest/sites-available/$siteName $dest/sites-enabled"
 }
 
 disable(){
     siteName=${1:?"missing siteName"}
     if [ -e "$dest/sites-enabled/$siteName" ];then
-        runAsRoot "rm -rf $dest/sites-enabled/$siteName"
+        _runAsRoot "rm -rf $dest/sites-enabled/$siteName"
     fi
 }
 
