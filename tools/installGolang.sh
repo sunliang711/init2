@@ -69,13 +69,17 @@ EOF
 
 # TODO
 defaultVersion=1.13.8
-prefix=$HOME/.app/go
+if [ -n "${LOCAL_APP_ROOT}" ];then
+    prefix=${LOCAL_APP_ROOT}
+else
+    prefix=$HOME/.app
+fi
 
 install(){
     need curl
     need tar
     version=${1:-$defaultVersion}
-    dest=$HOME/.app/go/$version
+    dest=${prefix}/go/$version
 
     if [ ! -d $dest ];then
         mkdir -p $dest
