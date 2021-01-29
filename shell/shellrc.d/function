@@ -1393,14 +1393,14 @@ function newsh(){
 		    GREEN="$(tput setaf 2)"
 		    YELLOW="$(tput setaf 3)"
 		    BLUE="$(tput setaf 4)"
-            CYAN="$(tput setaf 5)"
+		    CYAN="$(tput setaf 5)"
 		    BOLD="$(tput bold)"
 		    NORMAL="$(tput sgr0)"
 		else
 		    RED=""
 		    GREEN=""
 		    YELLOW=""
-            CYAN=""
+		    CYAN=""
 		    BLUE=""
 		    BOLD=""
 		    NORMAL=""
@@ -1416,7 +1416,8 @@ function newsh(){
 		    if [ "${EUID}" -ne "${rootID}" ];then
 		        echo -n "Not root, try to run '${cmd}' as root.."
 		        # or sudo sh -c ${cmd} ?
-		        if eval "sudo ${cmd}";then
+		        # if eval "sudo ${cmd}";then
+		        if sudo sh -c "${cmd}";then
 		            echo "ok"
 		            return 0
 		        else
