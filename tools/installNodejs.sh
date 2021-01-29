@@ -69,12 +69,18 @@ usage:
 EOF
 }
 
+if [ -n "${LOCAL_APP_ROOT}" ];then
+    prefix=${LOCAL_APP_ROOT}
+else
+    prefix=$HOME/.app
+fi
+
 defaultVersion=12.16.1
 install(){
     need curl
     need tar
     version=${1:-$defaultVersion}
-    dest=$HOME/.app/nodejs/$version
+    dest=${prefix}/nodejs/$version
     if [ ! -d $dest ];then
         mkdir -p $dest
     fi

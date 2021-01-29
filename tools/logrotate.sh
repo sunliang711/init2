@@ -55,13 +55,17 @@ function runAsRoot(){
 # function with 'function' is hidden when run help, without 'function' is show
 ###############################################################################
 # TODO
+if [ -n "${LOCAL_APP_ROOT}" ];then
+    prefix=${LOCAL_APP_ROOT}
+else
+    prefix=$HOME/.app
+fi
 install(){
     if ! command -v logrotate >/dev/null 2>&1;then
         echo "Need logrotate installed!"
         exit 1
     fi
-    local defaultDest=$home/.logrotate
-    local dest=${1:-$defaultDest}
+    local dest=${prefix}/logrotate
     local confDir=conf.d
     echo "logrotate dest: $dest"
     if [ ! -d "$dest/$confDir" ];then

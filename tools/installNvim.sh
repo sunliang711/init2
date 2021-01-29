@@ -62,7 +62,14 @@ function need(){
     fi
 }
 version=0.4.4
-dest=$HOME/.app/nvim/$version
+if [ -n "${LOCAL_APP_ROOT}" ];then
+    prefix=${LOCAL_APP_ROOT}
+else
+    prefix=$HOME/.app
+fi
+
+dest=${prefix}/nvim/$version
+
 install(){
     need curl
     need tar
