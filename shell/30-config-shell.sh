@@ -17,7 +17,7 @@ yellow=$(tput setaf 3)
 blue=$(tput setaf 4)
 cyan=$(tput setaf 5)
 reset=$(tput sgr0)
-runAsRoot(){
+_runAsRoot(){
     verbose=0
     while getopts ":v" opt;do
         case "$opt" in
@@ -70,6 +70,7 @@ EOF
 
 bashrc="${home}/.bashrc"
 zshrc="${home}/.zshrc"
+localBin="${home}/.local/bin"
 
 install(){
     local type=${1}
@@ -109,6 +110,11 @@ install(){
 	source \${SHELLRC_ROOT}/shellrc
 	$endLine
 	EOF
+    fi
+
+    if [ ! -d "${localBin}" ];then
+        echo "Create ${localBin}..."
+        mkdir -p "${localBin}"
     fi
 
     # if ! grep -q "$root/tools" $root/shellrc.d/local ;then

@@ -60,7 +60,7 @@ detectProxyEnv
 # export PATH=""
 append_path "$HOME/.bin"
 [ -n "$GOPATH" ] && append_path $GOPATH/bin
-detectBin $HOME/.app
+detectBin $HOME
 
 append_path /usr/local/sbin
 append_path /usr/local/bin

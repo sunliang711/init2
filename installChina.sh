@@ -16,14 +16,14 @@ if [ -t 1 ] && [ -n "$ncolors" ] && [ "$ncolors" -ge 8 ]; then
     GREEN="$(tput setaf 2)"
     YELLOW="$(tput setaf 3)"
     BLUE="$(tput setaf 4)"
-            CYAN="$(tput setaf 5)"
+    CYAN="$(tput setaf 5)"
     BOLD="$(tput bold)"
     NORMAL="$(tput sgr0)"
 else
     RED=""
     GREEN=""
     YELLOW=""
-            CYAN=""
+    CYAN=""
     BLUE=""
     BOLD=""
     NORMAL=""
@@ -37,7 +37,7 @@ _runAsRoot(){
     cmd="${*}"
     local rootID=0
     if [ "${EUID}" -ne "${rootID}" ];then
-        echo -n "Not root, try to run as root.."
+        echo -n "Not root, try to run '${cmd}' as root.."
         # or sudo sh -c ${cmd} ?
         if eval "sudo ${cmd}";then
             echo "ok"
@@ -66,7 +66,7 @@ function _root(){
 # function is hidden when begin with '_'
 ###############################################################################
 install(){
-    local dest="$home/.app"
+    local dest="$home/.local/apps"
     if [ ! -e "${dest}" ];then
         mkdir -p "${dest}"
     fi
