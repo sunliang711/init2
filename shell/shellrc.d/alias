@@ -75,6 +75,7 @@ alias grep='grep --color=auto'
 alias cdgo="cd $workspace/go/src"
 alias cdrust="cd $workspace/rust"
 alias cdcpp="cd $workspace/cpp"
+alias cdapp="cd ${LOCAL_APP_ROOT}"
 
 if command -v emacs >/dev/null 2>&1;then
     alias emacs='emacs -nw'
