@@ -306,6 +306,8 @@ cfgEOFx
     echo "copy file content: init-tailer.vim -> $cfg"
     cat init-tailer.vim >> "$cfg"
 
+    echo "${green}Use pip3 to install neovim-remote${reset}"
+
 }
 
 uninstall(){
