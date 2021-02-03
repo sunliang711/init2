@@ -26,6 +26,22 @@ function sm(){
     fi
 }
 
+# TODO
+function addremote(){
+    local target="${1:?'missing target: github or gitee or others'}"
+
+    local originURL="$(git remote -v | grep origin | head -1 | awk '{print $2}')"
+    if [ -z "${originURL}" ];then
+        echo "No origin found"
+        return 1
+    fi
+    echo "originURL: ${originURL}"
+
+    local hostname="$( echo ${originURL} | awk -F'[/:]' '{print $4}' )"
+    echo "hostname: ${hostname}"
+
+}
+
 function append_path(){
     save=0
     while getopts ":hs" opt;do
@@ -246,7 +262,7 @@ EOF
 }
 
 aptproxyoff(){
-    if [ $(uname)!="Linux" ];then
+    if [ $(uname) != "Linux" ];then
         echo "Only on Linux"
         return 1
     fi
