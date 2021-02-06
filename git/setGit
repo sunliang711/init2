@@ -50,13 +50,17 @@ gitconfig(){
     # fi
 }
 
-read -p "git user.email: (default: sunliang711@163.com)"  email
-read -p "git user.name: (default: sunliang)"  name
+defaultEmail="sunliang711@163.com"
+defaultUser="sunliang711"
+read -p "git user.email: (default: ${defaultEmail}) "  -t 2 email
 if [[ -z "$email" ]];then
-    email="sunliang711@163.com"
+    email="${defaultEmail}"
+    echo
 fi
+read -p "git user.name: (default: ${defaultUser}) "  -t 2 name
 if [[ -z "$name" ]];then
-    name="sunliang"
+    name="${defaultUser}"
+    echo
 fi
 
 export -f gitconfig
