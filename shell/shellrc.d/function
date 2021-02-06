@@ -1430,14 +1430,14 @@ function newsh(){
 		    cmd="${*}"
 		    local rootID=0
 		    if [ "${EUID}" -ne "${rootID}" ];then
-		        echo -n "Not root, try to run '${cmd}' as root.."
+		        # echo -n "Not root, try to run '${cmd}' as root.."
 		        # or sudo sh -c ${cmd} ?
 		        # if eval "sudo ${cmd}";then
 		        if sudo sh -c "${cmd}";then
-		            echo "ok"
+		            # echo "ok"
 		            return 0
 		        else
-		            echo "failed"
+		            # echo "failed"
 		            return 1
 		        fi
 		    else
