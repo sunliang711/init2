@@ -67,6 +67,12 @@ usage(){
 EOF
 }
 
+function _insert_path(){
+    if [ -z "$1" ];then
+        return
+    fi
+    echo -e ${PATH//:/"\n"} | grep -c "^$1$" >/dev/null 2>&1 || export PATH=$1:$PATH
+}
 # TODO
 defaultVersion=1.13.8
 if [ -n "${LOCAL_APP_ROOT}" ];then
@@ -117,6 +123,7 @@ install(){
     # else
     #     echo "go$version has been installed to $dest, add ${binPath} to PATH manually"
     # fi
+    _insert_path $dest/go/bin
 
     cd - >/dev/null
 

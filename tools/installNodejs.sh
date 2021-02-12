@@ -50,6 +50,13 @@ function runAsRoot(){
         sudo sh -c "$cmd"
     fi
 }
+
+function _insert_path(){
+    if [ -z "$1" ];then
+        return
+    fi
+    echo -e ${PATH//:/"\n"} | grep -c "^$1$" >/dev/null 2>&1 || export PATH=$1:$PATH
+}
 ###############################################################################
 # write your code below (just define function[s])
 # function with 'function' is hidden when run help, without 'function' is show
@@ -118,6 +125,7 @@ install(){
     #     echo "nodejs $version has been installed to $dest, add ${binPath} to PATH manually"
     # fi
 
+    _insert_path $dest/$name/bin
     cd - >/dev/null
 }
 

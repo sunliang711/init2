@@ -50,6 +50,13 @@ function runAsRoot(){
         sudo sh -c "$cmd"
     fi
 }
+
+function _insert_path(){
+    if [ -z "$1" ];then
+        return
+    fi
+    echo -e ${PATH//:/"\n"} | grep -c "^$1$" >/dev/null 2>&1 || export PATH=$1:$PATH
+}
 ###############################################################################
 # write your code below (just define function[s])
 # function with 'function' is hidden when run help, without 'function' is show
@@ -96,6 +103,7 @@ install(){
     bash -c "$cmd >/dev/null"  || { echo "extract $name.tar.gz failed."; exit 1; }
 
     echo "nvim $version has been installed to $dest"
+    _insert_path $dest/${name}/bin
 
     # DELETE later
     # local localFile="${SHELLRC_ROOT}/shellrc.d/local"
