@@ -82,10 +82,17 @@ fi
 ###############################################################################
 set -e
 exeName=fetcher
+runtimeFiles=""
 _build(){
     local os=${1:?'missing GOOS'}
     local arch=${2:?'missing GOARCH'}
     local resultDir="${exeName}-${os}-${arch}"
+    # FIX ME
+    local gitHashPath="fetcher/cmd.GitHash"
+    # FIX ME
+    local buildTimePath=
+    # FIX ME
+    local buildMachinePath=
     if [ ! -d ${resultDir} ];then
         mkdir -p ${resultDir}
     fi
@@ -93,10 +100,12 @@ _build(){
     gitHash="$(git rev-parse HEAD)"
     buildTime="$(date +%FT%T)"
     buildMachine="$(uname -s)-$(uname -m)"
-    ldflags="-w -s -X fetcher/cmd.GitHash=${gitHash} -X fetcher/cmd.BuildTime=${buildTime} -X fetcher/cmd.Machine=${buildMachine}"
+    ldflags="-w -s -X ${gitHashPath}=${gitHash} -X ${buildTimePath}=${buildTime} -X ${buildMachinePath}=${buildMachine}"
     echo "Build location: ${resultDir}..."
     GOOS=${os} GOARCH=${arch} go build -o ${resultDir}/${exeName} -ldflags "${ldflags}" main.go
-    cp fetcher.yaml v2ray.tmpl ${resultDir}
+    for f in ${runtimeFiles};do
+        cp $f ${resultDir}
+    done
 }
 
 build(){
