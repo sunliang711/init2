@@ -41,43 +41,27 @@ function addremote(){
     echo "hostname: ${hostname}"
 
 }
+function newbuild(){
+   local ed=vi
+    if command -v vim >/dev/null 2>&1;then
+        ed=vim
+    fi
+    if command -v nvim >/dev/null 2>&1;then
+        ed=nvim
+    fi
+    if [ -n "${editor}" ];then
+        ed=${editor}
+    fi
+    cp "${SHELLRC_ROOT}/shellrc.d/newbuild" "build.sh"
+    "$ed" "build.sh"
+    chmod +x "build.sh"
+}
 
 function append_path(){
-    save=0
-    while getopts ":hs" opt;do
-        case $opt in
-            h)
-                echo "Usage: $0 [-h|-s] <path>  -s means to save"
-                return 1
-                ;;
-            s)
-                save=1
-                ;;
-            :)
-                echo "missing arg for option: \"$OPTARG\""
-                return 1
-                ;;
-            \?)
-                echo "Valid option \"$OPTARG\""
-                return 1
-                ;;
-
-        esac
-    done
-    shift $(($OPTIND-1))
     if [ -z "$1" ];then
-        echo "Missing path to add."
-        return 1
+        return
     fi
-    if ! echo -e ${PATH//:/"\n"} | grep -c "^$1$" >/dev/null 2>&1;then
-        export PATH=$PATH:$1
-        if (($save==1));then
-            (sed -n -e '1,/#END custom PATH/{
-            /#END custom PATH/!p
-        }' $SHELLRC_ROOT/shellrc.d/env;echo "append_path $1";sed -n -e '/#END custom PATH/,$p' $SHELLRC_ROOT/shellrc.d/env) >/tmp/tmpenv
-            mv /tmp/tmpenv $SHELLRC_ROOT/shellrc.d/env
-        fi
-    fi
+    echo -e ${PATH//:/"\n"} | grep -c "^$1$" >/dev/null 2>&1 || export PATH=$PATH:$1
 }
 
 function insert_path(){
