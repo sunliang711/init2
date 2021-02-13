@@ -80,6 +80,7 @@ function _insert_path(){
 
 _run(){
     # only output stderr
+    cmd="${*}"
     (set -x; bash -c "${cmd}" >> ${logfile})
 }
 
