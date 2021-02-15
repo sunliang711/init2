@@ -116,7 +116,9 @@ install(){
     linkDest="${home}/.local/bin"
     if [ -d "${linkDest}" ]; then
         # find all executable
-        find "${dest}/go/bin" -perm +111 -type f -print0 | xargs -0 -t -I{} ln -sf {} "${linkDest}" 
+        for f in $(find ${dest}/go/bin -type f);do
+            [ -x ${f} ] && ln -sf ${f} ${linkDest}
+        done
     fi
 
     # DELETE later
