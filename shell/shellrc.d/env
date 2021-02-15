@@ -62,6 +62,7 @@ detectProxyEnv
 append_path "$HOME/.bin"
 [ -n "$GOPATH" ] && append_path $GOPATH/bin
 # detectBin $HOME/.local
+append_path "$HOME/.local/bin"
 
 append_path /usr/local/sbin
 append_path /usr/local/bin

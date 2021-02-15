@@ -112,6 +112,11 @@ install(){
     echo "$cmd ..."
     bash -c "$cmd >/dev/null" || { echo "extract $name.tar.xz failed"; exit 1; }
 
+    linkDest="${home}/.local/bin"
+    if [ -d "${linkDest}" ]; then
+        # find all executable
+        find "${dest}/$name/bin" -perm +111 -type f -print0 | xargs -0 -t -I{} ln -sf {} "${linkDest}" 
+    fi
     echo "nodejs $version has been installed to $dest"
 
     # DELETE later
@@ -125,7 +130,6 @@ install(){
     #     echo "nodejs $version has been installed to $dest, add ${binPath} to PATH manually"
     # fi
 
-    _insert_path $dest/$name/bin
     cd - >/dev/null
 }
 

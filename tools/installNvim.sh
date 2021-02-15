@@ -102,8 +102,12 @@ install(){
     echo "$cmd ..."
     bash -c "$cmd >/dev/null"  || { echo "extract $name.tar.gz failed."; exit 1; }
 
-    echo "nvim $version has been installed to $dest"
-    _insert_path $dest/${name}/bin
+    echo "nvim $version has been installed to $dest/$name/bin"
+    linkDest="${home}/.local/bin"
+    if [ -d "${linkDest}" ]; then
+        # find all executable
+        find "${dest}/$name/bin" -perm +111 -type f -print0 | xargs -0 -t -I{} ln -sf {} "${linkDest}" 
+    fi
 
     # DELETE later
     # local localFile="${SHELLRC_ROOT}/shellrc.d/local"

@@ -111,7 +111,13 @@ install(){
     echo "$cmd ..."
     bash -c "$cmd >/dev/null" && echo "Done" || { echo "Extract $name failed."; exit 1; }
 
-    echo "go$version has been installed to $dest"
+    echo "go$version has been installed to $dest/go/bin"
+
+    linkDest="${home}/.local/bin"
+    if [ -d "${linkDest}" ]; then
+        # find all executable
+        find "${dest}/go/bin" -perm +111 -type f -print0 | xargs -0 -t -I{} ln -sf {} "${linkDest}" 
+    fi
 
     # DELETE later
     # local localFile="${SHELLRC_ROOT}/shellrc.d/local"
@@ -123,7 +129,7 @@ install(){
     # else
     #     echo "go$version has been installed to $dest, add ${binPath} to PATH manually"
     # fi
-    _insert_path $dest/go/bin
+
 
     cd - >/dev/null
 
