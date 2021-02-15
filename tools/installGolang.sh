@@ -116,7 +116,7 @@ install(){
     linkDest="${home}/.local/bin"
     if [ -d "${linkDest}" ]; then
         # find all executable
-        for f in $(find ${dest}/go/bin -type f);do
+        for f in $(find ${dest}/go/bin ! -type d);do
             [ -x ${f} ] && ln -sf ${f} ${linkDest}
         done
     fi
