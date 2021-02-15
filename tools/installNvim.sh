@@ -107,6 +107,9 @@ install(){
     if [ -d "${linkDest}" ]; then
         # find all executable
         find "${dest}/$name/bin" -perm +111 -type f -print0 | xargs -0 -t -I{} ln -sf {} "${linkDest}" 
+        for f in $(find ${dest}/$name/bin);do
+            ln -sf ${f} "${linkDest}"
+        done
     fi
 
     # DELETE later
