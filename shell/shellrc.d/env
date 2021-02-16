@@ -55,7 +55,6 @@ export LESSCHARSET=utf-8
 
 export PROXY_FILE="${home}/.PROXY_FILE"
 export LOCAL_APP_ROOT="${home}/.local/apps"
-
 detectProxyEnv
 #BEGIN PATH
 # export PATH=""
@@ -63,6 +62,7 @@ append_path "$HOME/.bin"
 [ -n "$GOPATH" ] && append_path $GOPATH/bin
 # detectBin $HOME/.local
 append_path "$HOME/.local/bin"
+append_path ${SHELLRC_ROOT}/bin
 
 append_path /usr/local/sbin
 append_path /usr/local/bin
