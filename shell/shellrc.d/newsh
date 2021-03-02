@@ -1,14 +1,18 @@
 #!/bin/bash
 if [ -z "${BASH_SOURCE}" ]; then
     this=${PWD}
-    logfile="/tmp/$(%FT%T).log"
 else
     rpath="$(readlink ${BASH_SOURCE})"
     if [ -z "$rpath" ]; then
         rpath=${BASH_SOURCE}
+    elif echo "$rpath" | grep -q '^/'; then
+        # absolute path
+        echo
+    else
+        # relative path
+        rpath="$(dirname ${BASH_SOURCE})/$rpath"
     fi
     this="$(cd $(dirname $rpath) && pwd)"
-    logfile="/tmp/$(basename ${BASH_SOURCE}).log"
 fi
 
 export PATH=$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
@@ -107,7 +111,6 @@ _runAsRoot(){
         cmd="${cmd} 2>/dev/null"
     fi
 
-    # (set -x; $bash_c "${cmd}" >> ${logfile} )
     if [ $subshell -eq 1 ];then
         if [ $trace -eq 1 ];then
             (set -x; ${bash_c} "${cmd}")
@@ -173,7 +176,6 @@ _run(){
         cmd="${cmd} 2>/dev/null"
     fi
 
-    # (set -x; $bash_c "${cmd}" >> ${logfile} )
     if [ $subshell -eq 1 ];then
         if [ $trace -eq 1 ];then
             (set -x; ${bash_c} "${cmd}")
