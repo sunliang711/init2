@@ -23,6 +23,7 @@ function sm(){
         source "$HOME/.bashrc"
     else
         echo "Unknow shell type"
+        return 1
     fi
 }
 
@@ -41,6 +42,12 @@ function addremote(){
     echo "hostname: ${hostname}"
 
 }
+
+# sudo cmd with current PATH
+function sudop(){
+    sudo env "PATH=$PATH" "${@}"
+}
+
 function newbuild(){
    local ed=vi
     if command -v vim >/dev/null 2>&1;then
@@ -52,7 +59,14 @@ function newbuild(){
     if [ -n "${editor}" ];then
         ed=${editor}
     fi
-    cp "${SHELLRC_ROOT}/shellrc.d/newbuild" "build.sh"
+    local line1="# function is hidden"
+    local line2="# write your code above"
+    (
+        sed -n "1,/${line1}/p" "${SHELLRC_ROOT}/shellrc.d/newsh";
+        cat "${SHELLRC_ROOT}/shellrc.d/newbuild";
+        sed -n "/${line2}/,\$p" "${SHELLRC_ROOT}/shellrc.d/newsh"
+    ) > build.sh
+
     "$ed" "build.sh"
     chmod +x "build.sh"
 }

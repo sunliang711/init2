@@ -52,7 +52,38 @@ _command_exists(){
 rootID=0
 
 _runAsRoot(){
-    cmd="${*}"
+    local trace=0
+    local subshell=0
+    local nostdout=0
+    local nostderr=0
+
+    local optNum=0
+    for opt in ${@};do
+        case "${opt}" in
+            --trace|-x)
+                trace=1
+                ((optNum++))
+                ;;
+            --subshell|-s)
+                subshell=1
+                ((optNum++))
+                ;;
+            --no-stdout)
+                nostdout=1
+                ((optNum++))
+                ;;
+            --no-stderr)
+                nostderr=1
+                ((optNum++))
+                ;;
+            *)
+                break
+                ;;
+        esac
+    done
+
+    shift $(($optNum))
+    local cmd="${*}"
     bash_c='bash -c'
     if [ "${EUID}" -ne "${rootID}" ];then
         if _command_exists sudo; then
@@ -67,8 +98,29 @@ _runAsRoot(){
             exit 1
         fi
     fi
-    # only output stderr
-    (set -x; $bash_c "${cmd}" >> ${logfile} )
+
+    local fullcommand="${bash_c} ${cmd}"
+    if [ $nostdout -eq 1 ];then
+        cmd="${cmd} >/dev/null"
+    fi
+    if [ $nostderr -eq 1 ];then
+        cmd="${cmd} 2>/dev/null"
+    fi
+
+    # (set -x; $bash_c "${cmd}" >> ${logfile} )
+    if [ $subshell -eq 1 ];then
+        if [ $trace -eq 1 ];then
+            (set -x; ${bash_c} "${cmd}")
+        else
+            (${bash_c} "${cmd}")
+        fi
+    else
+        if [ $trace -eq 1 ];then
+            set -x; ${bash_c} "${cmd}";set +x;
+        else
+            ${bash_c} "${cmd}"
+        fi
+    fi
 }
 
 function _insert_path(){
@@ -79,9 +131,62 @@ function _insert_path(){
 }
 
 _run(){
-    # only output stderr
-    cmd="${*}"
-    (set -x; bash -c "${cmd}" >> ${logfile})
+    local trace=0
+    local subshell=0
+    local nostdout=0
+    local nostderr=0
+
+    local optNum=0
+    for opt in ${@};do
+        case "${opt}" in
+            --trace|-x)
+                trace=1
+                ((optNum++))
+                ;;
+            --subshell|-s)
+                subshell=1
+                ((optNum++))
+                ;;
+            --no-stdout)
+                nostdout=1
+                ((optNum++))
+                ;;
+            --no-stderr)
+                nostderr=1
+                ((optNum++))
+                ;;
+            *)
+                break
+                ;;
+        esac
+    done
+
+    shift $(($optNum))
+    local cmd="${*}"
+    bash_c='bash -c'
+
+    local fullcommand="${bash_c} ${cmd}"
+    if [ $nostdout -eq 1 ];then
+        cmd="${cmd} >/dev/null"
+    fi
+    if [ $nostderr -eq 1 ];then
+        cmd="${cmd} 2>/dev/null"
+    fi
+
+    # (set -x; $bash_c "${cmd}" >> ${logfile} )
+    if [ $subshell -eq 1 ];then
+        if [ $trace -eq 1 ];then
+            (set -x; ${bash_c} "${cmd}")
+        else
+            (${bash_c} "${cmd}")
+        fi
+    else
+        if [ $trace -eq 1 ];then
+            set -x; ${bash_c} "${cmd}";set +x;
+        else
+            ${bash_c} "${cmd}"
+        fi
+    fi
 }
 
 function _root(){
@@ -105,15 +210,14 @@ fi
 ###############################################################################
 # write your code below (just define function[s])
 # function is hidden when begin with '_'
+
+# write your code above
 ###############################################################################
 
 em(){
     $ed $0
 }
 
-###############################################################################
-# write your code above
-###############################################################################
 function _help(){
     cd "${this}"
     cat<<EOF2
