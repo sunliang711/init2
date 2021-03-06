@@ -1661,16 +1661,19 @@ function editService(){
 
 function detectBin(){
     local root=${1:?'missing detect root'}
+    local dest="${SHELLRC_ROOT}/shellrc.d/local"
     if [ ! -d ${root} ];then
         echo "${root} not exist"
         return 1
     fi
 
     while read p;do
-        # debug
-        # echo "append_path ${p}"
-        append_path "${p}"
+        if [ -n "${p}" ];then
+            echo "add path ${p}..."
+            echo "append_path ${p}" >> "${dest}"
+        fi
     done<<<"$(find $(cd ${root} && pwd ) -type d -a -name bin | grep -v node_modules)"
+    [ -f ${dest} ] && sort ${dest} | uniq > ${dest}.tmp && mv ${dest}.tmp ${dest}
 }
 
 source ${SHELLRC_ROOT}/shellrc.d/function-snippets
