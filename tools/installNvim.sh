@@ -85,8 +85,16 @@ install(){
     fi
     case $(uname) in
         Linux)
-            local nvimURL="https://source711.oss-cn-shanghai.aliyuncs.com/neovim/$version/nvim-linux64.tar.gz"
-            local name=nvim-linux64
+            case $(uname -m) in
+                x86_64)
+                    local nvimURL="https://source711.oss-cn-shanghai.aliyuncs.com/neovim/$version/nvim-linux64.tar.gz"
+                    local name=nvim-linux64
+                    ;;
+                aarch64)
+                    local nvimURL="https://source711.oss-cn-shanghai.aliyuncs.com/neovim/0.5.0/nvim-linuxarm64.tar.bz2"
+                    local name=nvim-linuxarm64
+                    ;;
+            esac
             ;;
         Darwin)
             local nvimURL="https://source711.oss-cn-shanghai.aliyuncs.com/neovim/$version/nvim-macos.tar.gz"
