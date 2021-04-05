@@ -92,6 +92,9 @@ install(){
                 aarch64)
                     local nvimURL="https://source711.oss-cn-shanghai.aliyuncs.com/neovim/$version/nvim-linuxarm64.tar.bz2"
                     ;;
+                aarch64)
+                    local nvimURL="https://source711.oss-cn-shanghai.aliyuncs.com/neovim/0.5.0/nvim-linuxarm64.tar.bz2"
+                    ;;
             esac
             ;;
         Darwin)
