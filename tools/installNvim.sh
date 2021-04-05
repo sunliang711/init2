@@ -68,11 +68,11 @@ function need(){
         exit 1
     fi
 }
-version=0.4.4
+version=0.5.0
 if [ -n "${LOCAL_APP_ROOT}" ];then
     prefix=${LOCAL_APP_ROOT}
 else
-    prefix=$HOME/.app
+    prefix=$HOME/.local/apps
 fi
 
 dest=${prefix}/nvim/$version
@@ -85,31 +85,38 @@ install(){
     fi
     case $(uname) in
         Linux)
-            local nvimURL="https://source711.oss-cn-shanghai.aliyuncs.com/neovim/$version/nvim-linux64.tar.gz"
-            local name=nvim-linux64
+            case $(uname -m) in
+                x86_64)
+                    local nvimURL="https://source711.oss-cn-shanghai.aliyuncs.com/neovim/$version/nvim-linux64.tar.gz"
+                    ;;
+                aarch64)
+                    local nvimURL="https://source711.oss-cn-shanghai.aliyuncs.com/neovim/$version/nvim-linuxarm64.tar.bz2"
+                    ;;
+            esac
             ;;
         Darwin)
             local nvimURL="https://source711.oss-cn-shanghai.aliyuncs.com/neovim/$version/nvim-macos.tar.gz"
-            local name=nvim-macos
             ;;
     esac
+    local tarFile="${nvimURL##*/}"
+    local name="${tarFile%.tar.*}"
     cd /tmp
-    if [ ! -e ${name}.tar.gz ];then
+    if [ ! -e ${tarFile} ];then
         curl -LO "$nvimURL"
     fi
 
-    cmd="tar -C $dest -xvf ${name}.tar.gz"
+    cmd="tar -C $dest -xvf ${tarFile}"
     echo "$cmd ..."
-    bash -c "$cmd >/dev/null"  || { echo "extract $name.tar.gz failed."; exit 1; }
+    bash -c "$cmd >/dev/null"  || { echo "extract ${tarFile} failed."; exit 1; }
 
     echo "nvim $version has been installed to $dest/$name/bin"
-    linkDest="${home}/.local/bin"
-    if [ -d "${linkDest}" ]; then
-        # find all executable
-        for f in $(find ${dest}/$name/bin ! -type d);do
-            ln -sf ${f} "${linkDest}"
-        done
-    fi
+    # linkDest="${home}/.local/bin"
+    # if [ -d "${linkDest}" ]; then
+    #     # find all executable
+    #     for f in $(find ${dest}/$name/bin ! -type d);do
+    #         ln -sf ${f} "${linkDest}"
+    #     done
+    # fi
 
     # DELETE later
     # local localFile="${SHELLRC_ROOT}/shellrc.d/local"
