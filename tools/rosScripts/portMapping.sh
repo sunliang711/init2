@@ -12,7 +12,8 @@ use
 ----------------------------------------------------------------
 {:for c from=1 to=999 do={/ip firewall nat remove numbers=\$c}}
 ----------------------------------------------------------------
-to remove all rules except masquerade srcnat(number 0)
+use the forllowing to remove all rules(numbers: from index len-1 to 1 ) except masquerade srcnat(number 0)
+:local len [:len [/ip firewall nat find]];:put \$len;for counter from=(\$len-1) to=1 step=-1 do={/ip firewall nat remove numbers=\$counter}
 
 EOF
 
