@@ -117,6 +117,10 @@ install(){
         mkdir -p "${localBin}"
     fi
 
+    # soft link sshconfig
+    mkdir -p $home/.ssh >/dev/null 2>&1
+    ln -sf ${SHELLRC_ROOT}/shellrc.d/sshconfig $home/.ssh/config
+
     # if ! grep -q "$root/tools" $root/shellrc.d/local ;then
     #     echo "append_path $root/tools" >> $root/shellrc.d/local
     # fi
@@ -156,6 +160,8 @@ uninstall(){
 
     sed -ibak -e "/$startLine/,/$endLine/ d" "$configFile"
     rm -rf ${configFile}bak
+
+    [ -s $home/.ssh/config ] && /bin/rm -rf $home/.ssh/config
 }
 
 

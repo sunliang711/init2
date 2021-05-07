@@ -1,0 +1,45 @@
+# Host 26
+#     HostName 10.1.1.26
+#     User eagle
+#     Port 22
+
+Host aliyun
+    HostName gitez.cc
+    User eagle
+    Port 2000
+
+
+Host dev26
+    HostName sh.gitez.cc
+    Port 2026
+    User eagle
+
+
+Host proxy18
+    HostName sh.gitez.cc
+    Port 2018
+
+
+# shanghai ROS router
+Host shros
+    HostName sh.gitez.cc
+    User user
+    Port 20000
+
+Host memento
+    HostName memento.gitez.cc
+    User eagle
+
+##################################################
+# ATOM LOCAL VMs
+
+Host atom110
+    HostName 10.1.9.110
+    User root
+
+Host atomfrpc
+    HostName 10.1.9.113
+    User eagle
+
+# ATOM LOCAL VMs
+##################################################
