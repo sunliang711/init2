@@ -24,7 +24,7 @@ mappings=(
 "udp|500,4500,1701|10.1.1.18||ikev2 vpn server"
 
 "tcp|2026|10.1.1.26|22|dev26 ssh"
-"tcp|5001,9091|10.1.1.22||dsm web transmission"
+"tcp|5001,9091,32400|10.1.1.22||dsm web transmission plex"
 "tcp|8006|10.1.1.100|8006|pve admin"
 )
 
