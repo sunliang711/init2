@@ -26,5 +26,7 @@ mappings=(
 "tcp|2026|10.1.1.26|22|dev26 ssh"
 "tcp|5001,9091,32400|10.1.1.22||dsm web transmission plex"
 "tcp|8006|10.1.1.100|8006|pve admin"
+"tcp|8007|10.1.1.53|8006|dell pve admin"
+"tcp|2158|10.1.1.158|22|dev ssh"
 )
 

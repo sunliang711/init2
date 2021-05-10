@@ -8,12 +8,11 @@ trim(){
 }
 
 cat<<EOF
-use
-----------------------------------------------------------------
-{:for c from=1 to=999 do={/ip firewall nat remove numbers=\$c}}
-----------------------------------------------------------------
 use the forllowing to remove all rules(numbers: from index len-1 to 1 ) except masquerade srcnat(number 0)
+
+-------------------------------------------------------------------------------------------------------------------------------------------
 :local len [:len [/ip firewall nat find]];:put \$len;for counter from=(\$len-1) to=1 step=-1 do={/ip firewall nat remove numbers=\$counter}
+-------------------------------------------------------------------------------------------------------------------------------------------
 
 EOF
 
@@ -38,15 +37,18 @@ echo "#$comment"
 if echo "$toPorts" | grep -qE '(,|-)';then
 cat<<EOF
 /ip firewall nat add chain=dstnat action=dst-nat protocol=$protocol dst-address=[/ip address get [/ip address find interface=${wan}] address] dst-port=$dstPort to-addresses=$toAddresses comment="$comment $dynWanTag"
+
 EOF
 else
 cat<<EOF
 /ip firewall nat add chain=dstnat action=dst-nat protocol=$protocol dst-address=[/ip address get [/ip address find interface=${wan}] address] dst-port=$dstPort to-addresses=$toAddresses to-ports=$toPorts comment="$comment $dynWanTag"
+
 EOF
 fi
 
 # 回流
 cat<<EOF
 /ip firewall nat add chain=srcnat action=masquerade protocol=$protocol out-interface=$bridge src-address=$subnet dst-address=$toAddresses dst-port=$toPorts comment="$comment $hairpinTag "
+
 EOF
 done

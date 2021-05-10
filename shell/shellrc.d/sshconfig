@@ -32,6 +32,9 @@ Host memento
 
 ##################################################
 # ATOM LOCAL VMs
+Host atompve
+    HostName 10.1.9.2
+    User root
 
 Host atom110
     HostName 10.1.9.110
@@ -43,3 +46,7 @@ Host atomfrpc
 
 # ATOM LOCAL VMs
 ##################################################
+
+Host 10.1.1.158
+    HostName 10.1.1.158
+    User eagle
