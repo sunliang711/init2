@@ -1553,6 +1553,32 @@ cdinit(){
     cd ${SHELLRC_ROOT}/..
 }
 
+cdgo(){
+    local dest="${workspace}/go/src"
+    if [ ! -d "$dest" ];then
+        mkdir "$dest"
+    fi
+    cd "$dest"
+}
+
+cdrust(){
+    local dest="${workspace}/rust"
+    if [ ! -d "$dest" ];then
+        mkdir "$dest"
+    fi
+    cd "$dest"
+
+}
+
+cdcpp(){
+    local dest="${workspace}/cpp"
+    if [ ! -d "$dest" ];then
+        mkdir "$dest"
+    fi
+    cd "$dest"
+
+}
+
 sshconfig(){
     local ed=vi
     if command -v vim >/dev/null 2>&1;then
