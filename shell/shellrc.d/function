@@ -1585,6 +1585,21 @@ sshconfig(){
     $ed ${cfgFile}
 }
 
+function sshknownhosts(){
+   local ed=vi
+    if command -v vim >/dev/null 2>&1;then
+        ed=vim
+    fi
+    if command -v nvim >/dev/null 2>&1;then
+        ed=nvim
+    fi
+    if [ -n "${editor}" ];then
+        ed=${editor}
+    fi
+
+    $ed $home/.ssh/known_hosts
+}
+
 function sendmail(){
     local url=https://aliyun.eagle711.win:9000/send
     receiver="sunliang711@163.com"
@@ -1674,6 +1689,7 @@ function detectBin(){
         fi
     done<<<"$(find $(cd ${root} && pwd ) -type d -a -name bin | grep -v node_modules)"
     [ -f ${dest} ] && sort ${dest} | uniq > ${dest}.tmp && mv ${dest}.tmp ${dest}
+    source ${dest}
 }
 
 source ${SHELLRC_ROOT}/shellrc.d/function-snippets

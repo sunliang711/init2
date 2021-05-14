@@ -28,5 +28,9 @@ mappings=(
 "tcp|8006|10.1.1.100|8006|pve admin"
 "tcp|8007|10.1.1.53|8006|dell pve admin"
 "tcp|2158|10.1.1.158|22|dev ssh"
+
+"tcp|8545|10.1.1.172||eth mainnet rpc"
+"udp|30303|10.1.1.172||eth mainnet dht"
+"tcp|8547|10.1.1.172||eth private rpc"
 )
 
