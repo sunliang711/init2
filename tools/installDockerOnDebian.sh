@@ -82,7 +82,7 @@ EOF
         ca-certificates \
         curl \
         gnupg-agent \
-        software-properties-common
+        software-properties-common -y
 
     curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
 
@@ -94,7 +94,7 @@ EOF
         stable"
 
     apt-get update
-    apt-get install docker-ce docker-ce-cli containerd.io
+    apt-get install docker-ce docker-ce-cli containerd.io -y
 
     echo "add $user to group docker"
     usermod -aG docker $user
