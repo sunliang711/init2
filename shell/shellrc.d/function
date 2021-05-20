@@ -512,6 +512,55 @@ function mkcddir(){
     mkdir -p "$1" && cd $_
 }
 
+date2timestamp(){
+    local date="${1}"
+
+    case $(uname) in
+        Linux)
+            if [ -n "${date}" ];then
+                echo "Note: quote the whole date string" >&2
+                date -d "${date}"  +%s || { echo "date format like: '2012-03-22 22:00:05 EDT'" >&2; return 1; }
+            else
+                echo "convert current time to timestamp..." >&2
+                date +%s
+            fi
+            ;;
+        Darwin)
+            if [ -n "${date}" ];then
+                echo "Note: quote the whole date string" >&2
+                date -j -f "%Y-%m-%d %H:%M:%S" "${date}" +%s || { echo "date format like: '2012-03-22 22:00:05 EDT'" >&2; return 1; }
+            else
+                echo "convert current time to timestamp..." >&2
+                date +%s
+            fi
+            ;;
+    esac
+
+}
+
+datefromtimestamp(){
+    local date="${1}"
+
+    case $(uname) in
+        Linux)
+            if [ -n "${date}" ];then
+                date -d @"${date}" '+%Y-%m-%d %H:%M:%S'
+            else
+                date +%Y-%m-%d %H:%M:%S
+            fi
+            ;;
+        Darwin)
+            if [ -n "${date}" ];then
+                date -r ${date} '+%Y-%m-%d %H:%M:%S'
+            else
+                date '+%Y-%m-%d %H:%M:%S'
+            fi
+            ;;
+    esac
+
+
+}
+
 rm(){
     local pre=/tmp/recycle
     if [ ! -d "${pre}" ];then
