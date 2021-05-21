@@ -92,7 +92,14 @@ install(){
     fi
     case $(uname) in
         Linux)
-            goURL=https://dl.google.com/go/go${version}.linux-amd64.tar.gz
+            case $(uname -m) in
+                x86_64)
+                    goURL=https://dl.google.com/go/go${version}.linux-amd64.tar.gz
+                    ;;
+                aarch64)
+                    goURL=https://dl.google.com/go/go${version}.linux-arm64.tar.gz
+                    ;;
+            esac
             ;;
         Darwin)
             goURL=https://dl.google.com/go/go${version}.darwin-amd64.pkg
