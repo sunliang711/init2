@@ -13,6 +13,10 @@ buildTimePath=
 # FIX ME
 # example: main.BuildMachine or packageName/path/to/hello.BuildMachine
 buildMachinePath=
+
+# Correct ME
+mainFile=main.go
+
 _build(){
     local os=${1:?'missing GOOS'}
     local arch=${2:?'missing GOARCH'}
@@ -27,7 +31,7 @@ _build(){
     fi
 
     if [ ! -d ${resultDir} ];then
-        mkdir -p ${resultDir}
+        mkdir -p ${resultDir}/bin
     fi
 
     ldflags="-w -s"
@@ -53,7 +57,7 @@ _build(){
     fi
 
     echo "${GREEN}Build ${exeName} to ${resultDir}...${NORMAL}"
-    GOOS=${os} GOARCH=${arch} go build -o ${resultDir}/${exeName} -ldflags "${ldflags}" main.go && { echo "${GREEN}Build successfully.${NORMAL}"; } || { echo "${RED}Build failed${NORMAL}"; /bin/rm -rf "${resultDir}"; exit 1; }
+    GOOS=${os} GOARCH=${arch} go build -o ${resultDir}/bin/${exeName} -ldflags "${ldflags}" ${mainFile} && { echo "${GREEN}Build successfully.${NORMAL}"; } || { echo "${RED}Build failed${NORMAL}"; /bin/rm -rf "${resultDir}"; exit 1; }
     for f in "${runtimeFiles[@]}";do
         cp $f ${resultDir}
     done
