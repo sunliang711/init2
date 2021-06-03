@@ -198,6 +198,17 @@ function _root(){
     fi
 }
 
+function _wait(){
+    # secs=$((5 * 60))
+    secs=${1:?'missing seconds'}
+
+    while [ $secs -gt 0 ]; do
+       echo -ne "$secs\033[0K\r"
+       sleep 1
+       : $((secs--))
+    done
+}
+
 ed=vi
 if _command_exists vim; then
     ed=vim
