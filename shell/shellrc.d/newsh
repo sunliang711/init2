@@ -207,6 +207,7 @@ function _wait(){
        sleep 1
        : $((secs--))
     done
+    echo -ne "\033[0K\r"
 }
 
 ed=vi
