@@ -58,7 +58,7 @@ function runAsRoot(){
 if [ -n "${LOCAL_APP_ROOT}" ];then
     prefix=${LOCAL_APP_ROOT}
 else
-    prefix=$HOME/.app
+    prefix=$HOME/.local/apps
 fi
 install(){
     if ! command -v logrotate >/dev/null 2>&1;then
