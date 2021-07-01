@@ -1656,7 +1656,7 @@ sshconfig(){
     if command -v vim >/dev/null 2>&1;then
         ed=vim
     fi
-    if command -v vim >/dev/null 2>&1;then
+    if command -v nvim >/dev/null 2>&1;then
         ed=nvim
     fi
     if [ -n "${editor}" ];then
