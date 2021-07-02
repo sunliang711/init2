@@ -1533,6 +1533,34 @@ function newpy(){
     "$ed" "$filename"
 }
 
+function opendir(){
+    dir="${1}"
+    if [ -z "${dir}" ];then
+        echo "Missing dir name,please enter: "
+        read dir
+        if [ -z "${dir}" ];then
+            echo "No dir name provided"
+            return 1
+        fi
+    fi
+
+    local ed=vi
+    if command -v vim >/dev/null 2>&1;then
+        ed=vim
+    fi
+    if command -v nvim >/dev/null 2>&1;then
+        ed=nvim
+    fi
+    if [ -n "${editor}" ];then
+        ed="${editor}"
+    fi
+    cd "${dir}" || { echo "no ${dir}"; return 2; }
+
+    tmux new-session -s "${dir}" "${ed}" \; split-window -h\;
+
+
+}
+
 function newgitignore(){
     dest=${1:-"${PWD}"}
     ignorefile="${dest}/.gitignore"
