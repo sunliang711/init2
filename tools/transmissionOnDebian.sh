@@ -172,6 +172,7 @@ EOF
         echo "transmission uid: ${PUID} gid: ${PGID}"
         echo "run 'docker-compose up -d' in ${dest} to start transmission."
         echo "You can mount smb on ${downloadDir} to let it be download destination"
+        echo "for example: mount --bind <dsm-mount-dir> ${downloadDir}, after bind then run transmission service!!"
     else
         echo "failed"
     fi
