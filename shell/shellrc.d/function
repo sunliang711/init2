@@ -1555,6 +1555,7 @@ function opendir(){
         ed="${editor}"
     fi
     cd "${dir}" || { echo "no ${dir}"; return 2; }
+    dir="$(pwd | xargs basename)"
 
     tmux new-session -s "${dir}" "${ed}" \; split-window -h\;
 
