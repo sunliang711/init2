@@ -193,14 +193,14 @@ _run(){
 
 function _root(){
     if [ ${EUID} -ne ${rootID} ];then
-        echo "Requires root privilege." 1>&2
+        echo "Requires root privilege."
         exit 1
     fi
 }
 
 function _linux(){
     if [ "$(uname)" != "Linux" ];then
-        echo "Requires Linux" 1>&2
+        echo "Need on Linux"
         exit 1
     fi
 }
@@ -231,6 +231,33 @@ fi
 ###############################################################################
 # write your code below (just define function[s])
 # function is hidden when begin with '_'
+# all version
+if [ -n "${SOLC_DEST}" ];then
+    dest="${SOLC_DEST}"
+else
+    dest=$HOME/.local/apps/solc
+fi
+
+install(){
+    echo "solc will be installed in $dest or env SOLC_DEST"
+    _linux
+    version=${1:?'missing version'}
+    solcURL=https://github.com/ethereum/solidity/releases/download/v${version}/solc-static-linux
+    versionDest="${dest}/${version}"
+    binDir="${dest}/bin"
+    if [ ! -d "${binDir}" ];then
+        mkdir -p "${binDir}"
+    fi
+    if [ ! -d "${versionDest}" ];then
+        mkdir -p "${versionDest}"
+    fi
+    cd "${versionDest}"
+    binaryName="${solcURL##*/}"
+    curl -LO "${solcURL}" && mv "${binaryName}" "solc-${version}" && chmod +x "solc-${version}"
+    echo "solc-${version} has been installed in ${versionDest}"
+    ln -sf "${versionDest}/solc-${version}" "${binDir}"
+}
+
 
 # write your code above
 ###############################################################################

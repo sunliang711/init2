@@ -103,6 +103,7 @@ install(){
             ;;
     esac
 
+    export SHELLRC_ROOT=${root}
     if ! grep -q "$startLine" "$configFile";then
         cat <<-EOF >> "$configFile"
 	$startLine

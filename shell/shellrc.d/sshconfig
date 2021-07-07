@@ -2,6 +2,9 @@
 #     HostName 10.1.1.26
 #     User eagle
 #     Port 22
+Host chuan
+    HostName gitez.cc
+    Port 7300
 
 Host aliyun
     HostName gitez.cc
