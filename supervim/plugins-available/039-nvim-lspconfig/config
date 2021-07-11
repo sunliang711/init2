@@ -18,12 +18,22 @@ lua <<EOF
 -- nvim_lsp object
 local nvim_lsp = require'lspconfig'
 
-local servers = {'pyright', 'gopls', 'rust_analyzer', 'solargraph'}
-for _, lsp in ipairs(servers) do
-  nvim_lsp[lsp].setup {
-    on_attach = on_attach,
-  }
+-- local servers = {'pyright', 'gopls', 'rust_analyzer', 'solargraph'}
+-- for _, lsp in ipairs(servers) do
+--   nvim_lsp[lsp].setup {
+--     on_attach = on_attach,
+--   }
+-- end
+
+-- function to attach completion when setting up lsp
+local on_attach = function(client)
+    require'completion'.on_attach(client)
 end
+
+-- Enable rust_analyzer
+nvim_lsp.rust_analyzer.setup({ on_attach=on_attach })
+-- Enable gopls
+nvim_lsp.gopls.setup({ on_attach=on_attach })
 
 -- Enable diagnostics
 vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
