@@ -108,7 +108,7 @@ install(){
             ;;
     esac
     cd /tmp
-    local name=go${version}.linux-amd64.tar.gz
+    local name=${goURL##*/}
     if [ ! -e $name ];then
         echo "Download $name to /tmp..."
         curl -LO $goURL || { echo "Download $name error"; exit 1; }
