@@ -26,7 +26,7 @@ Host proxy18
 # shanghai ROS router
 Host shros
     HostName sh.gitez.cc
-    User user
+    User userxx1
     Port 20000
 
 Host memento
@@ -45,6 +45,10 @@ Host atom110
 
 Host atomfrpc
     HostName 10.1.9.113
+    User eagle
+
+Host atom126
+    HostName 10.1.9.126
     User eagle
 
 # ATOM LOCAL VMs

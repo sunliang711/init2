@@ -1557,7 +1557,11 @@ function opendir(){
     cd "${dir}" || { echo "no ${dir}"; return 2; }
     dir="$(pwd | xargs basename)"
 
-    tmux new-session -s "${dir}" "${ed}" \; split-window -h\; select-pane -t 0\;
+    if tmux has-session -t "${dir}" >/dev/null 2>&1;then
+        tmux attach -t "${dir}"
+    else
+        tmux new-session -s "${dir}" "${ed}" \; split-window -h\; select-pane -t 0\;
+    fi
 
 
 }
