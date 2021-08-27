@@ -268,6 +268,8 @@ _checkService(){
     fi
 }
 
+# ref: https://foxi.buduanwang.vip/virtualization/pve/615.html/
+
 # install grafana
 igrafana(){
     _root
