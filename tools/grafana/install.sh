@@ -409,19 +409,18 @@ cpveexporter(){
 cnodeexporter(){
     _root
 
-    echo "input pve ip: "
+    echo "input node exporter host ip: "
     read ip
 
     local nodeExporterHeader="#node exporter begin"
     local nodeExporterTail="#node exporter end"
 
-    if grep "${nodeExporterHeader}" /etc/prometheus/prometheus.yml;then
-        echo "already configured node exporter"
-        exit
-    fi
+    # if grep "${nodeExporterHeader}" /etc/prometheus/prometheus.yml;then
+    #     echo "already configured node exporter"
+    # fi
     cat>>/etc/prometheus/prometheus.yml<<-EOF
 	${nodeExporterHeader}
-	  - job_name: 'node_exporter_metrics'
+	  - job_name: 'node_exporter_metrics${ip}'
 	    scrape_interval: 5s
 	    static_configs:
 	      - targets: ['$ip:9100']
