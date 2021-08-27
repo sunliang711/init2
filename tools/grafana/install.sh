@@ -346,7 +346,7 @@ iprometheus(){
 }
 
 # config proxmox-pve-exporter
-pve-exporter(){
+ipveexporter(){
     _root
     _run -x "groupadd --system prometheus"
     _run -x "useradd -s /sbin/nologin --system -g prometheus prometheus"
@@ -372,6 +372,8 @@ pve-exporter(){
     chown -R prometheus:prometheus /etc/prometheus/
     chmod -R 775 /etc/prometheus/
 
+    _infoln "install prometheus-pve-exporter service"
+    cp ${this}/prometheus-pve-exporter.service /etc/systemd/system
     _infoln "enable prometheus-pve-exporter.."
     systemctl daemon-reload
     systemctl enable --now prometheus-pve-exporter
@@ -403,6 +405,7 @@ cpveexporter(){
 
     _infoln "restart prometheus"
     systemctl restart prometheus
+    echo "template id: 10347"
 }
 
 # config prometheus node exporter
@@ -429,6 +432,7 @@ cnodeexporter(){
 
     _infoln "restart prometheus"
     systemctl restart prometheus
+    echo "template id: 8919"
 
 }
 
