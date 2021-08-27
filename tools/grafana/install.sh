@@ -437,9 +437,10 @@ inodeexporter(){
     _root
 
     _infoln "downlad node exporter.."
-    wget -P /tmp https://github.com/prometheus/node_exporter/releases/download/v1.0.1/node_exporter-1.0.1.linux-amd64.tar.gz
-    tar -xzvf /tmp/node_exporter-1.0.1.linux-amd64.tar.gz -C /tmp
-    mv /tmp/node_exporter-1.0.1.linux-amd64/node_exporter /usr/local/bin/
+    version=1.0.1
+    wget -P /tmp https://github.com/prometheus/node_exporter/releases/download/v${version}/node_exporter-${version}.linux-amd64.tar.gz
+    tar -xzvf /tmp/node_exporter-${version}.linux-amd64.tar.gz -C /tmp
+    mv /tmp/node_exporter-${version}.linux-amd64/node_exporter /usr/local/bin/
 
     _infoln "add user node_exporter"
     useradd -rs /bin/false node_exporter
