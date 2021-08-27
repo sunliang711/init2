@@ -265,6 +265,7 @@ _checkService(){
         echo "OK"
     else
         echo "Not found"
+        return 1
     fi
 }
 
@@ -288,11 +289,11 @@ igrafana(){
 
 
     _info "get gpg siqnature.. "
-    _run "curl -s https://packages.grafana.com/gpg.key | sudo apt-key add -"
+    _run "curl -s https://packages.grafana.com/gpg.key | apt-key add -"
     _must_ok
 
     _infoln "update source and install grafana"
-    _run -x "apt update && sudo apt install -y apt-transport-https grafana"
+    _run -x "apt update && apt install -y apt-transport-https grafana"
 
     _infoln "enable and start grafana"
     _run "systemctl enable --now grafana-server"
