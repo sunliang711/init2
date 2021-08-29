@@ -303,6 +303,7 @@ install(){
     perl -i -p -e 's/("rpc-password": )".+",/$1"$ENV{rpcPassword}",/' ${configFile}
 
     perl -i -p -e 's/("rpc-whitelist-enabled": )[^,]+,/$1false,/' ${configFile}
+    perl -i -p -e 's/("port-forwarding-enabled": )[^,]+,/$1true,/' ${configFile}
 
 
     rootDir=/usr/local/transmission
