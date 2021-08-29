@@ -237,15 +237,24 @@ fi
 install(){
     _root
 
-    if ! systemctl --all  --type service --no-pager | grep -q transmission ;then
+    if ! systemctl list-unit-files --no-pager | grep -q transmission ;then
         echo "update source.."
         _run -x "apt update"
         echo "install transmission-daemon.."
         _run -x "apt install transmission-daemon -y"
+        _run -x "apt install cifs-utils -y"
 
     fi
+
+
     echo "stop transmission-daemon for config.."
+    _run -x "systemctl disable transmission-daemon"
     _run -x "systemctl stop transmission-daemon"
+
+    # # run transmission daemon as root
+    # local transmissionDeamonServiceFile="$(systemctl status transmission-daemon | perl -ne 'print if /Loaded/' | awk -F'(' '{print $2}' | awk -F';' '{print $1}')"
+    # echo "transmissionDeamonServiceFile: ${transmissionDeamonServiceFile}"
+    # perl -i -p -e "s|User=.+|User=root|" ${transmissionDeamonServiceFile}
 
     local configFile='/etc/transmission-daemon/settings.json'
     echo "backup old config file.."
@@ -295,10 +304,30 @@ install(){
 
     perl -i -p -e 's/("rpc-whitelist-enabled": )[^,]+,/$1false,/' ${configFile}
 
-    systemctl start transmission-daemon
 
+    rootDir=/usr/local/transmission
+    if [ ! -d ${rootDir} ];then
+        mkdir -p ${rootDir}
+    fi
+    # cp ${this}/transmission.sh ${rootDir}
+    sed -e "s|<TransmissionDownloadDir>|${downloadDir}|g" ${this}/transmission.sh >${rootDir}/transmission.sh
+    chmod +x ${rootDir}/transmission.sh
+
+    sed -e "s|<ROOT>|${rootDir}|g" ${this}/transmission.service >/etc/systemd/system/transmission.service
+    systemctl daemon-reload
+    # systemctl enable --now transmission.service
 }
 
+uninstall(){
+    _root
+    echo "stop service.."
+    systemctl stop transmission
+
+    echo "remove service file.."
+    rm -rf /etc/systemd/system/transmission.service
+    rm -rf ${rootDir}
+
+}
 
 em(){
     $ed $0
