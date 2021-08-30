@@ -231,76 +231,42 @@ fi
 ###############################################################################
 # write your code below (just define function[s])
 # function is hidden when begin with '_'
-cmd='qbittorrent-nox'
-user='qbittorrent'
-group='qbittorrent'
-
-install(){
-    _root
-    if ! command -v "${cmd}" >/dev/null 2>&1;then
-        echo "install ${cmd}"
-        apt update
-        apt install -y "${cmd}" || { echo "install ${cmd} failed"; exit 1; }
-    fi
-
-    if ! id -u ${user} >/dev/null 2>&1;then
-        echo "create user: ${user} "
-        useradd -m ${user} || { echo "create user failed"; exit 1; }
-        # add ${user} to sudoer
-        _addsudo ${user}
-    fi
-
-    cp ${this}/smb.sh /usr/local/bin/smb.sh
-
-    port=8083
-    echo "webui port: ${port} "
-    fullPath="$(which ${cmd}) --webui-port=${port}"
-
-    start_pre=
-    stop=
-
-    echo "config smb mount? [y/n]"
-    read configSmb
-    if [ "${configSmb}" == y ];then
-        read -p "enter smb ip: " smbIp
-        read -p "enter smb name: " smbName
-        mountDir=/home/${user}/Downloads
-        read -p "enter smb user: " smbUser
-        read -p "enter smb password: " smbPass
-        #read -p "enter smb mount as user: " asUser
-        asUser=${user}
-        start_pre="/usr/local/bin/smb.sh mount ${smbIp} ${smbName} ${mountDir} ${smbUser} ${smbPass} ${asUser}"
-        stop="/usr/local/bin/smb.sh umount ${mountDir}"
-
-    fi
-    # local usage="usage: mount <smb_ip> <smb_name> <mount_dir> <smb_user> <smb_password> <as_user>"
-
-    sed -e "s|<EXE>|${fullPath}|g" \
-        -e "s|<START_PRE>|${start_pre}|g" \
-        -e "s|<STOP>|${stop}|g" \
-        -e "s|<USER>|${user}|g" ${this}/qbittorrent.service >/etc/systemd/system/qbittorrent.service
-
-    systemctl daemon-reload
-    systemctl start qbittorrent.service
-
-    echo "config file at: $HOME/.config/qBittorrent/qBittorrent.conf"
-
-}
-
-_addsudo(){
-    user=${1:?'missing user'}
-    echo "add ${user} to sudoers"
-    if ! command -v sudo >/dev/null 2>&1;then
-        apt install sudo || { echo "install sudo failed."; exit 1; }
-    fi
-    cat>>/etc/sudoers.d/nopass<<-EOF
-${user} ALL=(ALL:ALL) NOPASSWD:ALL
-EOF
-
-}
 
 # write your code above
 ###############################################################################
+mount(){
+    if ! dpkg -L cifs-utils >/dev/null 2>&1;then
+        echo "install cifs-utils.."
+        sudo apt install -y cifs-utils || { echo "install cifs-utils failed"; exit 1; }
+    fi
+    local usage="usage: mount <smb_ip> <smb_name> <mount_dir> <smb_user> <smb_password> <as_user>"
+    if [ $# -lt 6 ];then
+        echo ${usage}
+        exit 1
+    fi
+
+    smbIp=${1}
+    smbName=${2}
+    mountDir=${3}
+    smbUser=${4}
+    smbPass=${5}
+    asUser=${6}
+
+    sudo mount -t cifs //${smbIp}/${smbName} "${mountDir}" -o user=${smbUser},pass=${smbPass},uid=$(id -u ${asUser}) || { echo "mount smb failed"; exit 1; }
+
+}
+
+umount(){
+    mountDir=${1:?'missing mount dir'}
+    sudo umount ${mountDir}
+}
+
+bindMount(){
+    src=${1:?'missing src'}
+    dest=${2:?'missing dest'}
+
+    sudo mount --bind ${src} ${dest}
+}
 
 em(){
     $ed $0
