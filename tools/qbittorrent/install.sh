@@ -239,8 +239,14 @@ install(){
     _root
     if ! command -v "${cmd}" >/dev/null 2>&1;then
         echo "install ${cmd}"
-        apt update
-        apt install -y "${cmd}" || { echo "install ${cmd} failed"; exit 1; }
+        # apt update
+        # apt install -y "${cmd}" || { echo "install ${cmd} failed"; exit 1; }
+        link="https://source711.oss-cn-shanghai.aliyuncs.com/qbittorrent-nox/linux/x64/4.3.8/qbittorrent-nox"
+        (
+        cd /tmp
+        curl -LO "${link}" && mv qbittorrent-nox /usr/local/bin || { echo "download qbittorrent-nox failed"; exit 1; }
+        chmod +x /usr/local/bin/qbittorrent-nox
+        )
     fi
 
     if ! id -u ${user} >/dev/null 2>&1;then
