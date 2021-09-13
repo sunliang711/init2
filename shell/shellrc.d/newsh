@@ -119,7 +119,11 @@ _runAsRoot(){
         fi
     else
         if [ $trace -eq 1 ];then
-            set -x; ${bash_c} "${cmd}";set +x;
+            set -x
+            ${bash_c} "${cmd}"
+            local ret=$?
+            { set +x; } 2>/dev/null
+            return $ret
         else
             ${bash_c} "${cmd}"
         fi
@@ -187,7 +191,7 @@ _run(){
             set -x
             ${bash_c} "${cmd}"
             local ret=$?
-            set +x;
+            { set +x; } 2>/dev/null
             return ${ret}
         else
             ${bash_c} "${cmd}"
