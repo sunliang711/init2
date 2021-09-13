@@ -261,7 +261,7 @@ _errorln(){
 
 _checkService(){
     _info "find service ${1}.."
-    if systemctl | grep -q "${1}";then
+    if systemctl --all --no-pager | grep -q "${1}";then
         echo "OK"
     else
         echo "Not found"
