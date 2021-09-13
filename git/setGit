@@ -52,15 +52,32 @@ gitconfig(){
 
 defaultEmail="sunliang711@163.com"
 defaultUser="sunliang711"
-read -p "git user.email: (default: ${defaultEmail}) "  -t 2 email
-if [[ -z "$email" ]];then
-    email="${defaultEmail}"
-    echo
-fi
-read -p "git user.name: (default: ${defaultUser}) "  -t 2 name
-if [[ -z "$name" ]];then
-    name="${defaultUser}"
-    echo
+if command -v whiptail >/dev/null 2>&1;then
+    email="$(whiptail --title 'set git email' --inputbox 'enter email address' 5 40 ${defaultEmail} 3>&1 1>&2 2>&3)"
+    if [ $? -eq 0 ];then
+        echo 
+    else
+        echo "canceled"
+        exit 1
+    fi
+    name="$(whiptail --title 'set git name' --inputbox 'enter name ' 5 40 ${defaultUser} 3>&1 1>&2 2>&3)"
+    if [ $? -eq 0 ];then
+        echo
+    else
+        echo "canceled"
+        exit 1
+    fi
+else
+    read -p "git user.email: (default: ${defaultEmail}) " email
+    if [[ -z "$email" ]];then
+        email="${defaultEmail}"
+        echo
+    fi
+    read -p "git user.name: (default: ${defaultUser}) " name
+    if [[ -z "$name" ]];then
+        name="${defaultUser}"
+        echo
+    fi
 fi
 
 export -f gitconfig
