@@ -55,7 +55,6 @@ esac
 if command -v sudo >/dev/null 2>&1;then
     #当使用sudo执行alias地时候会找不到alias，需要这样设置
     alias sudo='sudo '
-    alias halt='sudo shutdown -h now'
     alias reboot='sudo reboot'
     if command -v apt-get >/dev/null 2>&1;then
         alias apt-get='sudo apt-get'
