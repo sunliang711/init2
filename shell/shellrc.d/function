@@ -365,6 +365,9 @@ macproxyoff(){
 }
 
 npmproxyon(){
+    if ! command -v npm >/dev/null 2>&1;then
+        return
+    fi
     local defaultRegistry="http://registry.npm.taobao.org"
     local registry="${1}"
     if [ -z "${registry}" ];then
