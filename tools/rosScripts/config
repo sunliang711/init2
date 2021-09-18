@@ -32,5 +32,6 @@ mappings=(
 "tcp|8549|10.1.1.172||eth mainnet rpc"
 "udp|30303|10.1.1.172||eth mainnet dht"
 "tcp|8547|10.1.1.172||eth private rpc"
+"tcp|42400|10.1.1.160|32400|dsm plex server"
 )
 

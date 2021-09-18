@@ -33,11 +33,33 @@ Host memento
     HostName memento.gitez.cc
     User eagle
 
+Host pve
+    HostName a8.gitez.cc
+    User root
+    Port 7101
+
+# jia xing blockchain
+Host jx
+    HostName a8.gitez.cc
+    User root
+    Port 7999
+
+##################################################
+# atom aliyun
+Host a8
+    HostName a8.gitez.cc
+    User eagle
+    Port 2000
 ##################################################
 # ATOM LOCAL VMs
 Host atompve
     HostName 10.1.9.2
     User root
+
+Host atom22
+    HostName 10.1.9.22
+    User root
+    Port 7960
 
 Host atom110
     HostName 10.1.9.110
