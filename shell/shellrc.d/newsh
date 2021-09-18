@@ -113,13 +113,16 @@ _runAsRoot(){
 
     if [ $subshell -eq 1 ];then
         if [ $trace -eq 1 ];then
-            (set -x; ${bash_c} "${cmd}")
+            (
+             { set -x;} 2>/dev/null
+             ${bash_c} "${cmd}"
+            )
         else
             (${bash_c} "${cmd}")
         fi
     else
         if [ $trace -eq 1 ];then
-            set -x
+            { set -x; } 2>/dev/null
             ${bash_c} "${cmd}"
             local ret=$?
             { set +x; } 2>/dev/null
@@ -182,13 +185,16 @@ _run(){
 
     if [ $subshell -eq 1 ];then
         if [ $trace -eq 1 ];then
-            (set -x; ${bash_c} "${cmd}")
+            (
+                { set -x; } 2>/dev/null
+                ${bash_c} "${cmd}"
+            )
         else
             (${bash_c} "${cmd}")
         fi
     else
         if [ $trace -eq 1 ];then
-            set -x
+            { set -x; } 2>/dev/null
             ${bash_c} "${cmd}"
             local ret=$?
             { set +x; } 2>/dev/null
