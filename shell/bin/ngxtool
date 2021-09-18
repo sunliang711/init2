@@ -83,8 +83,11 @@ em(){
 edit(){
     siteName=${1:?"missing siteName in available directory."}
     editor=vi
-    if command -v >/dev/null 2>&1;then
+    if command -v vim >/dev/null 2>&1;then
         editor=vim
+    fi
+    if command -v nvim >/dev/null 2>&1;then
+        editor=nvim
     fi
     local fullPath="$dest/sites-available/$siteName"
     if [ ! -e "$fullPath" ];then
