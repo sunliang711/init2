@@ -85,11 +85,18 @@ function newhardhat(){
     mkdir ${projName} && cd ${projName}
     echo "initialize project.."
     npm init -y
-    npm install --save-dev hardhat || { echo "install hardhat failed"; return 1; }
-    npm install --save-dev @nomiclabs/hardhat-waffle ethereum-waffle chai @nomiclabs/hardhat-ethers ethers || { echo "install related packages failed"; return 1; }
-    npm install --save-dev hardhat-deploy || { echo "install hardhat-deploy failed"; return 1; }
+    # npm install --save-dev hardhat || { echo "install hardhat failed"; return 1; }
+    # npm install --save-dev @nomiclabs/hardhat-waffle ethereum-waffle chai @nomiclabs/hardhat-ethers ethers || { echo "install related packages failed"; return 1; }
+    # npm install --save-dev hardhat-deploy || { echo "install hardhat-deploy failed"; return 1; }
+    yarn add --dev hardhat || { echo "install hardhat failed"; return 1; }
+    yarn add --dev @nomiclabs/hardhat-waffle ethereum-waffle chai @nomiclabs/hardhat-ethers ethers || { echo "install related packages failed"; return 1; }
+    yarn add --dev @nomiclabs/hardhat-ethers@npm:hardhat-deploy-ethers || { echo "install hardhat-deploy-ethers failed"; return 1; }
+    yarn add --dev hardhat-deploy || { echo "install hardhat-deploy failed"; return 1; }
     _sampleDeploy
     npx hardhat
+
+    (echo "require('hardhat-deploy')";cat hardhat.config.js) >/tmp/hardhat.config.js.$$
+    mv /tmp/hardhat.config.js.$$ hardhat.config.js
     )
 }
 
@@ -111,10 +118,10 @@ module.exports = async ({
     const [owner, controller, user1, user2, user3] = await hre.ethers.getSigners();
 
     console.log("wait for deploy..")
-    const tx = await deploy('ERC1155Music', {
+    const tx = await deploy('Greeter', {
         from: owner.address,
         proxy: true,
-        // args:['https://abc.com']
+        args:['hello']
     });
     console.log("contract(proxy) address: ",tx.address)
     console.log("tx hash: ",tx.transactionHash)
