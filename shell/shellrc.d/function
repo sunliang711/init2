@@ -453,6 +453,9 @@ npmproxyon(){
 }
 
 npmproxyoff(){
+    if ! command -v npm >/dev/null 2>&1;then
+        return
+    fi
     echo -n "Delete npm registry .. "
     npm config delete registry && echo "Done." || echo "Failed."
 }
