@@ -234,19 +234,22 @@ fi
 cmd='qbittorrent-nox'
 user='qbittorrent'
 group='qbittorrent'
+port=8083
+dest=/usr/local/qbittorrent
 
 install(){
     _root
+    set -e
     if ! command -v "${cmd}" >/dev/null 2>&1;then
-        echo "install ${cmd}"
-        # apt update
-        # apt install -y "${cmd}" || { echo "install ${cmd} failed"; exit 1; }
-        link="https://source711.oss-cn-shanghai.aliyuncs.com/qbittorrent-nox/linux/x64/4.3.8/qbittorrent-nox"
-        (
-        cd /tmp
-        curl -LO "${link}" && mv qbittorrent-nox /usr/local/bin || { echo "download qbittorrent-nox failed"; exit 1; }
-        chmod +x /usr/local/bin/qbittorrent-nox
-        )
+        echo "install ${cmd} .."
+        apt update
+        apt install -y "${cmd}" || { echo "install ${cmd} failed"; exit 1; }
+        # link="https://source711.oss-cn-shanghai.aliyuncs.com/qbittorrent-nox/linux/x64/4.3.8/qbittorrent-nox"
+        # (
+        # cd /tmp
+        # curl -LO "${link}" && mv qbittorrent-nox /usr/local/bin || { echo "download qbittorrent-nox failed"; exit 1; }
+        # chmod +x /usr/local/bin/qbittorrent-nox
+        # )
     fi
 
     if ! id -u ${user} >/dev/null 2>&1;then
@@ -256,40 +259,62 @@ install(){
         _addsudo ${user}
     fi
 
-    cp ${this}/smb.sh /usr/local/bin/smb.sh
+    if [ ! -d ${dest} ];then
+        echo "create directory ${dest} .."
+        mkdir -p ${dest}
+    fi
 
-    port=8083
+
     echo "webui port: ${port} "
-    fullPath="$(which ${cmd}) --webui-port=${port}"
+    cmdStart="$(which ${cmd}) --webui-port=${port}"
 
-    start_pre=
-    stop=
+    start_pre="${dest}/qbittorrent.sh _start_pre"
+    start="${dest}/qbittorrent.sh start"
+    stop="${dest}/qbittorrent.sh stop"
 
-    echo "config smb mount? [y/n]"
-    read configSmb
+    echo -n "config smb mount? [y/n] "
+    read -n 1 configSmb
+    echo
     if [ "${configSmb}" == y ];then
         read -p "enter smb ip: " smbIp
         read -p "enter smb name: " smbName
         mountDir=/home/${user}/Downloads
         read -p "enter smb user: " smbUser
+        stty -echo
         read -p "enter smb password: " smbPass
-        #read -p "enter smb mount as user: " asUser
+        stty echo
+        echo
         asUser=${user}
-        start_pre="/usr/local/bin/smb.sh mount ${smbIp} ${smbName} ${mountDir} ${smbUser} ${smbPass} ${asUser}"
-        stop="/usr/local/bin/smb.sh umount ${mountDir}"
 
     fi
-    # local usage="usage: mount <smb_ip> <smb_name> <mount_dir> <smb_user> <smb_password> <as_user>"
+    sed -e "s|<smb_ip>|${smbIp}|g" \
+        -e "s|<smb_name>|${smbName}|g" \
+        -e "s|<mount_dir>|${mountDir}|g" \
+        -e "s|<smb_user>|${smbUser}|g" \
+        -e "s|<smb_pass>|${smbPass}|g" \
+        -e "s|<smb_as_user>|${user}|g" \
+        -e "s|<start>|${cmdStart}|g" \
+        ${this}/qbittorrent.sh >${dest}/qbittorrent.sh && chmod +x ${dest}/qbittorrent.sh
 
-    sed -e "s|<EXE>|${fullPath}|g" \
+
+    sed -e "s|<START>|${start}|g" \
         -e "s|<START_PRE>|${start_pre}|g" \
         -e "s|<STOP>|${stop}|g" \
         -e "s|<USER>|${user}|g" ${this}/qbittorrent.service >/etc/systemd/system/qbittorrent.service
 
     systemctl daemon-reload
-    systemctl start qbittorrent.service
+    
+    # read -n 1 -p "start qbittorrent service [y/n] " startQbittorrent
+    # echo
+    # if [ ${startQbittorrent} = "y" ];then
+    #     echo "start qbittorrent service .."
+    #     systemctl start qbittorrent.service
+    # fi
 
-    echo "config file at: $HOME/.config/qBittorrent/qBittorrent.conf"
+    echo "qtibtorrent config file at: $HOME/.config/qBittorrent/qBittorrent.conf"
+    echo "qbittorrent script installed at: ${dest}"
+    echo "issue command '${cmdStart}' manaually to accept notice"
+    echo "default webui credentials: user: admin password: adminadmin"
 
 }
 
@@ -303,6 +328,13 @@ _addsudo(){
 ${user} ALL=(ALL:ALL) NOPASSWD:ALL
 EOF
 
+}
+
+uninstall(){
+    _root
+    systemctl stop qbittorrent
+    rm -rf ${dest}
+    rm -rf /etc/systemd/system/qbittorrent.service
 }
 
 # write your code above

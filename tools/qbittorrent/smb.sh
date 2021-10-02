@@ -252,7 +252,7 @@ mount(){
     smbPass=${5}
     asUser=${6}
 
-    sudo mount -t cifs //${smbIp}/${smbName} "${mountDir}" -o user=${smbUser},pass=${smbPass},uid=$(id -u ${asUser}) || { echo "mount smb failed"; exit 1; }
+    sudo mount -t cifs //${smbIp}/${smbName} "${mountDir}" -o user=${smbUser},pass=${smbPass},uid=$(id -u ${asUser}),gid=$(id -g ${asUser}) || { echo "mount smb failed"; exit 1; }
 
 }
 

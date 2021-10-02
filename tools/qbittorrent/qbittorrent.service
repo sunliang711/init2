@@ -15,7 +15,7 @@ After=network.target
 
 Type=simple
 ExecStartPre=<START_PRE>
-ExecStart=<EXE>
+ExecStart=<START>
 #ExecStartPost=
 
 ExecStop=<STOP>
