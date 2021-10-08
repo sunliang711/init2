@@ -44,6 +44,12 @@ Host jx
     User root
     Port 7999
 
+# 政务云
+Host zheng
+    HostName a8.gitez.cc
+    User root
+    Port 7998
+
 ##################################################
 # atom aliyun
 Host a8

@@ -1,13 +1,13 @@
 
 #BEGIN alias
-alias dell='ssh -p 2001 eagle@sh.eagle711.win'
-alias ikev2='ssh -p 2002 eagle@sh.eagle711.win'
-alias google='ssh -p 2000 root@g.eagle711.win'
-alias google2='ssh -p 2000 root@g2.eagle711.win'
-alias dsm='ssh -p 2001 root@sh.eagle711.win'
-alias c7='ssh -p 2004 eagle@sh.eagle711.win'
-alias 101='ssh -p 7010 eagle@aliyun.eagle711.win'
-alias 102='ssh -p 7020 eagle@aliyun.eagle711.win'
+# alias dell='ssh -p 2001 eagle@sh.eagle711.win'
+# alias ikev2='ssh -p 2002 eagle@sh.eagle711.win'
+# alias google='ssh -p 2000 root@g.eagle711.win'
+# alias google2='ssh -p 2000 root@g2.eagle711.win'
+# alias dsm='ssh -p 2001 root@sh.eagle711.win'
+# alias c7='ssh -p 2004 eagle@sh.eagle711.win'
+# alias 101='ssh -p 7010 eagle@aliyun.eagle711.win'
+# alias 102='ssh -p 7020 eagle@aliyun.eagle711.win'
 
 
 #original rm
