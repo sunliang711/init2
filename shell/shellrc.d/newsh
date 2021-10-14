@@ -22,7 +22,7 @@ elif [ -r /tmp/shelllib ];then
 else
     # download shelllib then source
     shelllibURL=https://gitee.com/sunliang711/init2/raw/master/shell/shellrc.d/shelllib
-    (cd /tmp && curl -LO ${shelllibURL})
+    (cd /tmp && curl -s -LO ${shelllibURL})
     if [ -r /tmp/shelllib ];then
         source /tmp/shelllib
     fi
