@@ -1,77 +1,33 @@
 #!/bin/bash
-rpath="$(readlink ${BASH_SOURCE})"
-if [ -z "$rpath" ];then
-    rpath=${BASH_SOURCE}
-fi
-this="$(cd $(dirname $rpath) && pwd)"
-# cd "$this"
-export PATH=$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-
-user="${SUDO_USER:-$(whoami)}"
-home="$(eval echo ~$user)"
-
-# export TERM=xterm-256color
-
-# Use colors, but only if connected to a terminal, and that terminal
-# supports them.
-if which tput >/dev/null 2>&1; then
-  ncolors=$(tput colors 2>/dev/null)
-fi
-if [ -t 1 ] && [ -n "$ncolors" ] && [ "$ncolors" -ge 8 ]; then
-    RED="$(tput setaf 1)"
-    GREEN="$(tput setaf 2)"
-    YELLOW="$(tput setaf 3)"
-    BLUE="$(tput setaf 4)"
-            CYAN="$(tput setaf 5)"
-    BOLD="$(tput bold)"
-    NORMAL="$(tput sgr0)"
+if [ -z "${BASH_SOURCE}" ]; then
+    this=${PWD}
 else
-    RED=""
-    GREEN=""
-    YELLOW=""
-            CYAN=""
-    BLUE=""
-    BOLD=""
-    NORMAL=""
-fi
-_err(){
-    echo "$*" >&2
-}
-
-_runAsRoot(){
-    cmd="${*}"
-    local rootID=0
-    if [ "${EUID}" -ne "${rootID}" ];then
-        echo -n "Not root, try to run as root.."
-        # or sudo sh -c ${cmd} ?
-        if eval "sudo ${cmd}";then
-            echo "ok"
-            return 0
-        else
-            echo "failed"
-            return 1
-        fi
+    rpath="$(readlink ${BASH_SOURCE})"
+    if [ -z "$rpath" ]; then
+        rpath=${BASH_SOURCE}
+    elif echo "$rpath" | grep -q '^/'; then
+        # absolute path
+        echo
     else
-        # or sh -c ${cmd} ?
-        eval "${cmd}"
+        # relative path
+        rpath="$(dirname ${BASH_SOURCE})/$rpath"
     fi
-}
+    this="$(cd $(dirname $rpath) && pwd)"
+fi
 
-rootID=0
-function _root(){
-    if [ ${EUID} -ne ${rootID} ];then
-        echo "Need run as root!"
-        exit 1
+if [ -r ${SHELLRC_ROOT}/shellrc.d/shelllib ];then
+    source ${SHELLRC_ROOT}/shellrc.d/shelllib
+elif [ -r /tmp/shelllib ];then
+    source /tmp/shelllib
+else
+    # download shelllib then source
+    shelllibURL=https://gitee.com/sunliang711/init2/raw/master/shell/shellrc.d/shelllib
+    (cd /tmp && curl -s -LO ${shelllibURL})
+    if [ -r /tmp/shelllib ];then
+        source /tmp/shelllib
     fi
-}
+fi
 
-editor=vi
-if command -v vim >/dev/null 2>&1;then
-    editor=vim
-fi
-if command -v nvim >/dev/null 2>&1;then
-    editor=nvim
-fi
 ###############################################################################
 # write your code below (just define function[s])
 # function is hidden when begin with '_'

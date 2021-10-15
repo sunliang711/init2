@@ -1,62 +1,33 @@
 #!/bin/bash
-rpath="$(readlink ${BASH_SOURCE})"
-if [ -z "$rpath" ];then
-    rpath=${BASH_SOURCE}
-fi
-thisDir="$(cd $(dirname $rpath) && pwd)"
-cd "$thisDir"
-
-user="${SUDO_USER:-$(whoami)}"
-home="$(eval echo ~$user)"
-
-red=$(tput setaf 1)
-green=$(tput setaf 2)
-yellow=$(tput setaf 3)
-blue=$(tput setaf 4)
-cyan=$(tput setaf 5)
-        bold=$(tput bold)
-reset=$(tput sgr0)
-function runAsRoot(){
-    verbose=0
-    while getopts ":v" opt;do
-        case "$opt" in
-            v)
-                verbose=1
-                ;;
-            \?)
-                echo "Unknown option: \"$OPTARG\""
-                exit 1
-                ;;
-        esac
-    done
-    shift $((OPTIND-1))
-    cmd="$@"
-    if [ -z "$cmd" ];then
-        echo "${red}Need cmd${reset}"
-        exit 1
-    fi
-
-    if [ "$verbose" -eq 1 ];then
-        echo "run cmd:\"${red}$cmd${reset}\" as root."
-    fi
-
-    if (($EUID==0));then
-        sh -c "$cmd"
+if [ -z "${BASH_SOURCE}" ]; then
+    this=${PWD}
+else
+    rpath="$(readlink ${BASH_SOURCE})"
+    if [ -z "$rpath" ]; then
+        rpath=${BASH_SOURCE}
+    elif echo "$rpath" | grep -q '^/'; then
+        # absolute path
+        echo
     else
-        if ! command -v sudo >/dev/null 2>&1;then
-            echo "Need sudo cmd"
-            exit 1
-        fi
-        sudo sh -c "$cmd"
+        # relative path
+        rpath="$(dirname ${BASH_SOURCE})/$rpath"
     fi
-}
+    this="$(cd $(dirname $rpath) && pwd)"
+fi
 
-function _insert_path(){
-    if [ -z "$1" ];then
-        return
+if [ -r ${SHELLRC_ROOT}/shellrc.d/shelllib ];then
+    source ${SHELLRC_ROOT}/shellrc.d/shelllib
+elif [ -r /tmp/shelllib ];then
+    source /tmp/shelllib
+else
+    # download shelllib then source
+    shelllibURL=https://gitee.com/sunliang711/init2/raw/master/shell/shellrc.d/shelllib
+    (cd /tmp && curl -s -LO ${shelllibURL})
+    if [ -r /tmp/shelllib ];then
+        source /tmp/shelllib
     fi
-    echo -e ${PATH//:/"\n"} | grep -c "^$1$" >/dev/null 2>&1 || export PATH=$1:$PATH
-}
+fi
+
 ###############################################################################
 # write your code below (just define function[s])
 # function with 'function' is hidden when run help, without 'function' is show
