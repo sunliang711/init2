@@ -92,7 +92,7 @@ addClient(){
 
 [Peer]
   PublicKey = $(cat ${wireguardRoot}/${serverPubkey})
-  Endpoint = ${endpoint}
+  Endpoint = ${endpoint}:${serverPort}
   AllowedIPs = 0.0.0.0/0, ::0/0
   PersistentKeepalive = 25
 
