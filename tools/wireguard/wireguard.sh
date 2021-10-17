@@ -95,6 +95,7 @@ addClient(){
   Endpoint = ${endpoint}:${serverPort}
   AllowedIPs = 0.0.0.0/0, ::0/0
   PersistentKeepalive = 25
+EOF
 
 
     echo "add client peer to server"
@@ -106,6 +107,15 @@ AllowedIPs = ${subnet}.${hostNumber}/32
 # end client-${clientName}
 EOF
     echo "run 'systemctl start wg-quick@wg0 to start server'"
+}
+
+removeClient(){
+    clientName=${1:?'missing client name'}
+    _root
+    rm -rf ${wireguardRoot}/client-${clientName}.privatekey
+    rm -rf ${wireguardRoot}/client-${clientName}.publickey
+    rm -rf ${wireguardRoot}/client-${clientName}.conf
+    sed -i -e "/# begin client-${clientName}/,/# end client-${clientName}/d" ${wireguardRoot}/${serverConfigFile}
 }
 
 configClient(){
