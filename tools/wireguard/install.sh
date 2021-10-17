@@ -35,7 +35,7 @@ fi
 install(){
     _root
     # install soft
-    echo 'deb http://ftp.debian.org/debian buster-backports main' | sudo tee /etc/apt/sources.list.d/buster-backports.list
+    echo 'deb http://ftp.debian.org/debian buster-backports main' | tee /etc/apt/sources.list.d/buster-backports.list
     apt update
     apt install wireguard qrencode linux-image-amd64 linux-headers-amd64 -y
 
