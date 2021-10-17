@@ -80,7 +80,7 @@ addClient(){
     endpoint=${3:?'missing server endpoint'}
 
     echo "generate client key pair"
-    wg genkey | tee ${wireguardRoot}/client-${clientName}.privatekey | wg pubkey | tee ${wireguardRoot}/client-$clientName}.publickey
+    wg genkey | tee ${wireguardRoot}/client-${clientName}.privatekey | wg pubkey | tee ${wireguardRoot}/client-${clientName}.publickey
 
     echo "generate client config file"
     cat<<-EOF>${wireguardRoot}/client-${clientName}.conf
@@ -99,9 +99,11 @@ addClient(){
 
     echo "add client peer to server"
     cat<<-EOF>>${wireguardRoot}/${serverConfigFile}
+# begin client-${clientName}
 [Peer]
 PublicKey = $(cat ${wireguardRoot}/client-${clientName}.publickey)
 AllowedIPs = ${subnet}.${hostNumber}/32
+# end client-${clientName}
 EOF
     echo "run 'systemctl start wg-quick@wg0 to start server'"
 }
