@@ -65,10 +65,6 @@ PostDown = iptables -t nat -D POSTROUTING -o ${interface} -j MASQUERADE
 ListenPort = ${serverPort}
 PrivateKey = $(cat ${wireguardRoot}/${serverPrikey})
 
-[Peer]
-PublicKey = zynv6T7QmsgujEp7bd4Wn+Zz3LUSV5v3/vgODnBw61k=
-AllowedIPs = 10.2.2.2/32
-Endpoint = 101.82.79.206:39839
 EOF
     else
         $ed ${wireguardRoot}/${serverConfigFile}
