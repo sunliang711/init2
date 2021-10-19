@@ -29,6 +29,11 @@ Host shros
     User userxx1
     Port 20000
 
+Host njros
+    HostName nj.gitez.cc
+    User userxx1
+    Port 20000
+
 Host memento
     HostName memento.gitez.cc
     User eagle
