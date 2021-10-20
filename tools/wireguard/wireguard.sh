@@ -46,7 +46,11 @@ clientDNS=223.5.5.5
 
 
 configServer(){
+    set -e
     _root
+    if [ ! -d ${wireguardRoot} ];then
+        mkdir -p ${wireguardRoot}
+    fi
     # create server key pair when not exist
     if [ ! -f ${wireguardRoot}/${serverPrikey} ];then
         echo "create server key pair"

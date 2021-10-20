@@ -33,6 +33,7 @@ fi
 # write your code below (just define function[s])
 # function is hidden when begin with '_'
 install(){
+    set -e
     _root
     # install soft
     echo 'deb http://ftp.debian.org/debian buster-backports main' | tee /etc/apt/sources.list.d/buster-backports.list
