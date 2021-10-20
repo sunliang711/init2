@@ -32,6 +32,7 @@ fi
 ###############################################################################
 # write your code below (just define function[s])
 # function is hidden when begin with '_'
+wireguardRoot=/etc/wireguard
 install(){
     set -e
     _root
