@@ -83,6 +83,7 @@ EOF
 addClient(){
     set -e
     _root
+    stop
 
     clientName=${1:?'missing client name'}
     hostNumber=${2:?'missing host number(x of ${subnet}.x)'}
