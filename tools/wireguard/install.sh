@@ -51,8 +51,9 @@ install(){
 }
 
 uninstall(){
-    set -e
-    _root
+    if ! _root;then
+        exit 1
+    fi
     /usr/local/bin/wireguard.sh stop
     rm -rf /usr/local/bin/wireguard.sh
     rm -rf ${wireguardRoot}
