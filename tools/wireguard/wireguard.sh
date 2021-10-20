@@ -77,6 +77,7 @@ EOF
 }
 
 addClient(){
+    set -e
     _root
 
     clientName=${1:?'missing client name'}
@@ -115,6 +116,7 @@ EOF
 
 removeClient(){
     clientName=${1:?'missing client name'}
+    set -e
     _root
     rm -rf ${wireguardRoot}/client-${clientName}.privatekey
     rm -rf ${wireguardRoot}/client-${clientName}.publickey
@@ -127,16 +129,19 @@ configClient(){
 }
 
 start(){
+    set -e
     _root
     systemctl start wg-quick@wg0
 }
 
 stop(){
+    set -e
     _root
     systemctl stop wg-quick@wg0
 }
 
 exportClientConfig(){
+    set -e
     _root
     clientName=${1:?'missing client name'}
     if [ ! -f ${wireguardRoot}/client-${clientName}.conf ];then
