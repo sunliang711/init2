@@ -50,7 +50,11 @@ install(){
 }
 
 uninstall(){
-    echo "TODO"
+    set -e
+    _root
+    /usr/local/bin/wireguard.sh stop
+    rm -rf /usr/local/bin/wireguard.sh
+    rm -rf ${wireguardRoot}
 }
 
 # write your code above

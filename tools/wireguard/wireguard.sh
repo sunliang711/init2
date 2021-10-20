@@ -41,7 +41,8 @@ MTU=1420
 subnet=10.10.10
 serverIp=${subnet}.1/24
 serverPort=51820
-clientDNS=223.5.5.5
+# clientDNS=223.5.5.5
+tableNo=10
 
 
 
@@ -56,6 +57,9 @@ configServer(){
         echo "create server key pair"
         wg genkey | tee ${wireguardRoot}/${serverPrikey} | wg pubkey | tee ${wireguardRoot}/${serverPubkey}
     fi
+    echo -n "Enter client gateway: "
+    read clientGateway
+
     if [ ! -f ${wireguardRoot}/${serverConfigFile} ];then
         interface=$(ip -o -4 route show to default | awk '{print $5}')
         cat<<-EOF>${wireguardRoot}/${serverConfigFile}
@@ -64,8 +68,8 @@ Address = ${serverIp}
 MTU = ${MTU}
 SaveConfig = true
 PreUp = sysctl -w net.ipv4.ip_forward=1
-PostUp = iptables -t nat -A POSTROUTING -o ${interface} -j MASQUERADE
-PostDown = iptables -t nat -D POSTROUTING -o ${interface} -j MASQUERADE
+PostUp = iptables -t nat -A POSTROUTING -o ${interface} -j MASQUERADE;ip rule add from ${subnet}.0/24 table ${tableNo};ip route add default via ${clientGateway} table ${tableNo};
+PostDown = iptables -t nat -D POSTROUTING -o ${interface} -j MASQUERADE; ip rule del from ${subnet}.0/24 table ${tableNo};ip route del default table ${tableNo};
 ListenPort = ${serverPort}
 PrivateKey = $(cat ${wireguardRoot}/${serverPrikey})
 
@@ -81,8 +85,9 @@ addClient(){
     _root
 
     clientName=${1:?'missing client name'}
-    hostNumber=${2:?'missing host number'}
-    endpoint=${3:?'missing server endpoint'}
+    hostNumber=${2:?'missing host number(x of ${subnet}.x)'}
+    endpoint=${3:?'missing server endpoint(ip or domain)'}
+    clientDNS=${4:?'missing client DNS'}
 
     echo "generate client key pair"
     wg genkey | tee ${wireguardRoot}/client-${clientName}.privatekey | wg pubkey | tee ${wireguardRoot}/client-${clientName}.publickey
