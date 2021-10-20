@@ -116,7 +116,10 @@ PublicKey = $(cat ${wireguardRoot}/client-${clientName}.publickey)
 AllowedIPs = ${subnet}.${hostNumber}/32
 # end client-${clientName}
 EOF
-    echo "run 'systemctl start wg-quick@wg0 to start server'"
+cat<<-EOF
+    run 'wireguard.sh restart to restart server after add client'
+    run 'wireguard.sh exportClientConfig ${clientName} to export client qrcode'
+EOF
 }
 
 removeClient(){
@@ -127,6 +130,11 @@ removeClient(){
     rm -rf ${wireguardRoot}/client-${clientName}.publickey
     rm -rf ${wireguardRoot}/client-${clientName}.conf
     sed -i -e "/# begin client-${clientName}/,/# end client-${clientName}/d" ${wireguardRoot}/${serverConfigFile}
+}
+
+listClient(){
+    cd ${wireguardRoot}
+    ls client-*.conf
 }
 
 configClient(){
