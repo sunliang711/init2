@@ -163,6 +163,7 @@ exportClientConfig(){
         exit 1
     fi
     cat ${wireguardRoot}/client-${clientName}.conf | qrencode -t ansiutf8
+    cat ${wireguardRoot}/client-${clientName}.conf
 }
 
 restart(){
