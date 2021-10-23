@@ -1789,6 +1789,10 @@ cdinit(){
     cd ${SHELLRC_ROOT}/..
 }
 
+cdtools(){
+    cd ${SHELLRC_ROOT}/../tools
+}
+
 cdgo(){
     local dest="${workspace}/go/src"
     if [ ! -d "$dest" ];then
