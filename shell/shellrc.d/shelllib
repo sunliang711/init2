@@ -29,6 +29,11 @@ else
     NORMAL=""
 fi
 
+# error code
+err_require_root=1
+err_require_linux=2
+
+
 _err(){
     echo "$*" >&2
 }
@@ -191,15 +196,27 @@ _run(){
 
 function _root(){
     if [ ${EUID} -ne ${rootID} ];then
-        echo "Requires root privilege." 1>&2
-        return 1
+        echo "Require root privilege." 1>&2
+        return err_require_root
+    fi
+}
+
+function _require_root(){
+    if ! _root;then
+        exit err_require_root
     fi
 }
 
 function _linux(){
     if [ "$(uname)" != "Linux" ];then
-        echo "Requires Linux" 1>&2
-        return 1
+        echo "Require Linux" 1>&2
+        return err_require_linux
+    fi
+}
+
+function _require_linux(){
+    if ! _linux;then
+        exit err_require_linux
     fi
 }
 
