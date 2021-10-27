@@ -50,12 +50,12 @@ install(){
     fi
     # download and extract
     (
-        cd /tmp && curl -L -O ${ipfsLink} || { echo "download ipfs release failed!"; return 1; }
+        cd /tmp && curl -L -O ${ipfsLink} || { echo "download ipfs release failed!"; exit 1; }
         echo "extract ${ipfsTar}..."
         if [ ! -d ${dest} ];then
             mkdir -p ${dest}
         fi
-        tar -C ${dest} xvf ${ipfsTar} || { echo "extract ${ipfsTar} failed!"; return 1; }
+        tar -C ${dest} xvf ${ipfsTar} || { echo "extract ${ipfsTar} failed!"; exit 1; }
     )
 
     # init
@@ -64,7 +64,7 @@ install(){
     # check ipfsConfigFile
     if [ ! -e ${ipfsConfigFile} ];then
         echo "No such file: ${ipfsConfigFile}, init ipfs failed!"
-        return 1
+        exit 1
     fi
 
     # config 
