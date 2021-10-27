@@ -35,8 +35,6 @@ fi
 ipfsLink=https://github.com/ipfs/go-ipfs/releases/download/v0.10.0/go-ipfs_v0.10.0_linux-amd64.tar.gz
 ipfsTar=${ipfsLink##*/}
 ipfsDir=${ipfsTar%%_*}
-dest=/usr/local
-ipfsRoot=${dest}/${ipfsDir}
 ipfsConfigRoot=/root/.ipfs
 ipfsConfigFile=${ipfsConfigRoot}/config
 gatewayPort=3080
@@ -52,10 +50,8 @@ install(){
     (
         cd /tmp && curl -L -O ${ipfsLink} || { echo "download ipfs release failed!"; exit 1; }
         echo "extract ${ipfsTar}..."
-        if [ ! -d ${dest} ];then
-            mkdir -p ${dest}
-        fi
-        tar -C ${dest} xvf ${ipfsTar} || { echo "extract ${ipfsTar} failed!"; exit 1; }
+        tar xvf ${ipfsTar} || { echo "extract ${ipfsTar} failed!"; exit 1; }
+        bash ${ipfsDir}/install.sh
     )
 
     # init
@@ -112,8 +108,8 @@ uninstall(){
     systemctl stop ipfs.service
     /bin/rm -rf /etc/systemd/system/ipfs.service
     systemctl daemon-reload
-    /bin/rm -rf ${ipfsRoot}
     /bin/rm -rf ${ipfsConfigRoot}
+    /bin/rm -rf /usr/local/bin/ipfs
 }
 
 # write your code above
