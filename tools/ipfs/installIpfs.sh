@@ -106,7 +106,9 @@ EOF
 }
 
 uninstall(){
-    _root
+    if ! _root;then
+        exit 1
+    fi
     systemctl stop ipfs.service
     /bin/rm -rf /etc/systemd/system/ipfs.service
     systemctl daemon-reload
