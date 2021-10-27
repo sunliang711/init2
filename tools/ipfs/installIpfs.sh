@@ -42,8 +42,12 @@ ipfsConfigFile=${ipfsConfigRoot}/config
 gatewayPort=3080
 
 install(){
-    _linux
-    _root
+    if ! _linux;then
+        exit 1
+    fi
+    if ! _root;then
+        exit 1
+    fi
     # download and extract
     (
         cd /tmp && curl -L -O ${ipfsLink} || { echo "download ipfs release failed!"; return 1; }
