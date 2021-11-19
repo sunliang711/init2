@@ -40,7 +40,7 @@ serverConfigFile=${serverConfigName}.conf
 MTU=1420
 subnet=10.10.10
 serverIp=${subnet}.1/24
-serverPort=51820
+serverPort=<SERVER_PORT>
 # clientDNS=223.5.5.5
 tableNo=10
 

@@ -49,12 +49,16 @@ install(){
             ;;
     esac
 
+    echo -n "Enter server port: "
+    read serverPort
     # install wireguard.sh
-    cp ${this}/wireguard.sh  /usr/local/bin
+    sed -e "s|<SERVER_PORT>|${serverPort}|g" wiregurad.sh >/tmp/wiregurad.sh && chmod +x /tmp/wiregurad.sh
+    mv /tmp/wiregurad.sh /usr/local/bin
 
     # config server
     /usr/local/bin/wireguard.sh configServer
 
+    echo "${RED}Note: need reboot after install!${NORMAL}"
 
 }
 
