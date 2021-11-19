@@ -36,6 +36,7 @@ wireguardRoot=/etc/wireguard
 install(){
     set -e
     _root
+    cd ${this}
     # install soft
     echo 'deb http://ftp.debian.org/debian buster-backports main' | tee /etc/apt/sources.list.d/buster-backports.list
     apt update
