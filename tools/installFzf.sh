@@ -33,7 +33,7 @@ fi
 ###############################################################################
 # TODO
 install(){
-    cd "${thisDir}"
+    cd "${this}"
     echo "Install fzf ..."
     #install binary
     # if [ ! -e $GOPATH/bin/fzf ];then
