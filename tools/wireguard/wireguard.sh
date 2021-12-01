@@ -57,10 +57,10 @@ configServer(){
         echo "create server key pair"
         wg genkey | tee ${wireguardRoot}/${serverPrikey} | wg pubkey | tee ${wireguardRoot}/${serverPubkey}
     fi
-    echo -n "Enter client gateway: "
-    read clientGateway
 
     if [ ! -f ${wireguardRoot}/${serverConfigFile} ];then
+        echo -n "Enter client gateway: "
+        read clientGateway
         interface=$(ip -o -4 route show to default | awk '{print $5}')
         cat<<-EOF>${wireguardRoot}/${serverConfigFile}
 [Interface]
@@ -145,6 +145,7 @@ configClient(){
 start(){
     set -e
     _root
+    echo "Note: when start or restart, Must close clash gateway service!!"
     systemctl start wg-quick@wg0
 }
 
