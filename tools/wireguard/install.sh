@@ -59,6 +59,9 @@ install(){
     # config server
     /usr/local/bin/wireguard.sh configServer
 
+    # enable service
+    systemctl enable wg-quick@wg0
+
     echo "${RED}Note: need reboot after install!${NORMAL}"
 
 }
