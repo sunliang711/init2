@@ -49,7 +49,8 @@ vimGlobal(){
     fi
 
     echo "install vimrc to ${globalVimrcPath}.."
-    cp ${this}/basic-pre.vim ${globalVimrcPath}/vimrc
+    dest=${globalVimrcPath}/vimrc
+    sed -ne '1,/"vim-plut/' ${this}/basic-pre.vim > ${dest}
 }
 
 vimUser(){
@@ -59,7 +60,8 @@ vimUser(){
     fi
 
     echo "install vimrc to ${userVimrcPath}.."
-    cp ${this}/basic-pre.vim ${userVimrcPath}/.vimrc
+    dest=${userVimrcPath}/.vimrc
+    sed -ne '1,/"vim-plut/' ${this}/basic-pre.vim > ${dest}
 }
 
 userNvimrcPath=$home/.config/nvim
@@ -74,7 +76,8 @@ nvim(){
         return 0
     fi
     echo "install vimrc to ${userNvimrcPath}/init.vim.."
-    cp ${this}/basic-pre.vim ${userNvimrcPath}/init.vim
+    dest=${userNvimrcPath}/init.vim
+    sed -ne '1,/"vim-plut/' ${this}/basic-pre.vim > ${dest}
 
 }
 
