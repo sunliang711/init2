@@ -1966,6 +1966,36 @@ function detectBin(){
     source ${dest}
 }
 
+function switchSolanaRpc(){
+    local dest=${1:?'missing dest: dev,main,local,custom'}
+
+    devRpc=https://api.devnet.solana.com
+    mainRpc=https://api.mainnet-beta.solana.com
+    localRpc=http://localhost:8899
+
+    case $dest in
+        dev)
+            rpcLink=${devRpc}
+            ;;
+        main)
+            rpcLink=${mainRpc}
+            ;;
+        local)
+            rpcLink=${localRpc}
+            solana config set --url ${localRpc}
+            ;;
+        custom)
+            rpcLink=${2:?'missing custom rpc url'}
+            ;;
+        *)
+            echo "unsupported dest"
+            return 1
+            ;;
+    esac
+    echo "set solana rpc url to ${rpcLink}.."
+    solana config set --url ${rpcLink}
+}
+
 source ${SHELLRC_ROOT}/shellrc.d/function-snippets
 #END function
 
