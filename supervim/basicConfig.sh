@@ -50,7 +50,7 @@ vimGlobal(){
 
     echo "install vimrc to ${globalVimrcPath}.."
     dest=${globalVimrcPath}/vimrc
-    sed -ne '1,/"vim-plut/' ${this}/basic-pre.vim > ${dest}
+    sed -ne '1,/"vim-plut/p' ${this}/basic-pre.vim > ${dest}
 }
 
 vimUser(){
@@ -61,7 +61,7 @@ vimUser(){
 
     echo "install vimrc to ${userVimrcPath}.."
     dest=${userVimrcPath}/.vimrc
-    sed -ne '1,/"vim-plut/' ${this}/basic-pre.vim > ${dest}
+    sed -ne '1,/"vim-plut/p' ${this}/basic-pre.vim > ${dest}
 }
 
 userNvimrcPath=$home/.config/nvim
@@ -77,7 +77,7 @@ nvim(){
     fi
     echo "install vimrc to ${userNvimrcPath}/init.vim.."
     dest=${userNvimrcPath}/init.vim
-    sed -ne '1,/"vim-plut/' ${this}/basic-pre.vim > ${dest}
+    sed -ne '1,/"vim-plut/p' ${this}/basic-pre.vim > ${dest}
 
 }
 
