@@ -33,7 +33,7 @@ fi
 # write your code below (just define function[s])
 # function is hidden when begin with '_'
 
-globalVimrcPath=/usr/share/vim
+globalVimrcPath=/etc/vim
 userVimrcPath=$home
 
 vimGlobal(){
@@ -43,13 +43,13 @@ vimGlobal(){
         mkdir -pv ${globalVimrcPath}
     fi
 
-    if [ -e ${globalVimrcPath}/vimrc ];then
-        echo "already exists ${globalVimrcPath}/vimrc, skip.."
+    if [ -e ${globalVimrcPath}/vimrc.local ];then
+        echo "already exists ${globalVimrcPath}/vimrc.local, skip.."
         return 0
     fi
 
     echo "install vimrc to ${globalVimrcPath}.."
-    dest=${globalVimrcPath}/vimrc
+    dest=${globalVimrcPath}/vimrc.local
     sed -ne '1,/"vim-plug/p' ${this}/basic-pre.vim > ${dest}
 }
 
