@@ -36,5 +36,6 @@ mappings=(
 "tcp|42400|10.1.1.160|32400|dsm plex server"
 "udp|51820|10.1.1.161||wireguard vpn server"
 "udp|51830|10.1.1.18||wireguard vpn server2"
+"tcp|5006|10.1.1.160||dsm webdav"
 )
 
