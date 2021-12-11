@@ -7,9 +7,6 @@ function halt(){
     runAsRoot -x shutdown -h now
 }
 
-function reboot(){
-    runAsRoot -x reboot
-}
 
 function functions(){
     functionFile=$SHELLRC_ROOT/shellrc.d/function

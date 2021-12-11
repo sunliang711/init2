@@ -52,22 +52,6 @@ case $(uname) in
         # export PATH=/usr/local/Cellar/privoxy/3.0.26/sbin:$PATH
         ;;
 esac
-if command -v sudo >/dev/null 2>&1;then
-    #当使用sudo执行alias地时候会找不到alias，需要这样设置
-    alias sudo='sudo '
-    alias reboot='sudo reboot'
-    if command -v apt-get >/dev/null 2>&1;then
-        alias apt-get='sudo apt-get'
-    fi
-
-    if command -v yum >/dev/null 2>&1;then
-        alias yum='sudo yum'
-    fi
-
-    if command -v dnf >/dev/null 2>&1;then
-        alias dnf='sudo dnf'
-    fi
-fi
 alias cd..='cd ..'
 alias cd-='cd -'
 alias grep='grep --color=auto'
