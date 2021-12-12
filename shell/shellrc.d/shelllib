@@ -197,26 +197,26 @@ _run(){
 function _root(){
     if [ ${EUID} -ne ${rootID} ];then
         echo "Require root privilege." 1>&2
-        return err_require_root
+        return $err_require_root
     fi
 }
 
 function _require_root(){
     if ! _root;then
-        exit err_require_root
+        exit $err_require_root
     fi
 }
 
 function _linux(){
     if [ "$(uname)" != "Linux" ];then
         echo "Require Linux" 1>&2
-        return err_require_linux
+        return $err_require_linux
     fi
 }
 
 function _require_linux(){
     if ! _linux;then
-        exit err_require_linux
+        exit $err_require_linux
     fi
 }
 
