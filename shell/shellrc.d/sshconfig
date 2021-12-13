@@ -1,7 +1,6 @@
-# Host 26
-#     HostName 10.1.1.26
-#     User eagle
-#     Port 22
+# Include 指令必须放在Host指令之前!!
+Include ~/.ssh/local
+
 Host chuan
     HostName gitez.cc
     Port 7300
@@ -61,6 +60,10 @@ Host a8
     HostName a8.gitez.cc
     User eagle
     Port 2000
+Host atompveg
+    HostName sh.gitez.cc
+    Port 30003
+    User root
 ##################################################
 # ATOM LOCAL VMs
 Host atompve
@@ -72,6 +75,10 @@ Host atom22
     User root
     Port 7960
 
+Host atom126
+    HostName 10.1.9.126
+    User eagle
+
 Host atom110
     HostName 10.1.9.110
     User root
@@ -80,13 +87,8 @@ Host atomfrpc
     HostName 10.1.9.113
     User eagle
 
-Host atom126
-    HostName 10.1.9.126
-    User eagle
 
 # ATOM LOCAL VMs
 ##################################################
 
-Host 10.1.1.158
-    HostName 10.1.1.158
-    User eagle
+
