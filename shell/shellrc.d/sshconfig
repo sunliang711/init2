@@ -17,6 +17,10 @@ Host dev26
     Port 2026
     User eagle
 
+Host dev27
+    HostName sh.gitez.cc
+    Port 2027
+    User eagle
 
 Host proxy18
     HostName sh.gitez.cc
