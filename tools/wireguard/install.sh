@@ -64,11 +64,11 @@ install(){
 	serverPubkey=server-publickey
 	serverPrikey=server-privatekey
 	serverConfigName=wg0
-	serverConfigFile=${serverConfigName}.conf
+	serverConfigFile=\${serverConfigName}.conf
 	MTU=1420
 	subnet=10.10.10
-	serverIp=${subnet}.1/24
-	serverPort=${serverPort}
+	serverIp=\${subnet}.1/24
+	serverPort=\${serverPort}
 	tableNo=10
 	EOF
 
