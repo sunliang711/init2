@@ -53,7 +53,8 @@ else
     prefix=$HOME/.app
 fi
 
-defaultVersion=12.16.1
+# defaultVersion=12.16.1
+defaultVersion=14.9.0
 install(){
     need curl
     need tar
