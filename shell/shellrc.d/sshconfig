@@ -6,7 +6,7 @@ Host chuan
     Port 7300
 
 Host aliyun
-    HostName gitez.cc
+    HostName aliyun.gitez.cc
     User eagle
     Port 2000
 
@@ -16,11 +16,18 @@ Host dev26
     Port 2026
     User eagle
 
+Host dev27
+    HostName sh.gitez.cc
+    Port 2027
+    User eagle
 
 Host proxy18
     HostName sh.gitez.cc
     Port 2018
 
+Host proxy38
+    HostName sh.gitez.cc
+    Port 2038
 
 # shanghai ROS router
 Host shros
