@@ -69,13 +69,12 @@ install(){
 	tableNo=10
 	EOF
 
-    # config server
-    /usr/local/bin/wireguard.sh configServer
-
     # enable service
     systemctl enable wg-quick@wg0
 
-    echo "${RED}Note: need reboot after install!${NORMAL}"
+    cat<<-EOF
+	wireguard.sh configServer to config for first time
+	EOF
 
 }
 
