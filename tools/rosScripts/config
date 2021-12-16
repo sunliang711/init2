@@ -15,6 +15,7 @@ hairpinTag=HairpinNAT
 mappings=(
 "tcp|8090|10.1.1.18|443|nginx reverse proxy"
 "tcp|2018|10.1.1.18|22|proxy18 ssh"
+"tcp|2038|10.1.1.38|22|proxy38 ssh"
 "tcp|30000-39999|10.1.1.18||proxy18 frps"
 "udp|30000-39999|10.1.1.18||proxy18 frps"
 "tcp|4000-4050|10.1.1.18||ss1 tcp"
@@ -24,6 +25,7 @@ mappings=(
 "udp|500,4500,1701|10.1.1.18||ikev2 vpn server"
 
 "tcp|2026|10.1.1.26|22|dev26 ssh"
+"tcp|2027|10.1.1.27|22|dev27 ssh"
 "tcp|5001,9091,32400|10.1.1.22||dsm web transmission plex"
 "tcp|8006|10.1.1.21|8006|dell pve admin console"
 
