@@ -33,18 +33,12 @@ fi
 # write your code below (just define function[s])
 # function is hidden when begin with '_'
 wireguardRoot=/etc/wireguard
-serverPubkey=server-publickey
-serverPrikey=server-privatekey
-serverConfigName=wg0
-serverConfigFile=${serverConfigName}.conf
-MTU=1420
-subnet=10.10.10
-serverIp=${subnet}.1/24
-serverPort=<SERVER_PORT>
-# clientDNS=223.5.5.5
-tableNo=10
 
+source ${wireguardRoot}/settings
 
+config(){
+    $ed ${wireguardRoot}/settings
+}
 
 configServer(){
     set -e
@@ -63,17 +57,17 @@ configServer(){
         read clientGateway
         interface=$(ip -o -4 route show to default | awk '{print $5}')
         cat<<-EOF>${wireguardRoot}/${serverConfigFile}
-[Interface]
-Address = ${serverIp}
-MTU = ${MTU}
-SaveConfig = true
-PreUp = sysctl -w net.ipv4.ip_forward=1
-PostUp = iptables -t nat -A POSTROUTING -o ${interface} -j MASQUERADE;ip rule add from ${subnet}.0/24 table ${tableNo};ip route add default via ${clientGateway} table ${tableNo};
-PostDown = iptables -t nat -D POSTROUTING -o ${interface} -j MASQUERADE; ip rule del from ${subnet}.0/24 table ${tableNo};ip route del default table ${tableNo};
-ListenPort = ${serverPort}
-PrivateKey = $(cat ${wireguardRoot}/${serverPrikey})
-
-EOF
+		[Interface]
+		Address = ${serverIp}
+		MTU = ${MTU}
+		SaveConfig = true
+		PreUp = sysctl -w net.ipv4.ip_forward=1
+		PostUp = iptables -t nat -A POSTROUTING -o ${interface} -j MASQUERADE;ip rule add from ${subnet}.0/24 table ${tableNo};ip route add default via ${clientGateway} table ${tableNo};
+		PostDown = iptables -t nat -D POSTROUTING -o ${interface} -j MASQUERADE; ip rule del from ${subnet}.0/24 table ${tableNo};ip route del default table ${tableNo};
+		ListenPort = ${serverPort}
+		PrivateKey = $(cat ${wireguardRoot}/${serverPrikey})
+		
+		EOF
     else
         $ed ${wireguardRoot}/${serverConfigFile}
     fi

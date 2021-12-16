@@ -15,6 +15,7 @@ hairpinTag=HairpinNAT
 mappings=(
 "tcp|8090|10.1.1.18|443|nginx reverse proxy"
 "tcp|2018|10.1.1.18|22|proxy18 ssh"
+"tcp|2038|10.1.1.38|22|proxy38 ssh"
 "tcp|30000-39999|10.1.1.18||proxy18 frps"
 "udp|30000-39999|10.1.1.18||proxy18 frps"
 "tcp|4000-4050|10.1.1.18||ss1 tcp"

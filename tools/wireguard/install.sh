@@ -52,17 +52,32 @@ install(){
 
     echo -n "Enter server port: "
     read serverPort
-    # install wireguard.sh
-    sed -e "s|<SERVER_PORT>|${serverPort}|g" wireguard.sh >/tmp/wireguard.sh && chmod +x /tmp/wireguard.sh
-    mv /tmp/wireguard.sh /usr/local/bin
+    # # install wireguard.sh
+    # sed -e "s|<SERVER_PORT>|${serverPort}|g" wireguard.sh >/tmp/wireguard.sh && chmod +x /tmp/wireguard.sh
+    # mv /tmp/wireguard.sh /usr/local/bin
+    ln -sf ${this}/wireguard.sh /usr/local/bin
 
-    # config server
-    /usr/local/bin/wireguard.sh configServer
+    if [ ! -d ${wireguardRoot} ];then
+        mkdir -p ${wireguardRoot}
+    fi
+    cat<<-EOF>${wireguardRoot}/settings
+	serverPubkey=server-publickey
+	serverPrikey=server-privatekey
+	serverConfigName=wg0
+	serverConfigFile=\${serverConfigName}.conf
+	MTU=1420
+	subnet=10.10.10
+	serverIp=\${subnet}.1/24
+	serverPort=${serverPort}
+	tableNo=10
+	EOF
 
     # enable service
     systemctl enable wg-quick@wg0
 
-    echo "${RED}Note: need reboot after install!${NORMAL}"
+    cat<<-EOF
+	run wireguard.sh configServer to config for first time
+	EOF
 
 }
 
