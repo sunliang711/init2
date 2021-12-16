@@ -76,7 +76,7 @@ install(){
     systemctl enable wg-quick@wg0
 
     cat<<-EOF
-	wireguard.sh configServer to config for first time
+	run wireguard.sh configServer to config for first time
 	EOF
 
 }
