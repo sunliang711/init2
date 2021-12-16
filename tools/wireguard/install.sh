@@ -57,6 +57,9 @@ install(){
     # mv /tmp/wireguard.sh /usr/local/bin
     ln -sf ${this}/wireguard.sh /usr/local/bin
 
+    if [ ! -d ${wireguardRoot} ];then
+        mkdir -p ${wireguardRoot}
+    fi
     cat<<-EOF>${wireguardRoot}/settings
 	serverPubkey=server-publickey
 	serverPrikey=server-privatekey
