@@ -63,13 +63,13 @@ to(){
         # NOTE: xargs is for trim
         password=$(grep "^${host}:" ${decryptedCredentialFile} | awk -F: '{print $2}' | xargs)
         if [ -z ${password} ];then
-            echo "> ${RED}cannot find password for host ${host}, get global password..${NORMAL}" 1>&2
-            password=$(grep "^GLOBAL:" ${decryptedCredentialFile} | awk -F: '{print $2}' | xargs)
+            echo "> ${RED}cannot find password for host ${host}, get default password..${NORMAL}" 1>&2
+            password=$(grep "^DEFAULT:" ${decryptedCredentialFile} | awk -F: '{print $2}' | xargs)
             if [ -z ${password} ];then
-                echo "> ${RED}cannot find global password${NORMAL}" 1>&2
+                echo "> ${RED}cannot find default password${NORMAL}" 1>&2
                 return 1
             else
-                echo "> ${GREEN}use global password for host $host${NORMAL}"
+                echo "> ${GREEN}use default password for host $host${NORMAL}"
             fi
         fi
         /bin/rm -rf ${decryptedCredentialFile}
@@ -161,11 +161,11 @@ EOF
 	$ed ${cfgFile}
 }
 
-editPassword(){
+password(){
     # 如果不存在密文文件,则先新建明文文件;否则解密密文文件;
     if [ ! -e ${credentialFile} ];then
         cat<<-EOF>${decryptedCredentialFile}
-GLOBAL:globalpassword
+DEFAULT:defaultPassword
 #myhost1:some_password
 EOF
     else
