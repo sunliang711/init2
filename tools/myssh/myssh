@@ -104,7 +104,18 @@ _enc(){
         return 1
     fi
     echo "> encrypt ${decryptedCredentialFile} to ${credentialFile}.."
-    openssl enc -aes-256-cbc -in ${decryptedCredentialFile} -out ${credentialFile} -pass "pass:${opensslPassword}" -pbkdf2
+    case $(uname) in
+        Linux)
+            openssl enc -aes-256-cbc -in ${decryptedCredentialFile} -out ${credentialFile} -pass "pass:${opensslPassword}" -pbkdf2
+            ;;
+        Darwin)
+            openssl enc -aes-256-cbc -in ${decryptedCredentialFile} -out ${credentialFile} -pass "pass:${opensslPassword}"
+            ;;
+        *)
+            echo "only support linux and macos"
+            ;;
+
+    esac
 }
 
 _dec(){
@@ -113,7 +124,17 @@ _dec(){
         return 1
     fi
     echo "> decrypt ${credentialFile} to ${decryptedCredentialFile}.."
-    openssl enc -d -aes-256-cbc -in ${credentialFile} -out ${decryptedCredentialFile} -pass "pass:${opensslPassword}" -pbkdf2
+    case $(uname) in
+        Linux)
+            openssl enc -d -aes-256-cbc -in ${credentialFile} -out ${decryptedCredentialFile} -pass "pass:${opensslPassword}" -pbkdf2
+            ;;
+        Darwin)
+            openssl enc -d -aes-256-cbc -in ${credentialFile} -out ${decryptedCredentialFile} -pass "pass:${opensslPassword}"
+            ;;
+        *)
+            echo "only support linux and macos"
+            ;;
+    esac
 
 }
 
