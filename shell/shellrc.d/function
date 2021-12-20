@@ -1228,11 +1228,19 @@ function serviceEdit(){
 }
 
 function enc(){
-    /usr/bin/openssl aes-128-cbc -salt -in $1 -out $1.aes && rm -rf $1
+    local input=${1:?'missing input file'}
+    local output=${2:-"${input}.enc"}
+    echo "encrypt ${input} to ${output}.."
+    /usr/bin/openssl aes-128-cbc -salt -in ${input} -out ${output}
 }
+
 function dec(){
-    /usr/bin/openssl aes-128-cbc -d -in $1.aes -out $1 && rm -rf $1.aes
+    local input=${1:?'missing input file'}
+    local output=${2:-"${input}.dec"}
+    echo "decrypt ${input} to ${output}.."
+    /usr/bin/openssl aes-128-cbc -d -in ${input} -out ${output}
 }
+
 #Usage:
 #cecho @red@red text
 #cecho @b@@red@red text with bold
