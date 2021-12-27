@@ -39,9 +39,10 @@ function need(){
         exit 1
     fi
 }
-version=0.5.0
-if [ -n "${LOCAL_APP_ROOT}" ];then
-    prefix=${LOCAL_APP_ROOT}
+
+version=${version:-"0.6.0"}
+if [ -n "${local_app_root}" ];then
+    prefix=${local_app_root}
 else
     prefix=$HOME/.local/apps
 fi
@@ -51,6 +52,10 @@ dest=${prefix}/nvim/$version
 install(){
     need curl
     need tar
+    cat<<EOF
+supported env vars:
+version, local_app_root(install location)
+EOF
     if [ ! -d $dest ];then
         mkdir -p $dest
     fi
