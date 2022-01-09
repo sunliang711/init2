@@ -1798,6 +1798,10 @@ function bak(){
     done
 }
 
+cdnvim(){
+    cd $HOME/.config/nvim
+}
+
 cdinit(){
     cd ${SHELLRC_ROOT}/..
 }
