@@ -94,6 +94,7 @@ expect {
 interact
 EOF
 
+    # ${expectPath} -d -f ${expectScript}
     ${expectPath} -f ${expectScript}
     rm ${expectScript}
 }

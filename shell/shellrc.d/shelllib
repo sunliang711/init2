@@ -185,7 +185,7 @@ _run(){
         if [ $trace -eq 1 ];then
             { set -x; } 2>/dev/null
             ${bash_c} "${cmd}"
-            local ret=$?
+            { local ret=$?; } 2>/dev/null
             { set +x; } 2>/dev/null
             return ${ret}
         else
