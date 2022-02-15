@@ -32,9 +32,16 @@ fi
 ###############################################################################
 # write your code below (just define function[s])
 # function is hidden when begin with '_'
+usedVersion=${version:-'0.39.1'}
 install(){
+    link="https://raw.githubusercontent.com/nvm-sh/nvm/v${usedVersion}/install.sh"
+    _require_command curl
+    curl -o- ${link} | bash
 
-    echo "TODO"
+    cat<<EOF>> $HOME/.zshrc
+export NVM_DIR="\$([ -z "\${XDG_CONFIG_HOME-}" ] && printf %s "\${HOME}/.nvm" || printf %s "\${XDG_CONFIG_HOME}/nvm")"
+[ -s "\$NVM_DIR/nvm.sh" ] && \. "\$NVM_DIR/nvm.sh" # This loads nvm
+EOF
 
 }
 

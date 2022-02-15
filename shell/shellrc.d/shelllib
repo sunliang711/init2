@@ -32,6 +32,7 @@ fi
 # error code
 err_require_root=1
 err_require_linux=2
+err_require_command=3
 
 
 _err(){
@@ -39,7 +40,14 @@ _err(){
 }
 
 _command_exists(){
-    command -v "$@" > /dev/null 2>&1
+    command -v "$1" > /dev/null 2>&1
+}
+
+_require_command(){
+    if ! _command_exists "$1";then
+        echo "require command $1" 1>&2
+	exit ${err_require_command}
+    fi
 }
 
 rootID=0
