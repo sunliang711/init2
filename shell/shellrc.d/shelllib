@@ -202,6 +202,15 @@ _run(){
     fi
 }
 
+function _ensureDir(){
+    local dirs=$@
+    for dir in ${dirs};do
+        if [ ! -d ${dir} ];then
+            mkdir -p ${dir}
+        fi
+    done
+}
+
 function _root(){
     if [ ${EUID} -ne ${rootID} ];then
         echo "Require root privilege." 1>&2
