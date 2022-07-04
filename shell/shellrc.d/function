@@ -1656,6 +1656,8 @@ function newpy(){
 		#!/usr/bin/env python3
 		# -*- coding: utf-8 -*-
 
+		import argparse
+
 		# import logging
 
 		# LOG_FORMAT = "%(asctime)s - %(levelname)s - %(message)s"
@@ -1664,7 +1666,9 @@ function newpy(){
 		# logging.basicConfig(filename='my.log', level=logging.DEBUG, format=LOG_FORMAT, datefmt=DATE_FORMAT)
 
 		def main():
-		    pass
+		    parser = argparse.ArgumentParser(description="get opensea collection floor price")
+		    parser.add_argument('--name', help='collection name', required=True)
+		    args = parser.parse_args()
 
 		if __name__ == '__main__':
 		    main()
