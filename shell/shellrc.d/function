@@ -1655,21 +1655,34 @@ function newpy(){
     cat> "$filename" <<-EOF
 		#!/usr/bin/env python3
 		# -*- coding: utf-8 -*-
-
+		
 		import argparse
-
-		# import logging
-
-		# LOG_FORMAT = "%(asctime)s - %(levelname)s - %(message)s"
-		# DATE_FORMAT = "%Y/%m/%d %H:%M:%S %p"
-		# logging.basicConfig(level=logging.DEBUG, format=LOG_FORMAT, datefmt=DATE_FORMAT)
-		# logging.basicConfig(filename='my.log', level=logging.DEBUG, format=LOG_FORMAT, datefmt=DATE_FORMAT)
-
+		import logging
+		
+		
+		def setup_log(logfile, log_level):
+		    LOG_LEVEL = {'debug': logging.DEBUG , 'info': logging.INFO, 'warn': logging.WARN, 'error': logging.ERROR, 'fatal': logging.FATAL}
+		    LOG_FORMAT = "%(asctime)s - %(levelname)s - %(message)s"
+		    DATE_FORMAT = "%Y/%m/%d %H:%M:%S"
+		
+		    logging.basicConfig(filename=logfile, level=LOG_LEVEL.get(log_level, logging.ERROR), format=LOG_FORMAT, datefmt=DATE_FORMAT)
+		
 		def main():
 		    parser = argparse.ArgumentParser(description="get opensea collection floor price")
-		    parser.add_argument('--name', help='collection name', required=True)
+		    parser.add_argument('--log-level', help='log level,default level: warn', choices=['debug', 'info', 'warn', 'error', 'fatal'])
+		    parser.add_argument('--log-file', help = 'log file')
+		    parser.add_argument('--action', help='action to do', required=True)
+		    parser.add_argument('--arg', help='action arg', required=True)
 		    args = parser.parse_args()
-
+		
+		    setup_log(args.log_file,args.log_level)
+		
+		    # list actions below
+		    actions = {}
+		
+		    res = actions[args.action](args.arg)
+		    print("{}".format(res))
+		
 		if __name__ == '__main__':
 		    main()
 	EOF
