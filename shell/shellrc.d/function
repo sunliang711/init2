@@ -1635,6 +1635,69 @@ EOF
     $ed $filename
 
 }
+function newhardhattest(){
+    filename=${1:?'missing filename'}
+cat<<EOF>${filename}
+    const { expect } = require('chai')
+const hre = require('hardhat');
+const ethers = hre.ethers
+
+function getWallets() {
+    let wallets = []
+    for (let i = 0; i < 20; i++) {
+        const w = ethers.Wallet.fromMnemonic(
+            hre.network.config.accounts.mnemonic,
+            `m/44'/60'/0'/0/${i}`
+        );
+        wallets.push(w)
+    }
+    return wallets;
+};
+
+
+let owner, signers;
+async function init() {
+    console.log("[init]> init..");
+    [...signers] = await hre.ethers.getSigners();
+    owner = signers[0]
+
+    const networkName = hre.network.name;
+    const networkUrl = hre.network.config.url
+    console.log("[init]>> Network Name: ", networkName)
+    console.log("[init]>> Network URL: ", networkUrl)
+    // console.log("Network URL: ", hre.network)
+}
+
+async function deploy(contractName, args) {
+    await init()
+    console.log("[deploy]> deploy contract: ", contractName)
+    const factory = await ethers.getContractFactory(contractName);
+    let contract
+    console.log("[deploy]>> deploy args: ", args)
+    if (args && args.length > 0) {
+        contract = await factory.deploy(...args)
+    } else {
+        contract = await factory.deploy()
+    }
+    console.log("[deploy]>> deploy..")
+    await contract.deployed()
+
+    return contract
+}
+EOF
+
+    local ed=vi
+    if command -v vim >/dev/null 2>&1;then
+        ed=vim
+    fi
+    if command -v nvim >/dev/null 2>&1;then
+        ed=nvim
+    fi
+    if [ -n "${editor}" ];then
+        ed=${editor}
+    fi
+    $ed $filename
+}
 
 function newpy(){
     filename=${1}
