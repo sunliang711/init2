@@ -1470,8 +1470,8 @@ esac
 function pushall(){
     branch=$1
     if [ -z "$branch" ];then
-        echo "Not specify branch,use \"master\""
-        branch=master
+        branch="$(git rev-parse --abbrev-ref HEAD)"
+        echo "Not specify branch,use current branch: ${branch}"
     fi
     git remote | xargs -IR git push --tags R $branch
 }
@@ -1898,6 +1898,11 @@ cdgo(){
         mkdir "$dest"
     fi
     cd "$dest"
+}
+
+cdnvim(){
+    local dest="${home}/.config/nvim"
+    cd ${dest}
 }
 
 cdrust(){
