@@ -130,7 +130,7 @@ for eachDir in "$@";do
     fi
     eval "${cmd}"
     if [ $? -eq 0 ];then
-        curl -XPOST -d '{"to":"cargocheck001@163.com","subject":"backup complete","body":"backup ${eachDir} completed","auth_key":"${key}"}' https://gitez.cc/api/mail/v1/send
+        curl -XPOST -d "{\"to\":\"cargocheck001@163.com\",\"subject\":\"backup complete\",\"body\":\"backup ${eachDir} completed\",\"auth_key\":\"${key}\"}" https://gitez.cc/api/mail/v1/send
     fi
 done
 
