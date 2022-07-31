@@ -36,7 +36,8 @@ declare -A srcs=(
     [paopao]=$host:/volume2/paopao
 )
 #backup destination
-dest=${thisDir}/NasBackup
+# dest=${thisDir}/NasBackup
+dest=${PWD}/NasBackup
 
 logdir=${thisDir}/logs
 if [ ! -d $logdir ];then
