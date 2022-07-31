@@ -64,10 +64,8 @@ usage(){
     echo
     echo "backupdirs:"
     echo "           eagle"
-    echo "           admin"
     echo "           family"
     echo "           public"
-    echo "           timemachine"
     echo "           paopao"
     echo
     echo "run \"ssh-keygen\" to generate ssh key"
