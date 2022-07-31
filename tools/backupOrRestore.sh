@@ -56,7 +56,7 @@ beep(){
 }
 
 usage(){
-    echo "${green}Usage${reset}: $(basename $0) Options backupdir1 backupdir2..."
+    echo "${green}Usage${reset}: key=<key> $(basename $0) Options backupdir1 backupdir2..."
     echo
     echo "Options:"
     echo "         -n dry run mode"
@@ -129,6 +129,9 @@ for eachDir in "$@";do
         cmd="rsync $option $ignoreOption $src . 2>&1 | tee -a $logfile"
     fi
     eval "${cmd}"
+    if [ $? -eq 0 ];then
+        curl -XPOST -d '{"to":"cargocheck001@163.com","subject":"backup complete","body":"backup ${eachDir} completed","auth_key":"${key}"}' https://gitez.cc/api/mail/v1/send
+    fi
 done
 
 if [ $restore -eq 1 ];then
