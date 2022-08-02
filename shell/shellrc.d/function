@@ -1676,12 +1676,13 @@ async function deploy(contractName, args) {
     const factory = await ethers.getContractFactory(contractName);
     let contract
     console.log("[deploy]>> deploy args: ", args)
+    console.log("[deploy]>> deploy..")
     if (args && args.length > 0) {
         contract = await factory.deploy(...args)
     } else {
         contract = await factory.deploy()
     }
-    console.log("[deploy]>> deploy..")
+    console.log("[deploy]>> wait confirmation..")
     await contract.deployed()
 
     return contract
