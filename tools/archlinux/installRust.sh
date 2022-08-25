@@ -33,11 +33,8 @@ fi
 # write your code below (just define function[s])
 # function is hidden when begin with '_'
 install(){
-    cd /tmp
-    git clone https://aur.archlinux.org/yay.git
-    cd yay
-    makepkg -si
-    cd /tmp && rm -rf yay
+    sudo pacman -S rustup --noconfirm --needed
+    rustup toolchain install stable
 }
 
 # write your code above

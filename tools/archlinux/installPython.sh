@@ -33,11 +33,8 @@ fi
 # write your code below (just define function[s])
 # function is hidden when begin with '_'
 install(){
-    cd /tmp
-    git clone https://aur.archlinux.org/yay.git
-    cd yay
-    makepkg -si
-    cd /tmp && rm -rf yay
+    set -e
+    sudo pacman -S python python-pip --noconfirm --needed
 }
 
 # write your code above
