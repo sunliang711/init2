@@ -76,7 +76,8 @@ install(){
     fi
 
     cd "${dest}"
-    git clone https://github.com/sunliang711/init2
+    # git clone https://github.com/sunliang711/init2
+    git clone git@github.com:sunliang711/init2.git
     cd init2
     ./gitShellTmux.sh -o
 }
