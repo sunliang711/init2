@@ -76,7 +76,7 @@ install(){
     fi
 
     cd "${dest}"
-    git clone https://github.com/sunliang711/init2
+    git clone https://github.com/sunliang711/init2 || { "echo download init2 repo failed"; exit 1; }
     # git clone git@github.com:sunliang711/init2.git
     cd init2
     ./gitShellTmux.sh -o
