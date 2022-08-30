@@ -32,10 +32,10 @@ fi
 ###############################################################################
 # write your code below (just define function[s])
 # function is hidden when begin with '_'
-portainerPort=9000
-portainerPortHttps=9443
-name=portainer
-volumeName=portainer_data
+portainerPort=${port:-9000}
+portainerPortHttps=${ports:-9443}
+name=${pname:-portainer}
+volumeName=${vname:-portainer_data}
 
 install(){
     if ! command -v docker >/dev/null 2>&1;then
@@ -44,12 +44,13 @@ install(){
     fi
 
     cat<<EOF
-    Container name: ${name}
-    Portainer http port: ${portainerPort}
-    Portainer https port: ${portainerPortHttps}
-    Volume name: ${volumeName}
+Install infos:
+    Container name: ${name}   (env: port)
+    Portainer http port: ${portainerPort} (env: ports)
+    Portainer https port: ${portainerPortHttps} (env: pname)
+    Volume name: ${volumeName} (env: vname)
 EOF
-    read "Press Enter to continue or ctrl-c to quit."
+    read "Press Enter to continue or ctrl-c to quit." con
 
     docker volume create ${volumeName}
     docker run -d -p ${portainerPort}:9000 -p 8000:8000 -p ${portainerPortHttps}:9443 --name ${name} --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ee:latest
