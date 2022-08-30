@@ -37,11 +37,10 @@ mappings=(
 "udp|30303|10.1.1.172||eth mainnet p2p udp"
 "tcp|8547|10.1.1.172||eth private rpc"
 "tcp|42400|10.1.1.160|32400|dsm plex server"
-"udp|51820|10.1.1.161||wireguard vpn server"
 "udp|51830|10.1.1.18||wireguard vpn server2"
 "tcp|5006|10.1.1.160||dsm webdav"
-"udp|51840|10.1.1.28||wireguard vpn server3"
-"udp|51850|10.1.1.38||wireguard vpn server4"
+"udp|51840|10.1.1.105||wireguard vpn server3"
 "tcp|3389|10.1.1.183||win10 remote"
+"tcp|3390|10.1.1.198||ssh port"
 )
 
