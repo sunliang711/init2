@@ -45,9 +45,9 @@ install(){
 
     cat<<EOF
 Install infos:
-    Container name: ${name}   (env: port)
-    Portainer http port: ${portainerPort} (env: ports)
-    Portainer https port: ${portainerPortHttps} (env: pname)
+    Container name: ${name}   (env: pname)
+    Portainer http port: ${portainerPort} (env: port)
+    Portainer https port: ${portainerPortHttps} (env: ports)
     Volume name: ${volumeName} (env: vname)
 EOF
     read -p "Press Enter to continue or ctrl-c to quit." con
