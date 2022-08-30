@@ -50,7 +50,7 @@ Install infos:
     Portainer https port: ${portainerPortHttps} (env: pname)
     Volume name: ${volumeName} (env: vname)
 EOF
-    read "Press Enter to continue or ctrl-c to quit." con
+    read -p "Press Enter to continue or ctrl-c to quit." con
 
     docker volume create ${volumeName}
     docker run -d -p ${portainerPort}:9000 -p 8000:8000 -p ${portainerPortHttps}:9443 --name ${name} --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ee:latest
