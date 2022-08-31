@@ -27,6 +27,7 @@ mappings=(
 "tcp|2026|10.1.1.26|22|dev26 ssh"
 "tcp|2027|10.1.1.27|22|dev27 ssh"
 "tcp|2028|10.1.1.28|22|dev28 ssh"
+"tcp|2035|10.1.1.35|22|dev35 ssh"
 "tcp|6001,9091|10.1.1.160||dsm web transmission"
 "tcp|42400|10.1.1.160|32400|plex"
 "tcp|8006|10.1.1.21|8006|dell pve admin console"
@@ -36,11 +37,10 @@ mappings=(
 "udp|30303|10.1.1.172||eth mainnet p2p udp"
 "tcp|8547|10.1.1.172||eth private rpc"
 "tcp|42400|10.1.1.160|32400|dsm plex server"
-"udp|51820|10.1.1.161||wireguard vpn server"
 "udp|51830|10.1.1.18||wireguard vpn server2"
 "tcp|5006|10.1.1.160||dsm webdav"
-"udp|51840|10.1.1.28||wireguard vpn server3"
-"udp|51850|10.1.1.38||wireguard vpn server4"
+"udp|51840|10.1.1.105||wireguard vpn server3"
 "tcp|3389|10.1.1.183||win10 remote"
+"tcp|3390|10.1.1.198||ssh port"
 )
 

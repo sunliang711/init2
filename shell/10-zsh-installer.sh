@@ -17,9 +17,9 @@ if ! command -v zsh >/dev/null 2>&1;then
         fi
     elif command -v pacman >/dev/null 2>&1;then
         if [[ $EUID -eq 0 ]];then
-            pacman -S zsh --no-confirm
+            pacman -S zsh --noconfirm
         else
-            sudo pacman -S zsh --no-confirm
+            sudo pacman -S zsh --noconfirm
         fi
     fi
 fi
