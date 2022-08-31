@@ -13,35 +13,28 @@ hairpinTag=HairpinNAT
 # "tcp|26| 10.1.1.22|  22 |mjr ssh"
 
 mappings=(
+"tcp|4000-4400|10.1.1.177||ss1 tcp"
+"udp|4000-4400|10.1.1.177||ss1 udp"
+"tcp|2035|10.1.1.35|22|dev35 ssh"
+"tcp|8006|10.1.1.21|8006|dell pve admin console"
+"tcp|42400|10.1.1.160|32400|dsm plex server"
+
+"tcp|5006|10.1.1.160||dsm webdav"
+
 "tcp|8090|10.1.1.18|443|nginx reverse proxy"
 "tcp|2018|10.1.1.18|22|proxy18 ssh"
-"tcp|2038|10.1.1.38|22|proxy38 ssh"
 "tcp|30000-39999|10.1.1.18||proxy18 frps"
-# "udp|30000-39999|10.1.1.18||proxy18 frps"
-"tcp|4000-4400|10.1.1.18||ss1 tcp"
-"udp|4000-4400|10.1.1.18||ss1 udp"
-#"tcp|4100-4150|10.1.1.18||ss2 tcp"
-#"udp|4100-4150|10.1.1.18||ss2 udp"
-#"udp|500,4500,1701|10.1.1.18||ikev2 vpn server"
 
 "tcp|2026|10.1.1.26|22|dev26 ssh"
-"tcp|2027|10.1.1.27|22|dev27 ssh"
 "tcp|2028|10.1.1.28|22|dev28 ssh"
-"tcp|2035|10.1.1.35|22|dev35 ssh"
-"tcp|6001,9091|10.1.1.160||dsm web transmission"
-"tcp|42400|10.1.1.160|32400|plex"
-"tcp|8006|10.1.1.21|8006|dell pve admin console"
 
-"tcp|8545|10.1.1.172||eth mainnet rpc"
-"tcp|30303|10.1.1.172||eth mainnet p2p tcp"
-"udp|30303|10.1.1.172||eth mainnet p2p udp"
-"tcp|8547|10.1.1.172||eth private rpc"
-"tcp|42400|10.1.1.160|32400|dsm plex server"
 "udp|51830|10.1.1.18||wireguard vpn server2"
-"tcp|5006|10.1.1.160||dsm webdav"
 "udp|51840|10.1.1.105||wireguard vpn server3"
 "udp|51850|10.1.1.185||wireguard vpn server4"
-"tcp|3389|10.1.1.183||win10 remote"
-"tcp|3390|10.1.1.198||ssh port"
 )
 
+# "tcp|8545|10.1.1.172||eth mainnet rpc"
+# "tcp|30303|10.1.1.172||eth mainnet p2p tcp"
+# "udp|30303|10.1.1.172||eth mainnet p2p udp"
+# "tcp|8547|10.1.1.172||eth private rpc"
+# "tcp|6001,9091|10.1.1.160||dsm web transmission"
