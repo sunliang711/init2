@@ -18,6 +18,7 @@ mappings=(
 "tcp|2035|10.1.1.35|22|dev35 ssh"
 "tcp|8006|10.1.1.21|8006|dell pve admin console"
 "tcp|42400|10.1.1.160|32400|dsm plex server"
+"tcp|6001,9091|10.1.1.160||dsm web transmission"
 
 "tcp|5006|10.1.1.160||dsm webdav"
 
@@ -37,4 +38,3 @@ mappings=(
 # "tcp|30303|10.1.1.172||eth mainnet p2p tcp"
 # "udp|30303|10.1.1.172||eth mainnet p2p udp"
 # "tcp|8547|10.1.1.172||eth private rpc"
-# "tcp|6001,9091|10.1.1.160||dsm web transmission"
