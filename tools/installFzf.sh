@@ -48,7 +48,9 @@ install(){
         exit
     fi
 
-    git clone --depth 1 https://gitee.com/quick-source/fzf.git ~/.fzf
+    # git clone --depth 1 https://gitee.com/quick-source/fzf.git ~/.fzf
+    # ~/.fzf/install --all
+    git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
     ~/.fzf/install --all
 
     if ! grep -q '#BEGIN FZF function' ~/.zshrc;then

@@ -1470,8 +1470,8 @@ esac
 function pushall(){
     branch=$1
     if [ -z "$branch" ];then
-        echo "Not specify branch,use \"master\""
-        branch=master
+        branch="$(git rev-parse --abbrev-ref HEAD)"
+        echo "Not specify branch,use current branch: ${branch}"
     fi
     git remote | xargs -IR git push --tags R $branch
 }
@@ -1635,6 +1635,72 @@ EOF
     $ed $filename
 
 }
+function newhardhattest(){
+    filename=${1:?'missing filename'}
+cat>${filename}<<-'EOF'
+const { expect } = require('chai')
+const hre = require('hardhat');
+const ethers = hre.ethers
+
+const ZeroAddress = "0x0000000000000000000000000000000000000000"
+
+function getWallets() {
+    let wallets = []
+    for (let i = 0; i < 20; i++) {
+        const w = ethers.Wallet.fromMnemonic(
+            hre.network.config.accounts.mnemonic,
+            `m/44'/60'/0'/0/${i}`
+        );
+        wallets.push(w)
+    }
+    return wallets;
+};
+
+
+let owner, signers;
+async function init() {
+    console.log("[init]> init..");
+    [...signers] = await hre.ethers.getSigners();
+    owner = signers[0]
+
+    const networkName = hre.network.name;
+    const networkUrl = hre.network.config.url
+    console.log("[init]>> Network Name: ", networkName)
+    console.log("[init]>> Network URL: ", networkUrl)
+    // console.log("Network URL: ", hre.network)
+}
+
+async function deploy(contractName, args) {
+    await init()
+    console.log("[deploy]> deploy contract: ", contractName)
+    const factory = await ethers.getContractFactory(contractName);
+    let contract
+    console.log("[deploy]>> deploy args: ", args)
+    console.log("[deploy]>> deploy..")
+    if (args && args.length > 0) {
+        contract = await factory.deploy(...args)
+    } else {
+        contract = await factory.deploy()
+    }
+    console.log("[deploy]>> wait confirmation..")
+    await contract.deployed()
+
+    return contract
+}
+EOF
+
+    local ed=vi
+    if command -v vim >/dev/null 2>&1;then
+        ed=vim
+    fi
+    if command -v nvim >/dev/null 2>&1;then
+        ed=nvim
+    fi
+    if [ -n "${editor}" ];then
+        ed=${editor}
+    fi
+    $ed $filename
+}
 
 function newpy(){
     filename=${1}
@@ -1655,21 +1721,34 @@ function newpy(){
     cat> "$filename" <<-EOF
 		#!/usr/bin/env python3
 		# -*- coding: utf-8 -*-
-
+		
 		import argparse
-
-		# import logging
-
-		# LOG_FORMAT = "%(asctime)s - %(levelname)s - %(message)s"
-		# DATE_FORMAT = "%Y/%m/%d %H:%M:%S %p"
-		# logging.basicConfig(level=logging.DEBUG, format=LOG_FORMAT, datefmt=DATE_FORMAT)
-		# logging.basicConfig(filename='my.log', level=logging.DEBUG, format=LOG_FORMAT, datefmt=DATE_FORMAT)
-
+		import logging
+		
+		
+		def setup_log(logfile, log_level):
+		    LOG_LEVEL = {'debug': logging.DEBUG , 'info': logging.INFO, 'warn': logging.WARN, 'error': logging.ERROR, 'fatal': logging.FATAL}
+		    LOG_FORMAT = "%(asctime)s - %(levelname)s - %(message)s"
+		    DATE_FORMAT = "%Y/%m/%d %H:%M:%S"
+		
+		    logging.basicConfig(filename=logfile, level=LOG_LEVEL.get(log_level, logging.ERROR), format=LOG_FORMAT, datefmt=DATE_FORMAT)
+		
 		def main():
 		    parser = argparse.ArgumentParser(description="get opensea collection floor price")
-		    parser.add_argument('--name', help='collection name', required=True)
+		    parser.add_argument('--log-level', help='log level,default level: warn', choices=['debug', 'info', 'warn', 'error', 'fatal'])
+		    parser.add_argument('--log-file', help = 'log file')
+		    parser.add_argument('--action', help='action to do', required=True)
+		    parser.add_argument('--arg', help='action arg', required=True)
 		    args = parser.parse_args()
-
+		
+		    setup_log(args.log_file,args.log_level)
+		
+		    # list actions below
+		    actions = {}
+		
+		    res = actions[args.action](args.arg)
+		    print("{}".format(res))
+		
 		if __name__ == '__main__':
 		    main()
 	EOF
@@ -1820,6 +1899,11 @@ cdgo(){
         mkdir "$dest"
     fi
     cd "$dest"
+}
+
+cdnvim(){
+    local dest="${home}/.config/nvim"
+    cd ${dest}
 }
 
 cdrust(){
