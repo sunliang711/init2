@@ -35,8 +35,15 @@ fi
 install(){
     set -e
     yay -S nvm --noconfirm
+    export NVM_DIR=~/.nvm
+    source /usr/share/nvm/nvm.sh
     nvm install --lts
     sudo pacman -S yarn --noconfirm
+    cat<<EOF
+add the following to bashrc or zshrc:
+export NVM_DIR=~/.nvm
+source /usr/share/nvm/nvm.sh
+EOF
 }
 
 # write your code above
