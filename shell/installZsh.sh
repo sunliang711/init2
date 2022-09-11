@@ -41,7 +41,7 @@ install(){
     (
         cd /tmp
         local installer="omzInstaller.sh"
-        curl -fsSL -o ${installer} https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)
+        curl -fsSL -o ${installer} https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh
         RUNZSH=no bash ${installer}
     )
     # zsh-autosuggestions
