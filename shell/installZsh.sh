@@ -85,7 +85,10 @@ step2(){
 }
 
 uninstall(){
-    echo
+    set -x
+    cp ~/.zshrc{,.old}
+    /bin/rm -rf ~/.zshrc
+    /bin/rm -rf ~/.oh-my-zsh
 }
 
 # write your code above
