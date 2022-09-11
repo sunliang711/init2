@@ -20,8 +20,7 @@ option=$1
 
 #shell
 (cd shell && bash installZsh.sh uninstall )
-(cd shell && bash installZsh.sh step1 )
-(cd shell && bash installZsh.sh step2 )
+(cd shell && bash installZsh.sh install )
 # if [ "$option" == "-o" ];then
 #     (cd shell && bash 10-zsh-installer.sh -o && bash 20-set-zsh-theme.sh -o && bash 30-config-shell.sh all)
 # else
