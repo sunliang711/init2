@@ -19,11 +19,14 @@ option=$1
 (cd git && bash setGit)
 
 #shell
-if [ "$option" == "-o" ];then
-    (cd shell && bash 10-zsh-installer.sh -o && bash 20-set-zsh-theme.sh -o && bash 30-config-shell.sh all)
-else
-    (cd shell && bash 10-zsh-installer.sh && bash 20-set-zsh-theme.sh && bash 30-config-shell.sh all)
-fi
+(cd shell && bash installZsh.sh uninstall )
+(cd shell && bash installZsh.sh step1 )
+(cd shell && bash installZsh.sh step2 )
+# if [ "$option" == "-o" ];then
+#     (cd shell && bash 10-zsh-installer.sh -o && bash 20-set-zsh-theme.sh -o && bash 30-config-shell.sh all)
+# else
+#     (cd shell && bash 10-zsh-installer.sh && bash 20-set-zsh-theme.sh && bash 30-config-shell.sh all)
+# fi
 
 (./tools/installFzf.sh install)
 
