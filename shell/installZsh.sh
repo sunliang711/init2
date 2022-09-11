@@ -32,15 +32,18 @@ fi
 ###############################################################################
 # write your code below (just define function[s])
 # function is hidden when begin with '_'
-step1(){
-    _require_command curl
-    sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-}
 
-step2(){
-    _require_command git
+install(){
+    _require_command git curl
     set -xe
 
+    # install omz
+    (
+        cd /tmp
+        local installer="omzInstaller.sh"
+        curl -fsSL -o ${installer} https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)
+        RUNZSH=no bash ${installer}
+    )
     # zsh-autosuggestions
     git clone https://github.com/zsh-users/zsh-autosuggestions ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions
 
@@ -52,11 +55,9 @@ step2(){
         -e 's/plugins=.*/plugins=(git cp themes timer golang rust npm yarn zsh-autosuggestions)/' \
         ~/.zshrc
     rm ~/.zshrcbak
-    echo "bindkey ',' autosuggest-accept" >> ~/.zshrc
 
     # zsh-syntax-highlighting
     [ ! -d ~/.zsh-syntax-highlighting ] && git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.zsh-syntax-highlighting
-    # TODO check existence
     echo "source ~/.zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" >> ~/.zshrc
 
     startLine="##CUSTOM BEGIN v3"
@@ -71,6 +72,7 @@ step2(){
 	$endLine
 	EOF
     fi
+    echo "bindkey ',' autosuggest-accept" >> ~/.zshrc
 
     if [ ! -e "$HOME/.editrc" ] || ! grep -q 'bind -v' "$HOME/.editrc";then
         echo 'bind -v' >> "$HOME/.editrc"
@@ -89,6 +91,7 @@ uninstall(){
     cp ~/.zshrc{,.old}
     /bin/rm -rf ~/.zshrc
     /bin/rm -rf ~/.oh-my-zsh
+    /bin/rm -rf ~/.zsh-syntax-highlighting
 }
 
 # write your code above
