@@ -40,7 +40,7 @@ install(){
     # install omz
     (
         cd /tmp
-        local installer="omzInstaller.sh"
+        local installer="omzInstaller-$(date +%s).sh"
         curl -fsSL -o ${installer} https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh
         RUNZSH=no bash ${installer}
     )
