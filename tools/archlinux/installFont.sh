@@ -33,17 +33,11 @@ fi
 # write your code below (just define function[s])
 # function is hidden when begin with '_'
 install(){
-    set -e
-    yay -S nvm --noconfirm
-    export NVM_DIR=~/.nvm
-    source /usr/share/nvm/nvm.sh
-    nvm install --lts
-    sudo pacman -S yarn --noconfirm
-    cat<<EOF
-add the following to bashrc or zshrc:
-export NVM_DIR=~/.nvm
-source /usr/share/nvm/nvm.sh
-EOF
+    _require_command yay
+    set -xe
+    sudo pacman -S wqy-microhei --noconfirm  --needed >/dev/null # 浏览器中文乱码
+    yay -S bdf-unifont  --noconfirm  --needed >/dev/null # vim listchars character font
+    yay -S nerd-fonts-hack --noconfirm --needed >/dev/null # vim fonts
 }
 
 # write your code above

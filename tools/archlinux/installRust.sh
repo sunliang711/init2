@@ -33,6 +33,7 @@ fi
 # write your code below (just define function[s])
 # function is hidden when begin with '_'
 install(){
+    set -xe
     sudo pacman -S rustup --noconfirm --needed
     rustup toolchain install stable
 }

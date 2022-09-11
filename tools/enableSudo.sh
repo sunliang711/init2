@@ -53,6 +53,7 @@ _root(){
 enable(){
     _root
     user=${1:?'missing user'}
+    set -xe
     if grep -q "${beginLine}" ${customRule} 2>/dev/null;then
         echo "Already enabled,exit."
         return 0

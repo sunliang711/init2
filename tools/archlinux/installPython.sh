@@ -33,7 +33,7 @@ fi
 # write your code below (just define function[s])
 # function is hidden when begin with '_'
 install(){
-    set -e
+    set -ex
     sudo pacman -S python python-pip --noconfirm --needed
 }
 

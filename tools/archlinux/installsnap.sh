@@ -33,17 +33,14 @@ fi
 # write your code below (just define function[s])
 # function is hidden when begin with '_'
 install(){
-    set -e
-    yay -S nvm --noconfirm
-    export NVM_DIR=~/.nvm
-    source /usr/share/nvm/nvm.sh
-    nvm install --lts
-    sudo pacman -S yarn --noconfirm
-    cat<<EOF
-add the following to bashrc or zshrc:
-export NVM_DIR=~/.nvm
-source /usr/share/nvm/nvm.sh
-EOF
+    _require_command yay
+    set -xe
+    if ! _command_exists;then
+        yay -S snapd --noconfirm --needed >/dev/null
+    fi
+    sudo systemctl enable --now snapd.socket
+    [ ! -e /snap ] && sudo ln -s /var/lib/snapd/snap /snap
+    echo "run: sudo snap install code --classic to install vscode"
 }
 
 # write your code above

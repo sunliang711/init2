@@ -1,6 +1,16 @@
 # Include 指令必须放在Host指令之前!!
 Include ~/.ssh/local
 
+Host sh.gitez.cc
+    HostName sh.gitez.cc
+    Port 2035
+    User eagle
+
+Host sh.gitez.cc
+    HostName sh.gitez.cc
+    Port 2035
+    User eagle
+
 Host 10.1.1.106
     HostName 10.1.1.106
     User eagle
@@ -17,6 +27,11 @@ Host aliyun
 Host a8frpc
     HostName a8.gitez.cc
     Port 7101
+    User eagle
+
+Host dev35
+    HostName sh.gitez.cc
+    Port 2035
     User eagle
 
 Host dev26

@@ -33,6 +33,8 @@ fi
 # write your code below (just define function[s])
 # function is hidden when begin with '_'
 install(){
+    _require_command make
+    set -xe
     cd /tmp
     git clone https://aur.archlinux.org/yay.git
     cd yay
