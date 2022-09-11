@@ -46,7 +46,7 @@ _command_exists(){
 _require_command(){
     if ! _command_exists "$1";then
         echo "require command $1" 1>&2
-	exit ${err_require_command}
+	    exit ${err_require_command}
     fi
 }
 
