@@ -1578,6 +1578,16 @@ function newrust(){
 
 }
 
+function reload(){
+    if echo $0 | grep -q bash; then
+        echo "Reload bash.."
+        exec bash
+    elif echo $0 | grep -q zsh; then
+        echo "Reload zsh.."
+        exec zsh
+    fi
+}
+
 function newsh(){
     filename=${1}
     if [ -z "$filename" ];then
