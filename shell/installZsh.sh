@@ -52,7 +52,7 @@ install(){
 
     sed -ibak \
         -e 's/\(ZSH_THEME=\).\{1,\}/\1"zeta"/' \
-        -e 's/plugins=.*/plugins=(git cp themes timer golang rust npm yarn zsh-autosuggestions)/' \
+        -e 's/plugins=.*/plugins=(git cp themes timer sudo dirhistory golang rust npm yarn zsh-autosuggestions)/' \
         ~/.zshrc
     rm ~/.zshrcbak
 
