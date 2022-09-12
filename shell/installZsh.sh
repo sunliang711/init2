@@ -43,36 +43,39 @@ install(){
         local installer="omzInstaller-$(date +%s).sh"
         curl -fsSL -o ${installer} https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh
         RUNZSH=no bash ${installer}
+        ln -sf ${PWD}/zshrc ~/.zshrc
     )
+
+    # omz plugins
     # zsh-autosuggestions
-    git clone https://github.com/zsh-users/zsh-autosuggestions ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions
+    git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM}/plugins/zsh-autosuggestions
 
     # custom theme
-    ln -sf ${PWD}/*.zsh-theme ~/.oh-my-zsh/custom/themes
+    ln -sf ${PWD}/*.zsh-theme ${ZSH_CUSTOM}/themes
 
-    sed -ibak \
-        -e 's/\(ZSH_THEME=\).\{1,\}/\1"zeta"/' \
-        -e 's/plugins=.*/plugins=(git cp themes timer sudo dirhistory golang rust npm yarn zsh-autosuggestions)/' \
-        ~/.zshrc
-    rm ~/.zshrcbak
+    # sed -ibak \
+    #     -e 's/\(ZSH_THEME=\).\{1,\}/\1"zeta"/' \
+    #     -e 's/plugins=.*/plugins=(git cp themes timer sudo dirhistory golang rust npm yarn zsh-autosuggestions)/' \
+    #     ~/.zshrc
+    # rm ~/.zshrcbak
 
     # zsh-syntax-highlighting
-    [ ! -d ~/.zsh-syntax-highlighting ] && git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.zsh-syntax-highlighting
-    echo "source ~/.zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" >> ~/.zshrc
+    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM}/plugins/zsh-syntax-highlighting
+    # echo "source ~/.zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" >> ~/.zshrc
 
-    startLine="##CUSTOM BEGIN v3"
-    endLine="##CUSTOM END v3"
-    configFile=~/.zshrc
-    export SHELLRC_ROOT=${this}
-    if ! grep -q "$startLine" "${configFile}";then
-        cat <<-EOF >> "$configFile"
-	$startLine
-	export SHELLRC_ROOT=${this}
-	source \${SHELLRC_ROOT}/shellrc
-	$endLine
-	EOF
-    fi
-    echo "bindkey ',' autosuggest-accept" >> ~/.zshrc
+ #    startLine="##CUSTOM BEGIN v3"
+ #    endLine="##CUSTOM END v3"
+ #    configFile=~/.zshrc
+ #    export SHELLRC_ROOT=${this}
+ #    if ! grep -q "$startLine" "${configFile}";then
+ #        cat <<-EOF >> "$configFile"
+	# $startLine
+	# export SHELLRC_ROOT=${this}
+	# source \${SHELLRC_ROOT}/shellrc
+	# $endLine
+	# EOF
+ #    fi
+ #    echo "bindkey ',' autosuggest-accept" >> ~/.zshrc
 
     if [ ! -e "$HOME/.editrc" ] || ! grep -q 'bind -v' "$HOME/.editrc";then
         echo 'bind -v' >> "$HOME/.editrc"
