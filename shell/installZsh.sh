@@ -33,6 +33,8 @@ fi
 # write your code below (just define function[s])
 # function is hidden when begin with '_'
 
+ZSH=${ZSH:-${HOME}/.oh-my-zsh}
+ZSH_CUSTOM=${ZSH_CUSTOM:-${ZSH}/custom}
 install(){
     _require_command git curl
     set -xe
@@ -43,8 +45,8 @@ install(){
         local installer="omzInstaller-$(date +%s).sh"
         curl -fsSL -o ${installer} https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh
         RUNZSH=no bash ${installer}
-        ln -sf ${PWD}/zshrc ~/.zshrc
     )
+    ln -sf ${PWD}/zshrc ~/.zshrc
 
     # omz plugins
     # zsh-autosuggestions
@@ -93,8 +95,8 @@ uninstall(){
     set -x
     cp ~/.zshrc{,.old}
     /bin/rm -rf ~/.zshrc
-    /bin/rm -rf ~/.oh-my-zsh
-    /bin/rm -rf ~/.zsh-syntax-highlighting
+    /bin/rm -rf ${ZSH}
+    /bin/rm -rf ${ZSH_CUSTOM}
 }
 
 # write your code above
