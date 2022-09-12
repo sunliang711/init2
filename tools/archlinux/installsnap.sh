@@ -35,7 +35,7 @@ fi
 install(){
     _require_command yay
     set -xe
-    if ! _command_exists;then
+    if ! _command_exists snap;then
         yay -S snapd --noconfirm --needed >/dev/null
     fi
     sudo systemctl enable --now snapd.socket
