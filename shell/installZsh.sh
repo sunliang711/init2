@@ -46,38 +46,17 @@ install(){
         curl -fsSL -o ${installer} https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh
         RUNZSH=no bash ${installer}
     )
-    ln -sf ${PWD}/zshrc ~/.zshrc
+
+    ln -sf ${PWD}/zshrc ~/.zshrc || { echo "Please fork the repo first"; exit 1; }
 
     # omz plugins
     # zsh-autosuggestions
     git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM}/plugins/zsh-autosuggestions
+    # zsh-syntax-highlighting
+    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM}/plugins/zsh-syntax-highlighting
 
     # custom theme
     ln -sf ${PWD}/*.zsh-theme ${ZSH_CUSTOM}/themes
-
-    # sed -ibak \
-    #     -e 's/\(ZSH_THEME=\).\{1,\}/\1"zeta"/' \
-    #     -e 's/plugins=.*/plugins=(git cp themes timer sudo dirhistory golang rust npm yarn zsh-autosuggestions)/' \
-    #     ~/.zshrc
-    # rm ~/.zshrcbak
-
-    # zsh-syntax-highlighting
-    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM}/plugins/zsh-syntax-highlighting
-    # echo "source ~/.zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" >> ~/.zshrc
-
- #    startLine="##CUSTOM BEGIN v3"
- #    endLine="##CUSTOM END v3"
- #    configFile=~/.zshrc
- #    export SHELLRC_ROOT=${this}
- #    if ! grep -q "$startLine" "${configFile}";then
- #        cat <<-EOF >> "$configFile"
-	# $startLine
-	# export SHELLRC_ROOT=${this}
-	# source \${SHELLRC_ROOT}/shellrc
-	# $endLine
-	# EOF
- #    fi
- #    echo "bindkey ',' autosuggest-accept" >> ~/.zshrc
 
     if [ ! -e "$HOME/.editrc" ] || ! grep -q 'bind -v' "$HOME/.editrc";then
         echo 'bind -v' >> "$HOME/.editrc"
@@ -94,9 +73,21 @@ install(){
 uninstall(){
     set -x
     cp ~/.zshrc{,.old}
-    /bin/rm -rf ~/.zshrc
-    /bin/rm -rf ${ZSH}
-    /bin/rm -rf ${ZSH_CUSTOM}
+    _rm ~/.zshrc
+    _rm ${ZSH}
+    _rm ${ZSH_CUSTOM}
+    _rm ~/.zsh-syntax-highlighting
+    _rm ~/.fzf
+    _rm ~/.fzf.zsh
+    _rm ~/.fzf.bash
+    _rm ~/.ssh/config
+    _rm ~/.editrc
+    _rm ~/.inputrc
+}
+
+_rm(){
+    local target=${1}
+    [ -e ${target} ] && /bin/rm -rf ${target}
 }
 
 # write your code above
