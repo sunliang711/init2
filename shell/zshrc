@@ -110,5 +110,5 @@ source ${SHELLRC_ROOT}/shellrc
 source ${HOME}/.local/apps/init2/tools/fzffunctions.sh
 #END FZF function
 #
-bindkey ',' autosuggest-accept
+bindkey ',,' autosuggest-accept
 
