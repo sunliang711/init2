@@ -65,7 +65,7 @@ install(){
     bash basic.sh install
     bash installNettools.sh install
     bash installYay.sh install
-    bash installsnap.sh
+    bash installsnap.sh install
     bash installnode.sh install
     bash installPython.sh install
     bash installRust.sh install
