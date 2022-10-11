@@ -1916,6 +1916,11 @@ cdnvim(){
     cd ${dest}
 }
 
+cdsolana(){
+    local dest="${home}/.config/solana"
+    cd ${dest}
+}
+
 cdrust(){
     local dest="${workspace}/rust"
     if [ ! -d "$dest" ];then
