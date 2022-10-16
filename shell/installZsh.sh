@@ -15,6 +15,8 @@ else
     this="$(cd $(dirname $rpath) && pwd)"
 fi
 
+export SHELLRC_ROOT=$HOME/.local/apps/init2/shell
+
 if [ -r ${SHELLRC_ROOT}/shellrc.d/shelllib ];then
     source ${SHELLRC_ROOT}/shellrc.d/shelllib
 elif [ -r /tmp/shelllib ];then
