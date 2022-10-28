@@ -38,7 +38,7 @@ fi
 ZSH=${ZSH:-${HOME}/.oh-my-zsh}
 ZSH_CUSTOM=${ZSH_CUSTOM:-${ZSH}/custom}
 install(){
-    _require_command git curl
+    _require_command git curl zsh
     set -xe
 
     # install omz
