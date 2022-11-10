@@ -2126,6 +2126,20 @@ function blockoutput(){
     set +x
 }
 
+function clearoutput(){
+    if ! _command_exists iptables;then
+        echo "Need iptables"
+        return
+    fi
+    set -x
+
+    sudo iptables -F OUTPUT
+    sudo iptables -P OUTPUT ACCEPT
+
+    set +x
+
+}
+
 function blockinput(){
     if ! _command_exists iptables;then
         echo "Need iptables"
@@ -2146,9 +2160,27 @@ function blockinput(){
     set +x
 }
 
+function clearinput(){
+    if ! _command_exists iptables;then
+        echo "Need iptables"
+        return
+    fi
+    set -x
+
+    sudo iptables -F INPUT
+    sudo iptables -P INPUT ACCEPT
+
+    set +x
+}
+
 function blockall(){
     blockoutput
     blockinput
+}
+
+function clearall(){
+    clearoutput
+    clearinput
 }
 
 source ${SHELLRC_ROOT}/shellrc.d/function-snippets
