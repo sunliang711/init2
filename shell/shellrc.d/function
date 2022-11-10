@@ -2108,6 +2108,48 @@ function switchSolanaRpc(){
     solana config set --url ${rpcLink}
 }
 
+function blockoutput(){
+    if ! _command_exists iptables;then
+        echo "Need iptables"
+        return
+    fi
+
+    set -x
+
+    sudo iptables -F OUTPUT
+    sudo iptables -P OUTPUT DROP
+
+    # only allow DNS
+    sudo iptables -A OUTPUT -p udp --dport 53 -j ACCEPT
+
+    set +x
+}
+
+function blockinput(){
+    if ! _command_exists iptables;then
+        echo "Need iptables"
+        return
+    fi
+    set -x
+
+    sudo iptables -F INPUT
+    sudo iptables -P INPUT ACCEPT
+
+    sudo iptables -A INPUT -i lo -j ACCEPT
+    sudo iptables -A INPUT -m conntrack --cstate ESTABLISHED,RELATED -j ACCEPT
+    sudo iptables -A INPUT -p icmp -j ACCEPT
+    sudo iptables -A INPUT -p tcp --dport 22 -j ACCEPT
+
+    sudo iptables -A INPUT -j DROP
+
+    set +x
+}
+
+function blockall(){
+    blockoutput
+    blockinput
+}
+
 source ${SHELLRC_ROOT}/shellrc.d/function-snippets
 #END function
 
