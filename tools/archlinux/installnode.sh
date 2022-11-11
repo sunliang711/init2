@@ -33,6 +33,7 @@ fi
 # write your code below (just define function[s])
 # function is hidden when begin with '_'
 install(){
+    _require_command yay
     set -e
     yay -S nvm --noconfirm
     export NVM_DIR=~/.nvm
