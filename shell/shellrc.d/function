@@ -2045,6 +2045,14 @@ function cmakeclean(){
     fi
 }
 
+notify(){
+    to=${1:?'missing receiver'}
+    subject=${2:?'missing subject'}
+    body=${3:?'missing email body'}
+    key=${4:?'missing auth key'}
+    curl -XPOST -d "{\"to\":\"${to}\",\"subject\":\"${subject}\",\"body\":\"${body}\",\"auth_key\":\"${key}\"}" https://gitez.cc/api/mail/v1/send
+}
+
 function editService(){
     local serviceName=$1
     if [ -z "$serviceName" ];then
