@@ -33,7 +33,7 @@ fi
 # write your code below (just define function[s])
 # function is hidden when begin with '_'
 install(){
-    local pkgs=(man-db )
+    local pkgs=(man-db tmux zsh)
     for pkg in ${pkgs[@]};do
         _install $pkg
     done

@@ -1916,6 +1916,11 @@ cdnvim(){
     cd ${dest}
 }
 
+cdsolana(){
+    local dest="${home}/.config/solana"
+    cd ${dest}
+}
+
 cdrust(){
     local dest="${workspace}/rust"
     if [ ! -d "$dest" ];then
@@ -2109,6 +2114,98 @@ function switchSolanaRpc(){
     esac
     echo "set solana rpc url to ${rpcLink}.."
     solana config set --url ${rpcLink}
+}
+
+function _save_rules(){
+    local ruleFile=/etc/iptables/iptables.rules
+    if _command_exists pacman;then
+        echo "save rule to ${ruleFile}.."
+        sudo iptables-save -f ${ruleFile}
+        sudo systemctl enable --now iptables
+    fi
+
+}
+
+function blockoutput(){
+    if ! _command_exists iptables;then
+        echo "Need iptables"
+        return
+    fi
+
+
+    echo "flush OUTPUT.."
+    sudo iptables -F OUTPUT
+    echo "set OUTPUT policy to DROP.."
+    sudo iptables -P OUTPUT DROP
+
+    echo "allow ssh port 22.."
+    sudo iptables -A OUTPUT -p tcp --sport 22 -j ACCEPT
+
+    _save_rules
+}
+
+function clearoutput(){
+    if ! _command_exists iptables;then
+        echo "Need iptables"
+        return
+    fi
+
+    echo "flush OUTPUT.."
+    sudo iptables -F OUTPUT
+    echo "set OUTPUT policy to ACCEPT.."
+    sudo iptables -P OUTPUT ACCEPT
+
+    _save_rules
+}
+
+function blockinput(){
+    if ! _command_exists iptables;then
+        echo "Need iptables"
+        return
+    fi
+
+    echo "flush INPUT.."
+    sudo iptables -F INPUT
+    echo "set INPUT policy to ACCEPT.."
+    sudo iptables -P INPUT ACCEPT
+
+    echo "accept lo.."
+    sudo iptables -A INPUT -i lo -j ACCEPT
+    echo "accept established and related.."
+    sudo iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+    echo "accept icmp.."
+    sudo iptables -A INPUT -p icmp -j ACCEPT
+    echo "accept ssh port 22.."
+    sudo iptables -A INPUT -p tcp --dport 22 -j ACCEPT
+
+    echo "drop others.."
+    sudo iptables -A INPUT -j DROP
+
+    _save_rules
+}
+
+function clearinput(){
+    if ! _command_exists iptables;then
+        echo "Need iptables"
+        return
+    fi
+
+    echo "flush INPUT.."
+    sudo iptables -F INPUT
+    echo "set INPUT policy to ACCEPT.."
+    sudo iptables -P INPUT ACCEPT
+
+    _save_rules
+}
+
+function blockall(){
+    blockoutput
+    blockinput
+}
+
+function clearall(){
+    clearoutput
+    clearinput
 }
 
 source ${SHELLRC_ROOT}/shellrc.d/function-snippets
