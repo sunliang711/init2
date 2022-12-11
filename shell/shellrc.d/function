@@ -1227,6 +1227,30 @@ function serviceEdit(){
     $ed $filePath
 }
 
+function encText(){
+    text=${1:?'missing text'}
+    case $(uname) in
+        Darwin)
+            echo -n "${text}" | openssl aes-128-cbc -salt -base64
+            ;;
+        Linux)
+            echo -n "${text}" | openssl aes-128-cbc -pbkdf2 -base64
+            ;;
+    esac
+}
+
+function decText(){
+    text=${1:?'missing text'}
+    case $(uname) in
+        Darwin)
+            echo -n "${text}" | base64 -d | openssl aes-128-cbc -d
+            ;;
+        Linux)
+            echo -n "${text}" | base64 -d | openssl aes-128-cbc -d -pbkdf2
+            ;;
+    esac
+}
+
 function enc(){
     local input=${1:?'missing input file'}
     local output=${2:-"${input}.enc"}
