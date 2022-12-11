@@ -1255,14 +1255,28 @@ function enc(){
     local input=${1:?'missing input file'}
     local output=${2:-"${input}.enc"}
     echo "encrypt ${input} to ${output}.."
-    /usr/bin/openssl aes-128-cbc -salt -in ${input} -out ${output}
+    case $(uname) in
+        Darwin)
+            openssl aes-128-cbc -salt -in ${input} -out ${output}
+            ;;
+        Linux)
+            openssl aes-128-cbc -pbkdf2 -in ${input} -out ${output}
+            ;;
+    esac
 }
 
 function dec(){
     local input=${1:?'missing input file'}
     local output=${2:-"${input}.dec"}
     echo "decrypt ${input} to ${output}.."
-    /usr/bin/openssl aes-128-cbc -d -in ${input} -out ${output}
+    case $(uname) in
+        Darwin)
+            openssl aes-128-cbc -d -in ${input} -out ${output}
+            ;;
+        Linux)
+            openssl aes-128-cbc -d -pbkdf2 -in ${input} -out ${output}
+            ;;
+    esac
 }
 
 #Usage:
