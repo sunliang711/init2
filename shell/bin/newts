@@ -57,8 +57,29 @@ new(){
             --sourceMap true --allowSyntheticDefaultImports true
 
     set +x
-    echo "Tips: config outDir to ./dist manually in tsconfig.json"
-    
+    # perl -i -p -e 's/"outDir": "dist"/"outDir": ".\/dist"/' tsconfig.json
+    touch src/index.ts
+    mkdir dist
+    git init .
+    cat<<EOF >.gitignore
+.DS_Store
+*.swp
+.idea/
+node_modules/
+dist/
+EOF
+
+    # package.json scripts
+    tmpFile=/tmp/newtsTmpfile
+    sed -n -e '1,/"main"/p' package.json >${tmpFile}
+    cat<<EOF2 >>${tmpFile}
+  "scripts": {
+      "build": "npx tsc",
+        "start": "node dist/index.js"
+  },
+EOF2
+    sed -n -e '/"license"/,$p' package.json >>${tmpFile}
+    mv ${tmpFile} package.json
 
 }
 
