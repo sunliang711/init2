@@ -1228,7 +1228,21 @@ function serviceEdit(){
 }
 
 function encText(){
-    text=${1:?'missing text'}
+    text=${1}
+    if [ -z "${text}" ];then
+        # echo off
+        stty -echo
+        echo -n "Enter text:"
+        read text
+        stty echo
+        echo
+
+        if [ -z "${text}" ];then
+            echo "no input, quit"
+            return 1
+        fi
+    fi
+
     case $(uname) in
         Darwin)
             echo -n "${text}" | openssl aes-128-cbc -salt -base64
@@ -1240,7 +1254,21 @@ function encText(){
 }
 
 function decText(){
-    text=${1:?'missing text'}
+    text=${1}
+    if [ -z "${text}" ];then
+        # echo off
+        stty -echo
+        echo "Enter text:"
+        read text
+        stty echo
+        echo
+
+        if [ -z "${text}" ];then
+            echo "no input, quit"
+            return 1
+        fi
+    fi
+
     case $(uname) in
         Darwin)
             echo -n "${text}" | base64 -d | openssl aes-128-cbc -d
@@ -2025,7 +2053,7 @@ function sshknownhosts(){
 }
 
 function sendmail(){
-    local url=https://aliyun.eagle711.win:9000/send
+    local url=https://gitez.cc/api/mail/v1/send
     receiver="sunliang711@163.com"
     subject=
     body=
