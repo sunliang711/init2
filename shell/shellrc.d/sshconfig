@@ -44,13 +44,23 @@ Host dev28
     Port 2028
     User eagle
 
-Host proxy18
-    HostName sh.gitez.cc
-    Port 2018
+Host proxy177
+    HostName 10.1.1.177
+    Port 22
+    User eagle
 
-Host proxy38
-    HostName sh.gitez.cc
-    Port 2038
+Host portainer185
+    HostName 10.1.1.185
+    Port 22
+    User eagle
+
+# Host proxy18
+#     HostName sh.gitez.cc
+#     Port 2018
+#
+# Host proxy38
+#     HostName sh.gitez.cc
+#     Port 2038
 
 # shanghai ROS router
 Host shros

@@ -1245,10 +1245,10 @@ function encText(){
 
     case $(uname) in
         Darwin)
-            echo -n "${text}" | openssl aes-128-cbc -salt -base64
+            echo -n "${text}" | openssl aes-128-cbc -salt -base64 -A
             ;;
         Linux)
-            echo -n "${text}" | openssl aes-128-cbc -pbkdf2 -base64
+            echo -n "${text}" | openssl aes-128-cbc -pbkdf2 -base64 -A
             ;;
     esac
 }
