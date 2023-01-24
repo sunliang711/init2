@@ -11,9 +11,6 @@ if [ -e /etc/shell-header.sh ];then
 else
     (cd /tmp && wget -q "$shellHeaderLink") && source /tmp/shell-header.sh
 fi
-# write your code below
-
-option=$1
 
 #git
 (cd git && bash setGit)
@@ -21,26 +18,7 @@ option=$1
 #shell
 (cd shell && bash installZsh.sh uninstall )
 (cd shell && bash installZsh.sh install )
-# if [ "$option" == "-o" ];then
-#     (cd shell && bash 10-zsh-installer.sh -o && bash 20-set-zsh-theme.sh -o && bash 30-config-shell.sh all)
-# else
-#     (cd shell && bash 10-zsh-installer.sh && bash 20-set-zsh-theme.sh && bash 30-config-shell.sh all)
-# fi
 
 (./tools/installFzf.sh install)
-
-##vim
-#if [ "$option" == "-o" ];then
-#    (cd supervim && bash install.sh -o vim)
-#else
-#    (cd supervim && bash install.sh vim)
-#fi
-
-##nvim
-#if [ "$option" == "-o" ];then
-#    (cd supervim && bash install.sh -o nvim)
-#else
-#    (cd supervim && bash install.sh nvim)
-#fi
 
 (cd tmux && bash install.sh)
