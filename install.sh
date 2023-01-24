@@ -62,19 +62,19 @@ fi
 # function is hidden when begin with '_'
 ###############################################################################
 install(){
-    local dest="$home/.local/apps"
-    if [ ! -e "${dest}" ];then
-        mkdir -p "${dest}"
-    fi
-    if [ -e ${dest}/init2 ];then
-        echo "Already exists ${dest}/init2"
-        exit
-    fi
-
-    cd "${dest}"
-    git clone https://github.com/sunliang711/init2 || { "echo download init2 repo failed"; exit 1; }
-    # git clone git@github.com:sunliang711/init2.git
-    cd init2
+    # local dest="$home/.local/apps"
+    # if [ ! -e "${dest}" ];then
+    #     mkdir -p "${dest}"
+    # fi
+    # if [ -e ${dest}/init2 ];then
+    #     echo "Already exists ${dest}/init2"
+    #     exit
+    # fi
+    #
+    # cd "${dest}"
+    # git clone https://github.com/sunliang711/init2 || { "echo download init2 repo failed"; exit 1; }
+    # # git clone git@github.com:sunliang711/init2.git
+    # cd init2
     ./gitShellTmux.sh
 
     cat<<EOF

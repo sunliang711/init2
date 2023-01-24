@@ -10,5 +10,7 @@ issue the following command to install if you are in China:
 ### install via proxy
 ```
 (cd /tmp && curl -fsSLO https://raw.githubusercontent.com/sunliang711/init2/master/install.sh && bash install.sh install && /bin/rm -rf install.sh )
+(git clone https://github.com/sunliang711/init2 ~/.local/apps/init2 && cd ~/.local/apps/init2 && bash install.sh install) 
+
 ```
 

@@ -43,7 +43,7 @@ install(){
         cd /tmp
         local installer="omzInstaller-$(date +%s).sh"
         curl -fsSL -o ${installer} https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh
-        RUNZSH=no bash ${installer}
+        _run -x --no-stdout "RUNZSH=no bash ${installer}"
     )
 
     ln -sf ${PWD}/zshrc ~/.zshrc || { echo "Please fork the repo first"; exit 1; }
