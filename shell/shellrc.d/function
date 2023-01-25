@@ -1228,8 +1228,107 @@ function serviceEdit(){
 }
 
 function encText(){
-    text=${1}
-    if [ -z "${text}" ];then
+    while getopts ":hi:o:" opt;do
+        case $opt in
+            h)
+                echo "Usage: $0 [-h|-i|-o] for help,input file, output file"
+                return 1
+                ;;
+            i)
+                local inputFile="$OPTARG"
+                ;;
+            o)
+                local outputFile="$OPTARG"
+                ;;
+            \?)
+                echo "Unkown option: \"$OPTARG\""
+                return 1
+                ;;
+
+        esac
+    done
+    shift $((OPTIND-1))
+
+    if [ -n "${outputFile}" ];then
+        if [ -e "${outputFile}" ];then
+            echo "${outputFile} already exists, quit!" 1>&2
+            return 1
+        fi
+    fi
+
+    if [ -n "${inputFile}" ];then
+        echo "Read text from ${inputFile}.."
+        text="$(cat ${inputFile})"
+    elif [ -n "$1" ];then
+        text="$1"
+    else
+        # no input file and no input text, we read it
+        # echo off
+        stty -echo
+        echo -n "Enter text:"
+        read text
+        stty echo
+        echo
+
+        if [ -z "${text}" ];then
+            echo "no input, quit"
+            return 1
+        fi
+    fi
+
+
+    case $(uname) in
+        Darwin)
+            output=`echo -n "${text}" | openssl aes-128-cbc -salt -base64 -A`
+            ;;
+        Linux)
+            output=`echo -n "${text}" | openssl aes-128-cbc -pbkdf2 -base64 -A`
+            ;;
+    esac
+
+    if [ -n "${outputFile}" ];then
+        echo "${output}">${outputFile}
+    else
+        echo "${output}"
+    fi
+}
+
+function decText(){
+    while getopts ":hi:o:" opt;do
+        case $opt in
+            h)
+                echo "Usage: $0 [-h|-i|-o] for help,input file, output file"
+                return 1
+                ;;
+            i)
+                local inputFile="$OPTARG"
+                ;;
+            o)
+                local outputFile="$OPTARG"
+                ;;
+            \?)
+                echo "Unkown option: \"$OPTARG\""
+                return 1
+                ;;
+
+        esac
+    done
+    shift $((OPTIND-1))
+
+    if [ -n "${outputFile}" ];then
+        if [ -e "${outputFile}" ];then
+            echo "${outputFile} already exists, quit!" 1>&2
+            return 1
+        fi
+    fi
+
+    if [ -n "${inputFile}" ];then
+        echo "Read text from ${inputFile}.."
+        text="$(cat ${inputFile})"
+    elif [ -n "$1" ];then
+        text="$1"
+    else
+        # no input file and no input text, we read it
         # echo off
         stty -echo
         echo -n "Enter text:"
@@ -1245,38 +1344,18 @@ function encText(){
 
     case $(uname) in
         Darwin)
-            echo -n "${text}" | openssl aes-128-cbc -salt -base64 -A
+            output=`echo -n "${text}" | base64 -d | openssl aes-128-cbc -d`
             ;;
         Linux)
-            echo -n "${text}" | openssl aes-128-cbc -pbkdf2 -base64 -A
+            output=`echo -n "${text}" | base64 -d | openssl aes-128-cbc -d -pbkdf2`
             ;;
     esac
-}
 
-function decText(){
-    text=${1}
-    if [ -z "${text}" ];then
-        # echo off
-        stty -echo
-        echo "Enter text:"
-        read text
-        stty echo
-        echo
-
-        if [ -z "${text}" ];then
-            echo "no input, quit"
-            return 1
-        fi
+    if [ -n "${outputFile}" ];then
+        echo -n "${output}">${outputFile}
+    else
+        echo -n "${output}"
     fi
-
-    case $(uname) in
-        Darwin)
-            echo -n "${text}" | base64 -d | openssl aes-128-cbc -d
-            ;;
-        Linux)
-            echo -n "${text}" | base64 -d | openssl aes-128-cbc -d -pbkdf2
-            ;;
-    esac
 }
 
 function enc(){
