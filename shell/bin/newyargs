@@ -61,7 +61,7 @@ fi
 ###############################################################################
 # write your code below (just define function[s])
 # function is hidden when begin with '_'
-new(){
+ts(){
     local filename=${1:?'missing filename (*.ts)'}
     cat<<-EOF >${filename}
 // yarn add yargs
@@ -94,7 +94,7 @@ yargs.parserConfiguration({
 EOF
 }
 
-new2(){
+js(){
     local filename=${1:?'missing filename (*.js)'}
     cat<<-EOF >${filename}
 // yarn add yargs
