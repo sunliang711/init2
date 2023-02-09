@@ -24,6 +24,11 @@ Host aliyun
     User eagle
     Port 2000
 
+Host cw
+    HostName 10.1.1.192
+    User eagle
+    Port 22
+
 Host a8frpc
     HostName a8.gitez.cc
     Port 7101
