@@ -80,6 +80,13 @@ install(){
     fi
 }
 
+uninstall(){
+  /bin/rm -rf ~/.fzf
+  local output=/tmp/$$.fzf
+  sed -e '/#BEGIN FZF function/,/#END FZF function/d' $home/.zshrc >"${output}"
+  mv "${output}" $home/.zshrc
+}
+
 
 
 ###############################################################################

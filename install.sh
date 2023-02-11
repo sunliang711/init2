@@ -79,7 +79,7 @@ install(){
     git clone https://github.com/sunliang711/init2 || { "echo download init2 repo failed"; exit 1; }
     # git clone git@github.com:sunliang711/init2.git
     cd init2
-    ./gitShellTmux.sh -o
+    ./_install.sh install
 
     cat<<EOF
     run: 'git remote set-url origin git@github.com:sunliang711/init2.git' to use ssh

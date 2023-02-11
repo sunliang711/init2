@@ -1330,10 +1330,10 @@ function decText(){
     else
         # no input file and no input text, we read it
         # echo off
-        stty -echo
+        # stty -echo
         echo -n "Enter text:"
         read text
-        stty echo
+        # stty echo
         echo
 
         if [ -z "${text}" ];then

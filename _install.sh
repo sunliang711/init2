@@ -28,20 +28,58 @@ else
     fi
 fi
 
+# available VARs: user, home, rootID
+# available functions: 
+#    _err(): print "$*" to stderror
+#    _command_exists(): check command "$1" existence
+#    _require_command(): exit when command "$1" not exist
+#    _runAsRoot():
+#                  -x (trace)
+#                  -s (run in subshell)
+#                  --nostdout (discard stdout)
+#                  --nostderr (discard stderr)
+#    _insert_path(): insert "$1" to PATH
+#    _run():
+#                  -x (trace)
+#                  -s (run in subshell)
+#                  --nostdout (discard stdout)
+#                  --nostderr (discard stderr)
+#    _ensureDir(): mkdir if $@ not exist
+#    _root(): check if it is run as root
+#    _require_root(): exit when not run as root
+#    _linux(): check if it is on Linux
+#    _require_linux(): exit when not on Linux
+#    _wait(): wait $i seconds in script
+#    _must_ok(): exit when $? not zero
+#    _info(): info log
+#    _infoln(): info log with \n
+#    _error(): error log
+#    _errorln(): error log with \n
+#    _checkService(): check $1 exist in systemd
+
 
 ###############################################################################
 # write your code below (just define function[s])
 # function is hidden when begin with '_'
 install(){
-    set -xe
-    sudo pacman -S make --noconfirm --needed
-    cd /tmp
-    git clone https://aur.archlinux.org/yay.git
-    cd yay
-    makepkg -si
-    cd /tmp && rm -rf yay
+  #git
+  (cd git && bash setGit)
 
-   echo "run 'yay -S visual-studio-code-bin'" to install vscode
+  #shell
+  (cd shell && bash installZsh.sh uninstall )
+  (cd shell && bash installZsh.sh install )
+
+  (./tools/installFzf.sh install)
+
+  (cd tmux && bash tmux.sh install)
+}
+
+uninstall(){
+  (cd shell && bash installZsh.sh uninstall)
+
+  (./tools/installFzf.sh uninstall)
+
+  (cd tmux && bash tmux.sh uninstall)
 }
 
 # write your code above
