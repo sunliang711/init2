@@ -39,7 +39,7 @@ ZSH=${ZSH:-${HOME}/.oh-my-zsh}
 ZSH_CUSTOM=${ZSH_CUSTOM:-${ZSH}/custom}
 install(){
     _require_command git curl zsh
-    set -xe
+    set -e
 
     # install omz
     (
@@ -73,7 +73,6 @@ install(){
 }
 
 uninstall(){
-    set -x
     cp ~/.zshrc{,.old}
     _rm ~/.zshrc
     _rm ${ZSH}

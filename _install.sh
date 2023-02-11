@@ -77,6 +77,7 @@ install(){
 uninstall(){
   (cd shell && bash installZsh.sh uninstall)
 
+  return
   (./tools/installFzf.sh uninstall)
 
   (cd tmux && bash tmux.sh uninstall)
