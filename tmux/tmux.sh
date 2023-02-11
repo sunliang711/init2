@@ -160,6 +160,10 @@ uninstall(){
     /bin/rm -rf $home/.tmux
 }
 
+reinstall(){
+  uninstall
+  install
+}
 # write your code above
 ###############################################################################
 
