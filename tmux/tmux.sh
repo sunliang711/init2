@@ -137,7 +137,7 @@ bind o show-options -g
 set -g @plugin 'tmux-plugins/tpm'
 set -g @plugin 'tmux-plugins/tmux-sensible'
 
-set -g @plugin 'wfxr/tmux-power'
+#set -g @plugin 'wfxr/tmux-power'
 set -g @plugin 'egel/tmux-gruvbox'
 set -g @tmux-gruvbox 'light' # or 'dark'
 
