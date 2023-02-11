@@ -1,70 +1,66 @@
 #!/bin/bash
-export PATH=$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-
-user="${SUDO_USER:-$(whoami)}"
-home="$(eval echo ~$user)"
-
-# export TERM=xterm-256color
-
-# Use colors, but only if connected to a terminal, and that terminal
-# supports them.
-if which tput >/dev/null 2>&1; then
-  ncolors=$(tput colors 2>/dev/null)
-fi
-if [ -t 1 ] && [ -n "$ncolors" ] && [ "$ncolors" -ge 8 ]; then
-    RED="$(tput setaf 1)"
-    GREEN="$(tput setaf 2)"
-    YELLOW="$(tput setaf 3)"
-    BLUE="$(tput setaf 4)"
-    CYAN="$(tput setaf 5)"
-    BOLD="$(tput bold)"
-    NORMAL="$(tput sgr0)"
+if [ -z "${BASH_SOURCE}" ]; then
+    this=${PWD}
 else
-    RED=""
-    GREEN=""
-    YELLOW=""
-    CYAN=""
-    BLUE=""
-    BOLD=""
-    NORMAL=""
+    rpath="$(readlink ${BASH_SOURCE})"
+    if [ -z "$rpath" ]; then
+        rpath=${BASH_SOURCE}
+    elif echo "$rpath" | grep -q '^/'; then
+        # absolute path
+        echo
+    else
+        # relative path
+        rpath="$(dirname ${BASH_SOURCE})/$rpath"
+    fi
+    this="$(cd $(dirname $rpath) && pwd)"
 fi
 
-_err(){
-    echo "$*" >&2
-}
-
-_runAsRoot(){
-    cmd="${*}"
-    local rootID=0
-    if [ "${EUID}" -ne "${rootID}" ];then
-        echo -n "Not root, try to run '${cmd}' as root.."
-        # or sudo sh -c ${cmd} ?
-        if eval "sudo ${cmd}";then
-            echo "ok"
-            return 0
-        else
-            echo "failed"
-            return 1
-        fi
-    else
-        # or sh -c ${cmd} ?
-        eval "${cmd}"
+if [ -r ${SHELLRC_ROOT}/shellrc.d/shelllib ];then
+    source ${SHELLRC_ROOT}/shellrc.d/shelllib
+elif [ -r /tmp/shelllib ];then
+    source /tmp/shelllib
+else
+    # download shelllib then source
+    shelllibURL=https://gitee.com/sunliang711/init2/raw/master/shell/shellrc.d/shelllib
+    (cd /tmp && curl -s -LO ${shelllibURL})
+    if [ -r /tmp/shelllib ];then
+        source /tmp/shelllib
     fi
-}
+fi
 
-rootID=0
-function _root(){
-    if [ ${EUID} -ne ${rootID} ];then
-        echo "Need run as root!"
-        echo "Requires root privileges."
-        exit 1
-    fi
-}
+# available VARs: user, home, rootID
+# available functions: 
+#    _err(): print "$*" to stderror
+#    _command_exists(): check command "$1" existence
+#    _require_command(): exit when command "$1" not exist
+#    _runAsRoot():
+#                  -x (trace)
+#                  -s (run in subshell)
+#                  --nostdout (discard stdout)
+#                  --nostderr (discard stderr)
+#    _insert_path(): insert "$1" to PATH
+#    _run():
+#                  -x (trace)
+#                  -s (run in subshell)
+#                  --nostdout (discard stdout)
+#                  --nostderr (discard stderr)
+#    _ensureDir(): mkdir if $@ not exist
+#    _root(): check if it is run as root
+#    _require_root(): exit when not run as root
+#    _linux(): check if it is on Linux
+#    _require_linux(): exit when not on Linux
+#    _wait(): wait $i seconds in script
+#    _must_ok(): exit when $? not zero
+#    _info(): info log
+#    _infoln(): info log with \n
+#    _error(): error log
+#    _errorln(): error log with \n
+#    _checkService(): check $1 exist in systemd
+
 
 ###############################################################################
 # write your code below (just define function[s])
 # function is hidden when begin with '_'
-###############################################################################
 install(){
     local dest="$home/.local/apps"
     if [ ! -e "${dest}" ];then
@@ -85,7 +81,32 @@ install(){
     run: 'git remote set-url origin git@github.com:sunliang711/init2.git' to use ssh
 EOF
 }
+
+uninstall(){
+    ./_install.sh uninstall
+}
+
+# write your code above
 ###############################################################################
 
-install
+em(){
+    $ed $0
+}
 
+function _help(){
+    cd "${this}"
+    cat<<EOF2
+Usage: $(basename $0) ${bold}CMD${reset}
+
+${bold}CMD${reset}:
+EOF2
+    perl -lne 'print "\t$2" if /^\s*(function)?\s*(\S+)\s*\(\)\s*\{$/' $(basename ${BASH_SOURCE}) | perl -lne "print if /^\t[^_]/"
+}
+
+case "$1" in
+     ""|-h|--help|help)
+        _help
+        ;;
+    *)
+        "$@"
+esac
