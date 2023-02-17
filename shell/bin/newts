@@ -54,6 +54,8 @@ new(){
             --noImplicitAny true --resolveJsonModule true \
             --experimentalDecorators true \
             --emitDecoratorMetadata true \
+            --inlineSourceMap true \
+            --strictPropertyInitialization false \
             --sourceMap true --allowSyntheticDefaultImports true
 
     set +x

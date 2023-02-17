@@ -16,7 +16,6 @@ export ws=$workspace
 export GOPATH=$HOME/.go
 export GOBIN=$GOPATH/bin
 
-
 [ ! -d $workspace ] && mkdir -p $workspace
 [ ! -d $GOPATH ] && mkdir -p $GOPATH
 [ ! -d $GOBIN ] && mkdir -p $GOBIN
@@ -26,10 +25,10 @@ export gobin=${GOBIN}
 
 #default editor for `systemctl edit --full <service>`
 #sudo -E systemctl edit --full <service>
-if command -v vim >/dev/null 2>&1;then
-    export SYSTEMD_EDITOR=vim
+if command -v vim >/dev/null 2>&1; then
+	export SYSTEMD_EDITOR=vim
 else
-    export SYSTEMD_EDITOR=vi
+	export SYSTEMD_EDITOR=vi
 fi
 
 export shelllib=${SHELLRC_ROOT}/shellrc.d/shelllib
@@ -39,12 +38,12 @@ export tools=${init}/tools
 #export PS1='[\u@\h \[\e[32;1m\]\W\\$\e[0m'
 #export PS1='\[\033[1;34m\]\u@\h\[\033[00m\]:\[\033[00;33m\]\W\[\033[00m\]\$ '
 
-if command -v clang >/dev/null 2>&1;then
-    export CC=$(command -v clang)
+if command -v clang >/dev/null 2>&1; then
+	export CC=$(command -v clang)
 fi
 
-if command -v clang++ >/dev/null 2>&1;then
-    export CXX=$(command -v clang++)
+if command -v clang++ >/dev/null 2>&1; then
+	export CXX=$(command -v clang++)
 fi
 
 #解决git log乱码
@@ -62,10 +61,8 @@ detectProxyEnv
 #BEGIN PATH
 # export PATH=""
 append_path "$HOME/.bin"
-[ -n "$GOPATH" ] && append_path $GOPATH/bin
 # detectBin $HOME/.local
 append_path "$HOME/.local/bin"
-append_path ${SHELLRC_ROOT}/bin
 
 append_path /usr/local/sbin
 append_path /usr/local/bin
@@ -76,6 +73,11 @@ append_path /usr/bin
 append_path /sbin
 append_path /bin
 
+append_path "$HOME/.npm/bin"
+append_path "$HOME/.cargo/bin"
+append_path "$GOPATH/bin"
+append_path "${SHELLRC_ROOT}/bin"
+
 #BEGIN custom PATH
 
 #END custom PATH
@@ -84,6 +86,5 @@ append_path /bin
 #BEGIN proxy setting
 # proxyoff_ >/dev/null
 #END proxy setting
-
 
 # vim: set ft=sh:

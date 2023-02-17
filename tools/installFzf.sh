@@ -15,96 +15,86 @@ else
     this="$(cd $(dirname $rpath) && pwd)"
 fi
 
-if [ -r ${SHELLRC_ROOT}/shellrc.d/shelllib ];then
+if [ -r ${SHELLRC_ROOT}/shellrc.d/shelllib ]; then
     source ${SHELLRC_ROOT}/shellrc.d/shelllib
-elif [ -r /tmp/shelllib ];then
+elif [ -r /tmp/shelllib ]; then
     source /tmp/shelllib
 else
     # download shelllib then source
     shelllibURL=https://gitee.com/sunliang711/init2/raw/master/shell/shellrc.d/shelllib
     (cd /tmp && curl -s -LO ${shelllibURL})
-    if [ -r /tmp/shelllib ];then
+    if [ -r /tmp/shelllib ]; then
         source /tmp/shelllib
     fi
 fi
 
 ###############################################################################
-        # write your code below (just define function[s])
+# write your code below (just define function[s])
 ###############################################################################
 # TODO
-install(){
+install() {
     cd "${this}"
     echo "Install fzf ..."
-    #install binary
-    # if [ ! -e $GOPATH/bin/fzf ];then
-    #     cmd="go get -u github.com/junegunn/fzf"
-    #     echo "$cmd ..."
-    #     bash -c "$cmd > /dev/null" && { echo "Done"; } || { echo "Install fzf error!"; exit 1; }
-    # fi
 
-    # git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-    if [ -d ~/.fzf ];then
-        echo "~/.fzf exists,exit ..."
-        exit
-    fi
-
-    # git clone --depth 1 https://gitee.com/quick-source/fzf.git ~/.fzf
-    # ~/.fzf/install --all
-    git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+    if [ ! -d ~/.fzf ]; then
+        git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
     ~/.fzf/install --all
+    else
+        echo "~/.fzf exists, skip ..."
+    fi
 
-    if ! grep -q '#BEGIN FZF function' ~/.zshrc;then
+    if ! grep -q '#BEGIN FZF function' ~/.zshrc; then
         echo "add source $(pwd)/fzffunction.sh in .zshrc"
-        cat<<-EOF>>~/.zshrc
-		#BEGIN FZF function
-		source $(pwd)/fzffunctions.sh
-		#END FZF function
-		EOF
+        cat <<-EOF >>~/.zshrc
+            #BEGIN FZF function
+            source $(pwd)/fzffunctions.sh
+            #END FZF function
+        EOF
     fi
 
-    if ! grep -q '#BEGIN FZF function' ~/.bashrc;then
+    if ! grep -q '#BEGIN FZF function' ~/.bashrc; then
         echo "add source $(pwd)/fzffunction.sh in .bashrc"
-        cat<<-EOF>>~/.bashrc
-		#BEGIN FZF function
-		source $(pwd)/fzffunctions.sh
-		#END FZF function
-		EOF
+        cat <<-EOF >>~/.bashrc
+            #BEGIN FZF function
+            source $(pwd)/fzffunctions.sh
+            #END FZF function
+        EOF
     fi
 
-    if ! command -v fd >/dev/null 2>&1;then
+    if ! command -v fd >/dev/null 2>&1; then
         echo "${red}Warning: install fd or fd-find for fzf${reset}"
     fi
 
-    if ! command -v bat >/dev/null 2>&1;then
+    if ! command -v bat >/dev/null 2>&1; then
         echo "${cyan}Recommend: install bat for fzf preview${reset}"
     fi
 }
 
-uninstall(){
-  /bin/rm -rf ~/.fzf
-  local output=/tmp/$$.fzf
-  sed -e '/#BEGIN FZF function/,/#END FZF function/d' $home/.zshrc >"${output}"
-  mv "${output}" $home/.zshrc
+uninstall() {
+    ~/.fzf/uninstall
+    /bin/rm -rf ~/.fzf
+    local output=/tmp/$$.fzf
+    sed -e '/#BEGIN FZF function/,/#END FZF function/d' $home/.zshrc >"${output}"
+    mv "${output}" $home/.zshrc
 }
-
-
 
 ###############################################################################
 # write your code above
 ###############################################################################
-help(){
-    cat<<EOF2
+help() {
+    cat <<EOF2
 Usage: $(basename $0) ${bold}CMD${reset}
 
 ${bold}CMD${reset}:
 EOF2
-    perl -lne 'print "\t$1" if /^\s*(\w+)\(\)\{$/' $(basename ${BASH_SOURCE}) | grep -v runAsRoot
+    perl -lne 'print "\t$2" if /^\s*(function)?\s*(\S+)\s*\(\)\s*\{$/' $(basename ${BASH_SOURCE}) | perl -lne "print if /^\t[^_]/"
 }
 
 case "$1" in
-     ""|-h|--help|help)
-        help
-        ;;
-    *)
-        "$@"
+"" | -h | --help | help)
+    help
+    ;;
+*)
+    "$@"
+    ;;
 esac

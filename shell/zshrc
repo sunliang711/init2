@@ -105,7 +105,6 @@ export SHELLRC_ROOT=${HOME}/.local/apps/init2/shell
 source ${SHELLRC_ROOT}/shellrc
 ##CUSTOM END v3
 
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 #BEGIN FZF function
 source ${HOME}/.local/apps/init2/tools/fzffunctions.sh
 #END FZF function

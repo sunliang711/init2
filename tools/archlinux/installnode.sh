@@ -44,6 +44,10 @@ install(){
 add the following to bashrc or zshrc:
 export NVM_DIR=~/.nvm
 source /usr/share/nvm/nvm.sh
+
+then:
+npm config set prefix ~/.npm
+add ~/.npm/bin to PATH
 EOF
 }
 

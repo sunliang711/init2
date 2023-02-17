@@ -1,35 +1,35 @@
 #!/bin/bash
 if [ -z "${BASH_SOURCE}" ]; then
-    this=${PWD}
+	this=${PWD}
 else
-    rpath="$(readlink ${BASH_SOURCE})"
-    if [ -z "$rpath" ]; then
-        rpath=${BASH_SOURCE}
-    elif echo "$rpath" | grep -q '^/'; then
-        # absolute path
-        echo
-    else
-        # relative path
-        rpath="$(dirname ${BASH_SOURCE})/$rpath"
-    fi
-    this="$(cd $(dirname $rpath) && pwd)"
+	rpath="$(readlink ${BASH_SOURCE})"
+	if [ -z "$rpath" ]; then
+		rpath=${BASH_SOURCE}
+	elif echo "$rpath" | grep -q '^/'; then
+		# absolute path
+		echo
+	else
+		# relative path
+		rpath="$(dirname ${BASH_SOURCE})/$rpath"
+	fi
+	this="$(cd $(dirname $rpath) && pwd)"
 fi
 
-if [ -r ${SHELLRC_ROOT}/shellrc.d/shelllib ];then
-    source ${SHELLRC_ROOT}/shellrc.d/shelllib
-elif [ -r /tmp/shelllib ];then
-    source /tmp/shelllib
+if [ -r ${SHELLRC_ROOT}/shellrc.d/shelllib ]; then
+	source ${SHELLRC_ROOT}/shellrc.d/shelllib
+elif [ -r /tmp/shelllib ]; then
+	source /tmp/shelllib
 else
-    # download shelllib then source
-    shelllibURL=https://gitee.com/sunliang711/init2/raw/master/shell/shellrc.d/shelllib
-    (cd /tmp && curl -s -LO ${shelllibURL})
-    if [ -r /tmp/shelllib ];then
-        source /tmp/shelllib
-    fi
+	# download shelllib then source
+	shelllibURL=https://gitee.com/sunliang711/init2/raw/master/shell/shellrc.d/shelllib
+	(cd /tmp && curl -s -LO ${shelllibURL})
+	if [ -r /tmp/shelllib ]; then
+		source /tmp/shelllib
+	fi
 fi
 
 # available VARs: user, home, rootID
-# available functions: 
+# available functions:
 #    _err(): print "$*" to stderror
 #    _command_exists(): check command "$1" existence
 #    _require_command(): exit when command "$1" not exist
@@ -57,53 +57,51 @@ fi
 #    _errorln(): error log with \n
 #    _checkService(): check $1 exist in systemd
 
-
 ###############################################################################
 # write your code below (just define function[s])
 # function is hidden when begin with '_'
-install(){
-  #git
-  (cd git && bash setGit)
+install() {
+	#git
+	(cd git && bash setGit)
 
-  #shell
-  (cd shell && bash installZsh.sh uninstall )
-  (cd shell && bash installZsh.sh install )
+	#shell
+	(cd shell && bash installZsh.sh install)
 
-  (./tools/installFzf.sh install)
+	(./tools/installFzf.sh install)
 
-  (cd tmux && bash tmux.sh install)
+	(cd tmux && bash tmux.sh install)
 }
 
-uninstall(){
-  (cd shell && bash installZsh.sh uninstall)
+uninstall() {
+	(cd shell && bash installZsh.sh uninstall)
 
-  return
-  (./tools/installFzf.sh uninstall)
+	(./tools/installFzf.sh uninstall)
 
-  (cd tmux && bash tmux.sh uninstall)
+	(cd tmux && bash tmux.sh uninstall)
 }
 
 # write your code above
 ###############################################################################
 
-em(){
-    $ed $0
+em() {
+	$ed $0
 }
 
-function _help(){
-    cd "${this}"
-    cat<<EOF2
+function _help() {
+	cd "${this}"
+	cat <<EOF2
 Usage: $(basename $0) ${bold}CMD${reset}
 
 ${bold}CMD${reset}:
 EOF2
-    perl -lne 'print "\t$2" if /^\s*(function)?\s*(\S+)\s*\(\)\s*\{$/' $(basename ${BASH_SOURCE}) | perl -lne "print if /^\t[^_]/"
+	perl -lne 'print "\t$2" if /^\s*(function)?\s*(\S+)\s*\(\)\s*\{$/' $(basename ${BASH_SOURCE}) | perl -lne "print if /^\t[^_]/"
 }
 
 case "$1" in
-     ""|-h|--help|help)
-        _help
-        ;;
-    *)
-        "$@"
+"" | -h | --help | help)
+	_help
+	;;
+*)
+	"$@"
+	;;
 esac
